@@ -1,0 +1,9 @@
+Ran setup to create base electron app from here
+https://simulatedgreg.gitbooks.io/electron-vue/content/index.html
+
+ran this after the
+npm install -g vue-cli
+step in Getting Started
+npm install babel-preset-env --save-dev
+
+if using Git, make sure node-modules is in .gitignore

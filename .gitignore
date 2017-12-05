@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# for now ignore the C# version of this project
+csharp

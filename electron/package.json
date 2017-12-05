@@ -1,0 +1,28 @@
+{
+  "name": "electron-photo-album",
+  "version": "0.1.0",
+  "description": "Collect information about photos and produce a web page album",
+  "main": "app.js",
+  "scripts": {
+    "start": "electron app.js"
+  },
+  "author": "Kent Archie",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^1.8.1",
+    "electron-debug": "^1.1.0",
+    "electron-devtools-installer": "^2.0.1",
+    "electron-packager": "^8.5.0",
+    "electron-rebuild": "^1.1.3",
+    "file-loader": "^0.9.0",
+    "json-loader": "^0.5.4",
+    "require-dir": "^0.3.0",
+    "tree-kill": "^1.1.0",
+    "url-loader": "^0.5.7"
+  },
+  "dependencies": {
+    "dialog": "^0.3.1",
+    "fs": "0.0.1-security",
+    "remote": "^0.2.6"
+  }
+}
