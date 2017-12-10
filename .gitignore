@@ -59,3 +59,6 @@ typings/
 
 # for now ignore the C# version of this project
 csharp
+
+# vim files
+*.swp
