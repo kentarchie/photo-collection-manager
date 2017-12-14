@@ -3,27 +3,16 @@ const fsLib = require('fs');
 const pathLib = require('path');
 const FILE_TREE_NODE_LABEL = 'name';
 const FILE_TREE_NODE_CHILDREN = 'children';
+let FileTree = {};
+let FileList = [];
+let CurrentPicture = '';
+let AlbumPath = '';
+let AlbumName = '';
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 // base code from from https://gist.github.com/kethinov/6658166
 // modified to build a data structure for the electron-tree-view
-function walkSync (dir, fileTree) {
-  fileTree = fileTree || [];
-  var getFiles = fsLib.readdirSync(dir);
-  getFiles.forEach(function(file) {
-      if (fsLib.statSync(dir + '/' + file).isDirectory()) {
-          if((file == 'thumbnails') || (file == 'webpage')) return;
-          fileTree = walkSync(dir + '/' + file + '/', fileTree);
-      }
-      else {
-          fileTree.push(file);
-          logger('walkSync: file =:'+file +':')
-      }
-  });
-  return fileTree;
-}
-
-function walkSync2 (dir, fileTree) {
+function walkSync (dir, fileTree,fileList) {
   var getFiles = fsLib.readdirSync(dir);
   getFiles.forEach(function(file) {
       if (fsLib.statSync(dir + '/' + file).isDirectory()) {
@@ -36,22 +25,61 @@ function walkSync2 (dir, fileTree) {
           node[FILE_TREE_NODE_LABEL] = pathParts.base;
           node[FILE_TREE_NODE_CHILDREN] =  [];
           fileTree[FILE_TREE_NODE_CHILDREN].push(node);
-          logger('walkSync: file =:'+file +':')
+          fileList.push(pathParts.base);
+          //logger('walkSync: file =:'+file +':')
       }
   });
   return fileTree;
-} // walkSync2
+} // walkSync
+
+function showPicture(path)
+{
+    $('#currentPicture').attr('src', path);
+    $('#currentPicture').css('visibility','visible');
+} // showPicture
+
+function findPicture()
+{
+    logger('findPicture: START ');
+    return(FileList.indexOf(CurrentPicture));
+} // findPicture
+
+function nextPicture(evt)
+{
+    logger('nextPicture: START ');
+    logger('nextPicture: FileList.length=' + FileList.length)
+    let index = findPicture(CurrentPicture);
+    logger('nextPicture: initial index=' + index)
+    index++;
+    if(index >= FileList.length) index = 0;
+    logger('nextPicture: final index=' + index);
+    let path = AlbumPath + '/' + FileList[index];
+    CurrentPicture = FileList[index];
+    logger('nextPicture: path=' + path);
+    showPicture(path);
+} // nextPicture
+
+function prevPicture(evt)
+{
+    logger('prevPicture: START ');
+    logger('prevPicture: FileList.length=' + FileList.length);
+    let index = findPicture(CurrentPicture);
+    logger('prevPicture: initial index=' + index)
+    index--;
+    if(index <= 0) index = FileList.length-1;
+    logger('prevPicture: final index=' + index);
+    let path = AlbumPath + '/' + FileList[index];
+    CurrentPicture = FileList[index];
+    logger('prevPicture: path=' + path);
+    showPicture(path);
+} // prevPicture
 
 $(document).ready(function() {
    logger('init: START ');
 
-   const root3 = {
-     "name": "root"
-     ,"children" : [
-     ]
-   }
-
-   const root2 = {
+   /*
+   file tree format
+   const root = {
      "name": "root"
      ,"children" : [
          { "name": "bar", "children": [] }
@@ -59,20 +87,7 @@ $(document).ready(function() {
          ,{ "name": "nyarf", "children": [] }
      ]
    }
-
-   const root = {
-  name: 'foo',
-  children: [{
-    name: 'bar',
-    children: [{
-      name: 'bar',
-      children: []
-    }, {
-      name: 'baz',
-      children: []
-    }]
-  }]
-}
+   */
 
    ErrorDialog = $('#dialog-dataerror').dialog({
       autoOpen: false
@@ -80,6 +95,9 @@ $(document).ready(function() {
       ,width: 350
       ,modal: true
    });
+
+   $('#prevImage').click(prevPicture)
+   $('#nextImage').click(nextPicture)
 
    $('#selectAlbum').click(function(evt)
    {
@@ -96,27 +114,37 @@ $(document).ready(function() {
           }
           else {
               let pathParts = pathLib.parse(folderPaths[0]);
+              AlbumPath = folderPaths[0];
               logger('showOpenDialog: folderPaths:' + folderPaths);
               logger('showOpenDialog: album:' + pathParts.base);
-              $('#albumName').val(pathParts.base);
+              AlbumName = pathParts.base;
+              $('#albumName').val(AlbumName);
 
-              let fileTree = {};
-              fileTree[FILE_TREE_NODE_LABEL] = pathParts.base;
-              fileTree[FILE_TREE_NODE_CHILDREN] = [];
-              walkSync2 (folderPaths[0], fileTree);
+              FileTree[FILE_TREE_NODE_LABEL] = pathParts.base;
+              FileTree[FILE_TREE_NODE_CHILDREN] = [];
+              walkSync(folderPaths[0], FileTree,FileList);
 
               let tree = require('electron-tree-view')({
-                root       : fileTree
+                root       : FileTree
                 ,container : document.querySelector('.container')
                 ,children  : c => c[FILE_TREE_NODE_CHILDREN]
                 ,label     : c => c[FILE_TREE_NODE_LABEL]
               });
+
               tree.on('selected', item => {
                   logger('tree: item selected:' + item.name + ':')
+                  let fullPath = AlbumPath + '/' + item.name;
+                  if (fsLib.statSync(fullPath).isDirectory()) {
+                      return;
+                  }
+
+                  logger('tree: full path :' + fullPath + ':')
+                  CurrentPicture = item.name;
+                  showPicture(fullPath);
               });
 
               logger('showOpenDialog: after walkSync');
-              logger('showOpenDialog: fileTree:' + JSON.stringify(fileTree,null,'\t'));
+              //logger('showOpenDialog: fileTree:' + JSON.stringify(fileTree,null,'\t'));
           }
       });
    });
