@@ -1,6 +1,8 @@
 const {dialog} = require('electron').remote;
 const fsLib = require('fs');
 const pathLib = require('path');
+const thumb = require('node-thumbnail').thumb;
+
 const FILE_TREE_NODE_LABEL = 'name';
 const FILE_TREE_NODE_CHILDREN = 'children';
 let FileTree = {};
@@ -31,6 +33,40 @@ function walkSync (dir, fileTree,fileList) {
   });
   return fileTree;
 } // walkSync
+
+function makeThumbNails()
+{
+    logger('makeThumbNails: START:');
+    //for(var index=0,len=FileList.length; index<len; ++index) {
+     for(var index=0,len=2; index<len; ++index) {
+        let sourcePath = AlbumPath + '\\' + FileList[index];
+        let destPath = AlbumPath + '\\tn\\' + FileList[index];
+        logger('makeThumbNails: working on source :' + sourcePath + ':');
+        logger('makeThumbNails: working on dest :' + destPath + ':');
+    thumb({
+            source: sourcePath
+            ,destination: destPath
+            ,width: 300
+            ,quiet: false
+            ,overwrite: true
+            ,concurrency: 4
+        }).then(function() {
+                console.log('Success');
+                }).catch(function(e) {
+                    console.log('Error', e);
+                });
+
+          /*
+          function(files, err, stdout, stderr)
+          {
+            logger('makeThumbNails: source file ' + sourcePath + ' done!');
+            logger('makeThumbNails: dest file ' + destPath + ' done!');
+          }
+    );
+    */
+    logger('makeThumbNails: working on :' + sourcePath + ': done');
+    } // for FileList
+} // makeThumbNails
 
 function showPicture(path)
 {
@@ -123,6 +159,7 @@ $(document).ready(function() {
               FileTree[FILE_TREE_NODE_LABEL] = pathParts.base;
               FileTree[FILE_TREE_NODE_CHILDREN] = [];
               walkSync(folderPaths[0], FileTree,FileList);
+              makeThumbNails();
 
               let tree = require('electron-tree-view')({
                 root       : FileTree

@@ -1,0 +1,19 @@
+ {
+    "albumname": "trip one"
+    ,"picture" : [
+                     {
+                        "filename"   : ""
+                        ,"caption"   : ""
+                        ,"datetaken" : ""
+                        ,"notes"     : ""
+                        ,"who"       : ""
+                     }
+                     ,{
+                        "filename"   : ""
+                        ,"caption"   : ""
+                        ,"datetaken" : ""
+                        ,"notes"     : ""
+                        ,"who"       : ""
+                     }
+    ]
+ }

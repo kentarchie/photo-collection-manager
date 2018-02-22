@@ -58,7 +58,19 @@ typings/
 .env
 
 # for now ignore the C# version of this project
-csharp
+#csharp/
+
+# stuff I don't need to save
+attic/
+csharp/attic/
+csharp/dbCode/
+csharp/PhotoAlbum/attic/
+csharp/PhotoAlbum/packages/
+electron/attic/
 
 # vim files
 *.swp
+
+csharp/PhotoAlbum/PhotoAlbum/obj
+csharp/PhotoAlbum/PhotoAlbum/bin
+csharp/PhotoAlbum/webpageNonVue/

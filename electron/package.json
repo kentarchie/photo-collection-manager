@@ -29,6 +29,7 @@
     "electron-tree-view": "^1.1.0",
     "fs": "^0.0.1-security",
     "jimp": "^0.2.28",
+    "node-thumbnail": "^0.13.0",
     "remote": "^0.2.6"
   }
 }
