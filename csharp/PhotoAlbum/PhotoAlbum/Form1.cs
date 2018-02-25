@@ -56,6 +56,7 @@ namespace PhotoAlbum
         public const string NOTES = "notes";
         public const char TAG_SEPERATOR = ',';
         public const int MESSAGE_DISPLAY_TIME = 3000;
+        public const string PICTURE_EXTENSIONS = ".png,.jpg,.tiff,.gif,.bmp";
 
         public int PictureCounter = 0;
         public int NumPictures = 0;
@@ -84,8 +85,8 @@ namespace PhotoAlbum
             Thread1.Start();
             mainForm = this;
 
-            //if(Thread1.IsAlive) Thread1.Abort("Done Running");
-            //if(Thread1.IsAlive) Thread1.Join();
+            if(Thread1.IsAlive) Thread1.Abort("Done Running");
+            if(Thread1.IsAlive) Thread1.Join();
             
             //listBox1.Anchor =    (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
             //listBox1.Anchor =    (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
@@ -119,6 +120,7 @@ namespace PhotoAlbum
 
             Utilities.logger("Albums count=:"+albums.Count+":"); 
             if (albums.Count > 1) { // multiple albums, choose one
+                MessageBox.Show("Found more than one albm file");
             }
 
             if (albums.Count == 1) {
@@ -178,9 +180,11 @@ namespace PhotoAlbum
                 NumPictures = 0;
 
                 // make a list of all the picture files
-                FileInfo[] files = dinfo.GetFiles("*.jpg");
-                files.Concat(dinfo.GetFiles("*.tiff"));
-                files.Concat(dinfo.GetFiles("*.gif"));
+                string[] extensions = PICTURE_EXTENSIONS.Split(',');
+                FileInfo[] files = dinfo.GetFiles()
+                                    .Where(f => extensions.Contains(f.Extension.ToLower()))
+                                    .ToArray();
+
                 // Sort by creation-time descending 
                 Array.Sort(files, delegate(FileInfo f1, FileInfo f2)
                 {
@@ -503,6 +507,18 @@ namespace PhotoAlbum
         private void panel3_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void OpenDatePicker_Click(object sender, EventArgs e)
+        {
+            using (var form = new VagueDate())
+            {
+                var result = form.ShowDialog();
+                if(result == DialogResult.OK) {
+                    var vagueDate = form.ReturnVagueDate;
+                    this.whenTaken.Text = vagueDate;
+                }
+            }
         }
     }// class PhotoAlbum
 } // namespace PhotoAlbum

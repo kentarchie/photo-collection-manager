@@ -65,6 +65,7 @@
             this.messages = new System.Windows.Forms.Label();
             this.whenTaken = new System.Windows.Forms.ComboBox();
             this.whereTaken = new System.Windows.Forms.ComboBox();
+            this.OpenDatePicker = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -218,7 +219,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(948, 10);
+            this.label5.Location = new System.Drawing.Point(987, 10);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(94, 17);
@@ -423,10 +424,22 @@
             // whereTaken
             // 
             this.whereTaken.FormattingEnabled = true;
-            this.whereTaken.Location = new System.Drawing.Point(951, 33);
+            this.whereTaken.Location = new System.Drawing.Point(990, 28);
             this.whereTaken.Name = "whereTaken";
             this.whereTaken.Size = new System.Drawing.Size(206, 24);
             this.whereTaken.TabIndex = 39;
+            // 
+            // OpenDatePicker
+            // 
+            this.OpenDatePicker.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.OpenDatePicker.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.OpenDatePicker.Location = new System.Drawing.Point(881, 16);
+            this.OpenDatePicker.Name = "OpenDatePicker";
+            this.OpenDatePicker.Size = new System.Drawing.Size(75, 42);
+            this.OpenDatePicker.TabIndex = 40;
+            this.OpenDatePicker.Text = "Datei Picker";
+            this.OpenDatePicker.UseVisualStyleBackColor = false;
+            this.OpenDatePicker.Click += new System.EventHandler(this.OpenDatePicker_Click);
             // 
             // PhotoAlbum
             // 
@@ -434,6 +447,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1375, 559);
+            this.Controls.Add(this.OpenDatePicker);
             this.Controls.Add(this.whereTaken);
             this.Controls.Add(this.whenTaken);
             this.Controls.Add(this.messages);
@@ -504,6 +518,7 @@
         private Emgu.CV.UI.ImageBox pictureBox;
         private System.Windows.Forms.ComboBox whenTaken;
         private System.Windows.Forms.ComboBox whereTaken;
+        private System.Windows.Forms.Button OpenDatePicker;
     }
 }
 
