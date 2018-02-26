@@ -309,7 +309,7 @@
             // 
             // pictureBox
             // 
-            this.pictureBox.Location = new System.Drawing.Point(16, 82);
+            this.pictureBox.Location = new System.Drawing.Point(32, 97);
             this.pictureBox.Name = "pictureBox";
             this.pictureBox.Size = new System.Drawing.Size(681, 333);
             this.pictureBox.TabIndex = 2;
@@ -433,7 +433,7 @@
             // 
             this.OpenDatePicker.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.OpenDatePicker.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.OpenDatePicker.Location = new System.Drawing.Point(881, 16);
+            this.OpenDatePicker.Location = new System.Drawing.Point(881, 13);
             this.OpenDatePicker.Name = "OpenDatePicker";
             this.OpenDatePicker.Size = new System.Drawing.Size(75, 42);
             this.OpenDatePicker.TabIndex = 40;
