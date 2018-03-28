@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PhotoPageProcessor.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="PicturePrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">pict</Value>
+    </Setting>
+    <Setting Name="PagePrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">page</Value>
+    </Setting>
+    <Setting Name="BackPrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)">backOf</Value>
+    </Setting>
+    <Setting Name="F1State" Type="System.Windows.Forms.FormWindowState" Scope="User">
+      <Value Profile="(Default)">Normal</Value>
+    </Setting>
+    <Setting Name="F1Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="F1Size" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">900, 606</Value>
+    </Setting>
+    <Setting Name="OrigFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">orig</Value>
+    </Setting>
+    <Setting Name="DefaultPictures" Type="System.String" Scope="User">
+      <Value Profile="(Default)">c:\pictures</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

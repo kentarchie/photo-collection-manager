@@ -67,6 +67,8 @@ csharp/dbCode/
 csharp/PhotoAlbum/attic/
 csharp/PhotoAlbum/packages/
 electron/attic/
+csharp/PhotoPageProcessor/attic/
+csharp/PhotoPageProcessor/packages/
 
 # vim files
 *.swp
@@ -74,3 +76,6 @@ electron/attic/
 csharp/PhotoAlbum/PhotoAlbum/obj
 csharp/PhotoAlbum/PhotoAlbum/bin
 csharp/PhotoAlbum/webpageNonVue/
+
+csharp/PhotoAlbum/PhotoPageProcessor/obj
+csharp/PhotoAlbum/PhotoPageProcessor/bin
