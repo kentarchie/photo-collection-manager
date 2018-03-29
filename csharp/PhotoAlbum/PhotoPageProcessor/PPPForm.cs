@@ -1,19 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Web;
 using System.Threading;
-using PhotoPageProcessor.Properties;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace PhotoPageProcessor
 {
@@ -70,12 +62,10 @@ namespace PhotoPageProcessor
         {
             try {
                   Thread.Sleep(SAVE_INTERVAL); // every 30 seconds
-                  //Utilities.logger("periodicSave: doing periodic save"); 
                   //if(AlbumChanged) saveTheAlbum();
             }
             catch (ThreadInterruptedException te)
             {
-               //Utilities.logger("periodicSave: thread exception: "+te.ToString()); 
             }
         } // periodicSave
 
@@ -94,51 +84,46 @@ namespace PhotoPageProcessor
             folderBrowserDialog1.SelectedPath = DefaultPictures;
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {  // user selected a folder
                 AlbumDirName = folderBrowserDialog1.SelectedPath;
-                //Utilities.logger("loadAlbum_Clicked: AlbumDirName=:" + AlbumDirName + ":");
                 albumName.Text = Path.GetFileName(AlbumDirName);
                 albumLoader(AlbumDirName);  // load the list of scanned pages into the list box
                 displayPicture(PictureInfo.Keys.FirstOrDefault()); // set it up as if the user had clicked on the first one
             }
-            //Utilities.logger("loadAlbum_Click done");
         } // loadAlbum_Click
 
         private void albumLoader(string dirName)
         {
-            //Utilities.logger("dirName=:" + dirName + ":"); 
-           
             var pictureBacks = new HashSet<string>();
             PictureInfo = new Dictionary<string,string>();
 
             DirectoryInfo dinfo = new DirectoryInfo(AlbumDirName); // what files are here
 
             // make a list of all the picture files
-            string[] extensions = PICTURE_EXTENSIONS.Split(',');
+            string[] extensions = PICTURE_EXTENSIONS.Split(','); // list of file extensions for photos
             FileInfo[] files = dinfo.GetFiles()
                                     .Where(f => extensions.Contains(f.Extension.ToLower()))
                                     .ToArray();
 
-            // Sort by creation-time descending 
+            // Sort by name descending 
             Array.Sort(files, delegate(FileInfo f1, FileInfo f2)
-            {
-               return f1.CreationTime.CompareTo(f2.CreationTime);
-            });
-            //Utilities.logger("Found " + files.Count() + " pictures");
+                    {
+                        return f1.Name.CompareTo(f2.Name);
+                    }
+            );
 
             // make list of picture objects
             foreach (FileInfo f in files)
             {
                 string fname = f.Name;
+                if (fname.StartsWith(PagePrefix)) PictureInfo.Add(fname,"");
                 if (fname.StartsWith(BackPrefix)) pictureBacks.Add(fname);
-                if (fname.StartsWith(PagePrefix)) {
-                    PictureInfo.Add(fname,"");
-                }
-               //Utilities.logger("Added picture " + f.Name);
             } // foreach picture loading
+            MessageBox.Show("PictureInfo.Count=:"+PictureInfo.Count + ": pictureBacks.Count=:"+pictureBacks.Count + ":");
 
             // link pages to back ofpages
-            foreach (FileInfo f in files)
+            string[] keys = new string[PictureInfo.Keys.Count];
+            PictureInfo.Keys.CopyTo(keys,0);
+            foreach (string fname in keys)
             {
-                string fname = f.Name;
                 var backName = BackPrefix + fname;
                 if(pictureBacks.Contains(backName))
                     PictureInfo[fname] = backName;
@@ -148,9 +133,6 @@ namespace PhotoPageProcessor
             {
                 this.pageList.Items.Add(f); // display the picture file names
             }
-            
-            //Utilities.logger("albumLoader done");
-            //showMessage("Album Loaded");
         } // albumLoader
 
         private void displayPicture(string fname)
