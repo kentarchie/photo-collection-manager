@@ -6,13 +6,13 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Threading;
+using System.Drawing.Imaging;
 
 namespace PhotoPageProcessor
 {
     public partial class PPPForm : Form
     {
         public const int SAVE_INTERVAL = 30000; // every 30 seconds
-        public const string FILENAME = "filename";
         public const int MESSAGE_DISPLAY_TIME = 3000;
         public const string PICTURE_EXTENSIONS = ".png,.jpg,.tiff,.gif,.bmp";
 
@@ -27,6 +27,16 @@ namespace PhotoPageProcessor
         public static string BackPrefix;
         public static string OrigFolder;
         public static string DefaultPictures;
+
+        // The original image.
+        public static Bitmap OriginalImage;
+
+        // True when we're selecting a rectangle.
+        public static bool IsSelecting = false;
+
+        // The area we are selecting.
+        public static int X0, Y0, X1, Y1;
+        //private PPPForm mainForm;
 
         bool AlbumChanged = false;
         Thread Thread1;
@@ -84,7 +94,8 @@ namespace PhotoPageProcessor
             folderBrowserDialog1.SelectedPath = DefaultPictures;
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {  // user selected a folder
                 AlbumDirName = folderBrowserDialog1.SelectedPath;
-                albumName.Text = Path.GetFileName(AlbumDirName);
+                albumName.Text = Path.GetFullPath(folderBrowserDialog1.SelectedPath);
+                //albumName.Text = Path.GetFileName(AlbumDirName);
                 albumLoader(AlbumDirName);  // load the list of scanned pages into the list box
                 displayPicture(PictureInfo.Keys.FirstOrDefault()); // set it up as if the user had clicked on the first one
             }
@@ -117,7 +128,7 @@ namespace PhotoPageProcessor
                 if (fname.StartsWith(PagePrefix)) PictureInfo.Add(fname,"");
                 if (fname.StartsWith(BackPrefix)) pictureBacks.Add(fname);
             } // foreach picture loading
-            MessageBox.Show("PictureInfo.Count=:"+PictureInfo.Count + ": pictureBacks.Count=:"+pictureBacks.Count + ":");
+            //MessageBox.Show("PictureInfo.Count=:"+PictureInfo.Count + ": pictureBacks.Count=:"+pictureBacks.Count + ":");
 
             // link pages to back ofpages
             string[] keys = new string[PictureInfo.Keys.Count];
@@ -133,7 +144,20 @@ namespace PhotoPageProcessor
             {
                 this.pageList.Items.Add(f); // display the picture file names
             }
+            getInitialPictureNumber();
         } // albumLoader
+        
+        private void getInitialPictureNumber()
+        {
+            DirectoryInfo dinfo = new DirectoryInfo(AlbumDirName); // what files are here
+
+            // make a list of all the picture files
+            string[] extensions = PICTURE_EXTENSIONS.Split(','); // list of file extensions for photos
+            FileInfo[] files = dinfo.GetFiles()
+                                    .Where(f => extensions.Contains(f.Extension.ToLower()) && f.Name.StartsWith(PicturePrefix))
+                                    .ToArray();
+            PictureCounter = files.Length + 1;
+        } // getInitialPictureNumber
 
         private void displayPicture(string fname)
         {
@@ -147,7 +171,7 @@ namespace PhotoPageProcessor
             // To resize the image 
             var resizedImage = ScaleImage(image, pageDisplay.Width, pageDisplay.Height);
             if (pageDisplay.Image != null) pageDisplay.Image.Dispose();
-            pageDisplay.Image = resizedImage;                    
+            pageDisplay.Image = resizedImage; // resizedImage;                    
 
             // is there a back of page image?
             if(PictureInfo[fname] != "") {
@@ -155,7 +179,7 @@ namespace PhotoPageProcessor
                 Image backImage = Image.FromFile(imageBackFileName);
                 var resizedBackImage = ScaleImage(backImage, pageBackDisplay.Width, pageBackDisplay.Height);
                 if (pageBackDisplay.Image != null) pageBackDisplay.Image.Dispose();
-                pageBackDisplay.Image = resizedBackImage;                    
+                pageBackDisplay.Image = resizedBackImage; // resizedBackImage;                    
                 backOfPageFile.Text = fname;
             }
             
@@ -239,5 +263,129 @@ namespace PhotoPageProcessor
             pagebackImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
             pageBackDisplay.Image = pagebackImage;
         }
-    }
-}
+
+        private void clipImage_Click(object sender, EventArgs e)
+        {
+            OriginalImage = new Bitmap(pageDisplay.Image);
+            //MessageBox.Show("clipImage clicked");
+        } // clipImage_Click
+
+        private string makePictureCounterString()
+        {
+            if (PictureCounter >= 100) return PictureCounter.ToString();
+            if (PictureCounter >= 10) return "0" + PictureCounter.ToString();
+            return "00" + PictureCounter.ToString();
+        }
+
+        private void pageDone_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("saveImage start");
+            pictureFileName.Text = PicturePrefix + makePictureCounterString();
+            IsSelecting = false;
+
+            // Display the original image.
+            pageDisplay.Image = OriginalImage;
+
+            // Copy the selected part of the image.
+            int wid = Math.Abs(X0 - X1);
+            int hgt = Math.Abs(Y0 - Y1);
+            if ((wid < 1) || (hgt < 1)) return;
+
+            Bitmap area = new Bitmap(wid, hgt);
+            using (Graphics gr = Graphics.FromImage(area))
+            {
+                Rectangle source_rectangle =
+                    new Rectangle(Math.Min(X0, X1), Math.Min(Y0, Y1), wid, hgt);
+                Rectangle dest_rectangle =
+                    new Rectangle(0, 0, wid, hgt);
+                gr.DrawImage(OriginalImage, dest_rectangle,
+                    source_rectangle, GraphicsUnit.Pixel);
+            }
+
+            // Display the result.
+                var resizedClipImage = ScaleImage(area, clippedImage.Width, clippedImage.Height);
+            clippedImage.Image = resizedClipImage;
+            //MessageBox.Show("saveImage done");
+        } // saveImage_Click
+
+        private void rotateLeft_Click(object sender, EventArgs e)
+        {
+            var pageImage = clippedImage.Image;
+            pageImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            clippedImage.Image = pageImage;
+        } // rotateLeft_Click
+
+        private void rotateRight_Click(object sender, EventArgs e)
+        {
+            var pageImage = clippedImage.Image;
+            pageImage.RotateFlip(RotateFlipType.Rotate90FlipNone);
+            clippedImage.Image = pageImage;
+        } // rotateRight_Click
+
+        private void saveClip_Click(object sender, EventArgs e)
+        {
+            var path = string.Format("{0}/{1}.png",albumName.Text,pictureFileName.Text);
+            MessageBox.Show("path =" + path);
+            clipStatus.Text = path;
+            // MessageBox.Show("clippedImage.type =" + clippedImage.Image.GetType());
+            var i2 = new Bitmap(clippedImage.Image);
+            i2.Save(path, ImageFormat.Png);
+        } // saveClip_Click
+
+        // Start selecting the rectangle.
+        public void pageDisplay_MouseDown(object sender, MouseEventArgs e)
+        {
+            //MessageBox.Show("pageDisplay_mousedown start");
+            IsSelecting = true;
+
+            // Save the start point.
+            X0 = e.X;
+            Y0 = e.Y;
+            //MessageBox.Show(string.Format("pageDisplay_mousedown done X0={0} Y0={1}",X0,Y0));
+        } // pageDisplay_MouseDown
+
+        // Continue selecting.
+        public void pageDisplay_MouseMove(object sender, MouseEventArgs e)
+        {
+            // Do nothing it we're not selecting an area.
+            if (!IsSelecting) return;
+
+            // Save the new point.
+            X1 = e.X;
+            Y1 = e.Y;
+
+            // Make a Bitmap to display the selection rectangle.
+            Bitmap bm = new Bitmap(OriginalImage);
+
+            // Draw the rectangle.
+            using (Graphics gr = Graphics.FromImage(bm))
+            {
+                gr.DrawRectangle(Pens.Red,
+                    Math.Min(X0, X1), Math.Min(Y0, Y1),
+                    Math.Abs(X0 - X1), Math.Abs(Y0 - Y1));
+            }
+
+            // Display the temporary bitmap.
+            PPPForm.mainForm.pageDisplay.Image = bm;
+        } // pageDisplay_MouseMove
+
+        // Finish selecting the area.
+        public void pageDisplay_MouseUp(object sender, MouseEventArgs e)
+        {
+            // Do nothing it we're not selecting an area.
+            IsSelecting = !IsSelecting;
+        } // pageDisplay_MouseUp
+
+        // what to do when a piece of a page is selected
+        // image selection control is from
+        // https://github.com/rickapps/crop-image-control
+        private void OnImageCropped(object sender, EventArgs e)
+        {
+            // Get the cropped portion of our image
+            Image croppedImage = pageDisplay.SelectedImage;
+            //MessageBox.Show("Image copied to your clipboard");
+            clippedImage.Image = croppedImage;
+        }
+
+    } // class PPPForm
+} // PhotoPageProcessor
