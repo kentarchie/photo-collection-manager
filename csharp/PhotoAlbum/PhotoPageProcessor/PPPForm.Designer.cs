@@ -49,6 +49,7 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.pageList = new System.Windows.Forms.ListBox();
             this.saveClip = new System.Windows.Forms.Button();
+            this.pageDone = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.pageFileName = new System.Windows.Forms.Label();
             this.backOfPageFile = new System.Windows.Forms.Label();
@@ -63,7 +64,6 @@
             this.clipStatus = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pageDisplay = new RickApps.CropImage.RubberBand();
-            this.pageDone = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pageBackDisplay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.clippedImage)).BeginInit();
             this.panel2.SuspendLayout();
@@ -239,6 +239,18 @@
             this.saveClip.UseVisualStyleBackColor = true;
             this.saveClip.Click += new System.EventHandler(this.saveClip_Click);
             // 
+            // pageDone
+            // 
+            this.pageDone.Location = new System.Drawing.Point(613, 89);
+            this.pageDone.Name = "pageDone";
+            this.pageDone.Size = new System.Drawing.Size(99, 47);
+            this.pageDone.TabIndex = 64;
+            this.pageDone.Tag = "";
+            this.pageDone.Text = "Page\r\nDone";
+            this.toolTip1.SetToolTip(this.pageDone, "Save selected image");
+            this.pageDone.UseVisualStyleBackColor = true;
+            this.pageDone.Click += new System.EventHandler(this.pageDone_Click);
+            // 
             // label1
             // 
             this.label1.Location = new System.Drawing.Point(210, 98);
@@ -368,18 +380,6 @@
             this.pageDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pageDisplay.TabIndex = 0;
             this.pageDisplay.ImageCropped += new System.EventHandler(this.OnImageCropped);
-            // 
-            // pageDone
-            // 
-            this.pageDone.Location = new System.Drawing.Point(655, 89);
-            this.pageDone.Name = "pageDone";
-            this.pageDone.Size = new System.Drawing.Size(99, 47);
-            this.pageDone.TabIndex = 64;
-            this.pageDone.Tag = "";
-            this.pageDone.Text = "Page\r\nDone";
-            this.toolTip1.SetToolTip(this.pageDone, "Save selected image");
-            this.pageDone.UseVisualStyleBackColor = true;
-            this.pageDone.Click += new System.EventHandler(this.saveImage_Click);
             // 
             // PPPForm
             // 

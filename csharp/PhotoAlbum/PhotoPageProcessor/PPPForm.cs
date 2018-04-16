@@ -21,6 +21,7 @@ namespace PhotoPageProcessor
         public static PPPForm mainForm = null;
 
         public Dictionary<string,string> PictureInfo;
+        public string CurrentPage = "";
 
         public static string PicturePrefix;
         public static string PagePrefix;
@@ -81,9 +82,18 @@ namespace PhotoPageProcessor
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string curItem = pageList.SelectedItem.ToString();
-            displayPicture(curItem);
+            CurrentPage = pageList.SelectedItem.ToString();
+            displayPicture(CurrentPage);
         } // listBox1_SelectedIndexChanged
+
+        private string getNextPage()
+        {
+            var keys = PictureInfo.Keys.ToList<string>();
+            int index1 = keys.IndexOf(CurrentPage);
+            var nextKey = keys[index1 + 1];
+            MessageBox.Show("nextKey=:"+nextKey + ":");
+            return (nextKey);
+        } // getNextPage
 
         // start search for a folder that contains scanned pages to be processed.
         // the search begins at the DefaultPictures folder and a folder dialog is opened there
@@ -97,7 +107,8 @@ namespace PhotoPageProcessor
                 albumName.Text = Path.GetFullPath(folderBrowserDialog1.SelectedPath);
                 //albumName.Text = Path.GetFileName(AlbumDirName);
                 albumLoader(AlbumDirName);  // load the list of scanned pages into the list box
-                displayPicture(PictureInfo.Keys.FirstOrDefault()); // set it up as if the user had clicked on the first one
+                CurrentPage = PictureInfo.Keys.FirstOrDefault(); // set it up as if the user had clicked on the first one
+                displayPicture(CurrentPage); // set it up as if the user had clicked on the first one
             }
         } // loadAlbum_Click
 
@@ -172,6 +183,7 @@ namespace PhotoPageProcessor
             var resizedImage = ScaleImage(image, pageDisplay.Width, pageDisplay.Height);
             if (pageDisplay.Image != null) pageDisplay.Image.Dispose();
             pageDisplay.Image = resizedImage; // resizedImage;                    
+            image.Dispose();
 
             // is there a back of page image?
             if(PictureInfo[fname] != "") {
@@ -180,6 +192,7 @@ namespace PhotoPageProcessor
                 var resizedBackImage = ScaleImage(backImage, pageBackDisplay.Width, pageBackDisplay.Height);
                 if (pageBackDisplay.Image != null) pageBackDisplay.Image.Dispose();
                 pageBackDisplay.Image = resizedBackImage; // resizedBackImage;                    
+                backImage.Dispose();
                 backOfPageFile.Text = fname;
             }
             
@@ -275,38 +288,29 @@ namespace PhotoPageProcessor
             if (PictureCounter >= 100) return PictureCounter.ToString();
             if (PictureCounter >= 10) return "0" + PictureCounter.ToString();
             return "00" + PictureCounter.ToString();
-        }
+        } // makPictureString
 
         private void pageDone_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("saveImage start");
-            pictureFileName.Text = PicturePrefix + makePictureCounterString();
-            IsSelecting = false;
+            var thisFileName = pageFileName.Text;
+            var backFileName = string.Format("{0}{1}", BackPrefix, thisFileName);
+            var dirPath = string.Format("{0}/{1}",albumName.Text, OrigFolder);
+            var filePath = string.Format("{0}/{1}",albumName.Text, thisFileName);
+            var newFilePath = string.Format("{0}/{1}",dirPath, thisFileName);
+            var backFilePath = string.Format("{0}/{1}",albumName.Text, backFileName);
+            var newBackFilePath = string.Format("{0}/{1}",dirPath, backFileName);
 
-            // Display the original image.
-            pageDisplay.Image = OriginalImage;
-
-            // Copy the selected part of the image.
-            int wid = Math.Abs(X0 - X1);
-            int hgt = Math.Abs(Y0 - Y1);
-            if ((wid < 1) || (hgt < 1)) return;
-
-            Bitmap area = new Bitmap(wid, hgt);
-            using (Graphics gr = Graphics.FromImage(area))
-            {
-                Rectangle source_rectangle =
-                    new Rectangle(Math.Min(X0, X1), Math.Min(Y0, Y1), wid, hgt);
-                Rectangle dest_rectangle =
-                    new Rectangle(0, 0, wid, hgt);
-                gr.DrawImage(OriginalImage, dest_rectangle,
-                    source_rectangle, GraphicsUnit.Pixel);
+            if (pageDisplay.Image != null) pageDisplay.Image.Dispose();
+            displayPicture(getNextPage());
+            Directory.CreateDirectory(dirPath);
+            //MessageBox.Show("filePath=:"+filePath + ":");
+            //MessageBox.Show("newFilePath=:"+newFilePath + ":");
+            File.Move(filePath, newFilePath);
+            if(File.Exists(backFilePath)) {
+                File.Move(backFilePath, newBackFilePath);
             }
-
-            // Display the result.
-                var resizedClipImage = ScaleImage(area, clippedImage.Width, clippedImage.Height);
-            clippedImage.Image = resizedClipImage;
-            //MessageBox.Show("saveImage done");
-        } // saveImage_Click
+            MessageBox.Show("pageDone done");
+        } // pageDone
 
         private void rotateLeft_Click(object sender, EventArgs e)
         {
