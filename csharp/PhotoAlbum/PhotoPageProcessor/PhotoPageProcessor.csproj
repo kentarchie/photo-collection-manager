@@ -61,6 +61,7 @@
       <DependentUpon>PPPForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Prompt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserSettings.cs">
       <SubType>Form</SubType>

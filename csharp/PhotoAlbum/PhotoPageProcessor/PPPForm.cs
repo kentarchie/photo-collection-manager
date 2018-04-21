@@ -332,65 +332,27 @@ namespace PhotoPageProcessor
 
         private void saveClip_Click(object sender, EventArgs e)
         {
-            var path = string.Format("{0}/{1}.png",albumName.Text,pictureFileName.Text);
+            var path = string.Format("{0}/{1}",albumName.Text,pictureFileName.Text);
             MessageBox.Show("path =" + path);
-            clipStatus.Text = path;
             // MessageBox.Show("clippedImage.type =" + clippedImage.Image.GetType());
             var i2 = new Bitmap(clippedImage.Image);
             i2.Save(path, ImageFormat.Png);
             var pixLeft = Int32.Parse(unsavedPictures.Text);
             if (pixLeft > 0) pixLeft--;
             unsavedPictures.Text = pixLeft.ToString();
+            clipStatus.Text = "Picture Saved";
         } // saveClip_Click
-
-        // Start selecting the rectangle.
-        public void pageDisplay_MouseDown(object sender, MouseEventArgs e)
-        {
-            //MessageBox.Show("pageDisplay_mousedown start");
-            IsSelecting = true;
-
-            // Save the start point.
-            X0 = e.X;
-            Y0 = e.Y;
-            //MessageBox.Show(string.Format("pageDisplay_mousedown done X0={0} Y0={1}",X0,Y0));
-        } // pageDisplay_MouseDown
 
         private void pixPerPage_ValueChanged(object sender, EventArgs e)
         {
             unsavedPictures.Text = pixPerPage.Value.ToString();
         } // pixPerPage_ValueChanged
 
-        // Continue selecting.
-        public void pageDisplay_MouseMove(object sender, MouseEventArgs e)
+        private void addBackText_Click(object sender, EventArgs e)
         {
-            // Do nothing it we're not selecting an area.
-            if (!IsSelecting) return;
-
-            // Save the new point.
-            X1 = e.X;
-            Y1 = e.Y;
-
-            // Make a Bitmap to display the selection rectangle.
-            Bitmap bm = new Bitmap(OriginalImage);
-
-            // Draw the rectangle.
-            using (Graphics gr = Graphics.FromImage(bm))
-            {
-                gr.DrawRectangle(Pens.Red,
-                    Math.Min(X0, X1), Math.Min(Y0, Y1),
-                    Math.Abs(X0 - X1), Math.Abs(Y0 - Y1));
-            }
-
-            // Display the temporary bitmap.
-            PPPForm.mainForm.pageDisplay.Image = bm;
-        } // pageDisplay_MouseMove
-
-        // Finish selecting the area.
-        public void pageDisplay_MouseUp(object sender, MouseEventArgs e)
-        {
-            // Do nothing it we're not selecting an area.
-            IsSelecting = !IsSelecting;
-        } // pageDisplay_MouseUp
+            string promptValue = Prompt.ShowDialog("Enter Text From The Back Of This Picture", "Back Of Picture Text");
+            MessageBox.Show(string.Format("back text :{0}: ",promptValue));
+        }
 
         // what to do when a piece of a page is selected
         // image selection control is from
@@ -401,7 +363,9 @@ namespace PhotoPageProcessor
             Image croppedImage = pageDisplay.SelectedImage;
             //MessageBox.Show("Image copied to your clipboard");
             clippedImage.Image = croppedImage;
-        }
+            clipStatus.Text = "Picture UnSaved";
+            pictureFileName.Text = string.Format("{0}{1}.png",showPicturePrefix.Text,makePictureCounterString());
+        } // OnImageCropped
 
     } // class PPPForm
 } // PhotoPageProcessor

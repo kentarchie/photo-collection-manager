@@ -68,6 +68,7 @@
             this.pixPerPage = new System.Windows.Forms.NumericUpDown();
             this.label11 = new System.Windows.Forms.Label();
             this.unsavedPictures = new System.Windows.Forms.Label();
+            this.addBackText = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.clippedImage)).BeginInit();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -328,7 +329,7 @@
             // 
             // rotateLeft
             // 
-            this.rotateLeft.Location = new System.Drawing.Point(1529, 93);
+            this.rotateLeft.Location = new System.Drawing.Point(1499, 41);
             this.rotateLeft.Name = "rotateLeft";
             this.rotateLeft.Size = new System.Drawing.Size(75, 47);
             this.rotateLeft.TabIndex = 65;
@@ -338,7 +339,7 @@
             // 
             // rotateRight
             // 
-            this.rotateRight.Location = new System.Drawing.Point(1610, 93);
+            this.rotateRight.Location = new System.Drawing.Point(1499, 92);
             this.rotateRight.Name = "rotateRight";
             this.rotateRight.Size = new System.Drawing.Size(75, 47);
             this.rotateRight.TabIndex = 66;
@@ -427,11 +428,22 @@
             this.unsavedPictures.TabIndex = 74;
             this.unsavedPictures.Text = "0";
             // 
+            // addBackText
+            // 
+            this.addBackText.Location = new System.Drawing.Point(1622, 93);
+            this.addBackText.Name = "addBackText";
+            this.addBackText.Size = new System.Drawing.Size(78, 46);
+            this.addBackText.TabIndex = 75;
+            this.addBackText.Text = "Add Back\r\nText";
+            this.addBackText.UseVisualStyleBackColor = true;
+            this.addBackText.Click += new System.EventHandler(this.addBackText_Click);
+            // 
             // PPPForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1824, 789);
+            this.Controls.Add(this.addBackText);
             this.Controls.Add(this.unsavedPictures);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.pixPerPage);
@@ -518,6 +530,7 @@
         private System.Windows.Forms.NumericUpDown pixPerPage;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label unsavedPictures;
+        private System.Windows.Forms.Button addBackText;
     }
 }
 
