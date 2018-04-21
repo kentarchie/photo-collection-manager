@@ -54,7 +54,6 @@
             this.pageFileName = new System.Windows.Forms.Label();
             this.backOfPageFile = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
-            this.pageBackDisplay = new System.Windows.Forms.PictureBox();
             this.pictureFileName = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.clippedImage = new System.Windows.Forms.PictureBox();
@@ -64,10 +63,15 @@
             this.clipStatus = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pageDisplay = new RickApps.CropImage.RubberBand();
-            ((System.ComponentModel.ISupportInitialize)(this.pageBackDisplay)).BeginInit();
+            this.pageBackDisplay = new RickApps.CropImage.RubberBand();
+            this.label8 = new System.Windows.Forms.Label();
+            this.pixPerPage = new System.Windows.Forms.NumericUpDown();
+            this.label11 = new System.Windows.Forms.Label();
+            this.unsavedPictures = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.clippedImage)).BeginInit();
             this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pixPerPage)).BeginInit();
             this.SuspendLayout();
             // 
             // loadAlbum
@@ -241,7 +245,7 @@
             // 
             // pageDone
             // 
-            this.pageDone.Location = new System.Drawing.Point(613, 89);
+            this.pageDone.Location = new System.Drawing.Point(623, 92);
             this.pageDone.Name = "pageDone";
             this.pageDone.Size = new System.Drawing.Size(99, 47);
             this.pageDone.TabIndex = 64;
@@ -263,7 +267,7 @@
             // 
             this.pageFileName.Location = new System.Drawing.Point(192, 123);
             this.pageFileName.Name = "pageFileName";
-            this.pageFileName.Size = new System.Drawing.Size(153, 17);
+            this.pageFileName.Size = new System.Drawing.Size(172, 17);
             this.pageFileName.TabIndex = 55;
             // 
             // backOfPageFile
@@ -281,15 +285,6 @@
             this.label9.Size = new System.Drawing.Size(143, 17);
             this.label9.TabIndex = 57;
             this.label9.Text = "Page Back File Name";
-            // 
-            // pageBackDisplay
-            // 
-            this.pageBackDisplay.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pageBackDisplay.Location = new System.Drawing.Point(771, 142);
-            this.pageBackDisplay.Name = "pageBackDisplay";
-            this.pageBackDisplay.Size = new System.Drawing.Size(519, 557);
-            this.pageBackDisplay.TabIndex = 56;
-            this.pageBackDisplay.TabStop = false;
             // 
             // pictureFileName
             // 
@@ -366,7 +361,7 @@
             this.panel1.Controls.Add(this.pageDisplay);
             this.panel1.Location = new System.Drawing.Point(189, 142);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(576, 557);
+            this.panel1.Size = new System.Drawing.Size(557, 557);
             this.panel1.TabIndex = 69;
             // 
             // pageDisplay
@@ -376,16 +371,72 @@
             this.pageDisplay.Location = new System.Drawing.Point(13, 17);
             this.pageDisplay.Margin = new System.Windows.Forms.Padding(4);
             this.pageDisplay.Name = "pageDisplay";
-            this.pageDisplay.Size = new System.Drawing.Size(537, 513);
+            this.pageDisplay.Size = new System.Drawing.Size(530, 513);
             this.pageDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pageDisplay.TabIndex = 0;
             this.pageDisplay.ImageCropped += new System.EventHandler(this.OnImageCropped);
+            // 
+            // pageBackDisplay
+            // 
+            this.pageBackDisplay.Disabled = false;
+            this.pageBackDisplay.Image = null;
+            this.pageBackDisplay.Location = new System.Drawing.Point(763, 140);
+            this.pageBackDisplay.Margin = new System.Windows.Forms.Padding(4);
+            this.pageBackDisplay.Name = "pageBackDisplay";
+            this.pageBackDisplay.Size = new System.Drawing.Size(517, 551);
+            this.pageBackDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pageBackDisplay.TabIndex = 70;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(414, 123);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(111, 17);
+            this.label8.TabIndex = 71;
+            this.label8.Text = "Pictures In Page";
+            // 
+            // pixPerPage
+            // 
+            this.pixPerPage.Location = new System.Drawing.Point(531, 117);
+            this.pixPerPage.Name = "pixPerPage";
+            this.pixPerPage.Size = new System.Drawing.Size(76, 22);
+            this.pixPerPage.TabIndex = 72;
+            this.pixPerPage.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.pixPerPage.ValueChanged += new System.EventHandler(this.pixPerPage_ValueChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(1658, 56);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(91, 34);
+            this.label11.TabIndex = 73;
+            this.label11.Text = "Unsaved\r\n Pictures Left";
+            // 
+            // unsavedPictures
+            // 
+            this.unsavedPictures.AutoSize = true;
+            this.unsavedPictures.Location = new System.Drawing.Point(1755, 56);
+            this.unsavedPictures.Name = "unsavedPictures";
+            this.unsavedPictures.Size = new System.Drawing.Size(16, 17);
+            this.unsavedPictures.TabIndex = 74;
+            this.unsavedPictures.Text = "0";
             // 
             // PPPForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1824, 789);
+            this.Controls.Add(this.unsavedPictures);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.pixPerPage);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.pageBackDisplay);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.clipStatus);
             this.Controls.Add(this.saveClip);
@@ -397,7 +448,6 @@
             this.Controls.Add(this.clippedImage);
             this.Controls.Add(this.backOfPageFile);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.pageBackDisplay);
             this.Controls.Add(this.pageFileName);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.loadAlbum);
@@ -419,10 +469,10 @@
             this.Text = "PhotoPageProcessor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PPPForm_FormClosing);
             this.Load += new System.EventHandler(this.PPPForm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pageBackDisplay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.clippedImage)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pixPerPage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -451,7 +501,6 @@
         private System.Windows.Forms.Label pageFileName;
         private System.Windows.Forms.Label backOfPageFile;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.PictureBox pageBackDisplay;
         private System.Windows.Forms.Label pictureFileName;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.PictureBox clippedImage;
@@ -464,6 +513,11 @@
         private System.Windows.Forms.Panel panel1;
         private RickApps.CropImage.RubberBand pageDisplay;
         private System.Windows.Forms.Button pageDone;
+        private RickApps.CropImage.RubberBand pageBackDisplay;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown pixPerPage;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label unsavedPictures;
     }
 }
 

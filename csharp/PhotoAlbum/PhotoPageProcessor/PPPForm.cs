@@ -153,7 +153,7 @@ namespace PhotoPageProcessor
 
             foreach (string f in PictureInfo.Keys)
             {
-                this.pageList.Items.Add(f); // display the picture file names
+                pageList.Items.Add(f); // display the picture file names
             }
             getInitialPictureNumber();
         } // albumLoader
@@ -170,30 +170,25 @@ namespace PhotoPageProcessor
             PictureCounter = files.Length + 1;
         } // getInitialPictureNumber
 
+        private void updatePicture(string fname, Label fileNameLabel, RickApps.CropImage.RubberBand imageBox)
+        {
+            var imageFileName = AlbumDirName + "\\" + fname;
+            fileNameLabel.Text = fname;
+            Image image = Image.FromFile(imageFileName);
+            var resizedImage = ScaleImage(image, imageBox.Width, imageBox.Height);
+            if ( imageBox.Image != null) imageBox.Image.Dispose();
+            imageBox.Image = resizedImage; // resizedImage;                    
+            image.Dispose();
+        } // updatePicture
+
         private void displayPicture(string fname)
         {
             // fetch and display the image for this Picture
-            var imageFileName = AlbumDirName + "\\" + fname;
-            pageFileName.Text = fname;
-            //MessageBox.Show("imageFileName=:"+imageFileName + ":");
-
-            Image image = Image.FromFile(imageFileName);
-           
-            // To resize the image 
-            var resizedImage = ScaleImage(image, pageDisplay.Width, pageDisplay.Height);
-            if (pageDisplay.Image != null) pageDisplay.Image.Dispose();
-            pageDisplay.Image = resizedImage; // resizedImage;                    
-            image.Dispose();
+            updatePicture(fname, pageFileName, pageDisplay);
 
             // is there a back of page image?
             if(PictureInfo[fname] != "") {
-                var imageBackFileName = AlbumDirName + "\\" + PictureInfo[fname];
-                Image backImage = Image.FromFile(imageBackFileName);
-                var resizedBackImage = ScaleImage(backImage, pageBackDisplay.Width, pageBackDisplay.Height);
-                if (pageBackDisplay.Image != null) pageBackDisplay.Image.Dispose();
-                pageBackDisplay.Image = resizedBackImage; // resizedBackImage;                    
-                backImage.Dispose();
-                backOfPageFile.Text = fname;
+                updatePicture(PictureInfo[fname], backOfPageFile, pageBackDisplay);
             }
             
             pageList.SelectedIndex = pageList.FindString(fname);
@@ -299,6 +294,15 @@ namespace PhotoPageProcessor
             var newFilePath = string.Format("{0}/{1}",dirPath, thisFileName);
             var backFilePath = string.Format("{0}/{1}",albumName.Text, backFileName);
             var newBackFilePath = string.Format("{0}/{1}",dirPath, backFileName);
+            var unsavedCount = Int32.Parse(unsavedPictures.Text);
+            if(unsavedCount > 0) {
+                var confirmResult = MessageBox.Show("There may be unsaved pictures in this page, are you sure you want to mark it done?",
+                                     "Confirm Marking It Done!!",
+                                     MessageBoxButtons.YesNo);
+                if (confirmResult != DialogResult.Yes) {
+                    return;
+                }
+            }
 
             if (pageDisplay.Image != null) pageDisplay.Image.Dispose();
             displayPicture(getNextPage());
@@ -334,6 +338,9 @@ namespace PhotoPageProcessor
             // MessageBox.Show("clippedImage.type =" + clippedImage.Image.GetType());
             var i2 = new Bitmap(clippedImage.Image);
             i2.Save(path, ImageFormat.Png);
+            var pixLeft = Int32.Parse(unsavedPictures.Text);
+            if (pixLeft > 0) pixLeft--;
+            unsavedPictures.Text = pixLeft.ToString();
         } // saveClip_Click
 
         // Start selecting the rectangle.
@@ -347,6 +354,11 @@ namespace PhotoPageProcessor
             Y0 = e.Y;
             //MessageBox.Show(string.Format("pageDisplay_mousedown done X0={0} Y0={1}",X0,Y0));
         } // pageDisplay_MouseDown
+
+        private void pixPerPage_ValueChanged(object sender, EventArgs e)
+        {
+            unsavedPictures.Text = pixPerPage.Value.ToString();
+        } // pixPerPage_ValueChanged
 
         // Continue selecting.
         public void pageDisplay_MouseMove(object sender, MouseEventArgs e)
