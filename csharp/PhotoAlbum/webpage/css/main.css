@@ -25,17 +25,19 @@ body {
     text-shadow: none;
 }
 
-hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 1em 0;
-    padding: 0;
+ul {
+    list-style:none;
+}
+li {
+    border-bottom: 3px solid blue;
 }
 
 img {
     vertical-align: middle;
+}
+img {
+  -webkit-filter: drop-shadow(7px 7px 7px #222);
+  filter: drop-shadow(7px 7px 7px #222);
 }
 
 fieldset {
@@ -59,9 +61,7 @@ textarea {
    Author's custom styles
    ========================================================================== */
 img {
-    /*width: 200px; height: 200px;*/
     padding:10px;
-    float:left;
 }
 
 #albumName {
@@ -79,40 +79,60 @@ img {
     padding-left: 20px;
     border:3px solid red;
 }
-.pictureBox,.pictureInfoBox {
-    float:left;
-    margin:10px 10px 10px 10px;
-    overflow-y:auto;
+.imageLI div {
 }
-.boxSize {
-  width: 330px;
-  height: 230px;
+
+.wrapper {
+  background-color:beige;
+
+  display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 1fr 1.5fr .1fr;
 }
-.pictureBox{
-  /*border:3px solid red;*/
+.pictureBox {
+  grid-template-rows: 1fr 0.2fr;
 }
-.pictureInfoBox {
-  /*border:3px solid blue;*/
-  float:left;
+.pic {
+   position: relative;
+   background-color:lightgrey;
+}
+.pic img {
+   padding-left: 20px;
+}
+.fileName {
+   padding-top: 10px;
 }
 .caption {
   color:red;
-  margin-left: 1em;
+   padding-left: 1em;
 }
-.info {
-  font-weight:bold;
-  padding-left:5px;
+.pictureInfoBox {
+  grid-template-columns: 400px;
+  grid-template-rows: 20px 20px 20px 80px;
 }
-.info span {
-  font-weight:normal;
-}
-.whereTaken {
-}
-.whenTaken {
+.when {
 }
 .who {
 }
+.where {
+}
 .notes {
+   height: 100px;
+   width: 30em;
+   overflow: auto;
+}
+
+.info {
+  font-weight:bold;
+  font-style:italic;
+  padding-top:5px;
+  padding-left:5px;
+  padding-right: 30px;
+}    
+.info span {
+  font-weight:normal;
+  font-style:normal;
+  font-size:larger;
 }
 
 /* ==========================================================================

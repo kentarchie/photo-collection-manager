@@ -25,27 +25,32 @@
         </div>
 
         <div class='album'>
-            <div id="pictureList">
-               <div v-for="picture in pictures">
-               <div class="boxSize pictureBox">
-                   <a class="thumbNail" href="#" v-bind:data-featherlight="'../' + picture.filename"j>
-                     <img v-bind:src="'../thumbnails/' + picture.filename"></a>
-               </div>
-               <div class="boxSize pictureInfoBox">
-                  <div class="info">FileName: <span>{{ picture.filename }}</span></div>
-                  <div class="info whereTaken">Where Taken: <span> {{ picture.wheretaken }}</span></div>
-                  <div class="info whenTaken">When Taken: <span> {{ picture.whentaken }}</span></div>
-                  <div class="info who">Who: <span> {{ picture.who }}</span></div>
-               </div>
-               <div class="caption"> {{ picture.caption }}</div>
-               </div>
-           </div>
+            <ul id="pictureList">
+               <li class='imageLI' v-for="picture in pictures">
+               <div class='wrapper'>
+                  <div class='boxSize pbox'>
+                     <div class='pic'>
+                        <a class="thumbNail" href="#" v-bind:data-featherlight="'../' + picture.filename"j>
+                        <img v-bind:src="'../thumbnails/' + picture.filename"></a>
+                     </div>
+                     <div class='caption'>{{ picture.caption }}</div>
+                  </div>
+                  <div class='boxSize pinfo'>
+                     <div class="info fileName">FileName: <span>{{ picture.filename }}</span></div>
+                     <div class='info where'>Where Taken: <span> {{ picture.wheretaken }}</span></div>
+                     <div class='info when'>When Taken: <span> {{ picture.whentaken }}</span></div>
+                     <div class='info who'>Who: <span> {{ picture.who }}</span></div>
+                     <div class='info notes'>Notes: <span> {{ picture.notes }}</span></div>
+                  </div>
+                  <div class='padding'></div>
+              </li> <!-- picture in pictures -->
+           </ul> <!-- pictureList -->
         </div> <!-- album container -->
     </body>
       <script src='js/vendor/jquery-3.2.0.min.js' type='text/javascript'></script>
       <script src='js/vendor/vue.min.js' type='text/javascript'></script>
 	   <script src='js/vendor/featherlight.min.js' type='text/javascript' charset='utf-8'></script>
       <script src="js/plugins.js" type='text/javascript'></script>
-      <script src='../ALBUMFILENAME.album' type='text/javascript'></script>
+      <script src='../1HorseCarriage.album' type='text/javascript'></script>
       <script src='js/main.js' type='text/javascript'></script>
 </html>
