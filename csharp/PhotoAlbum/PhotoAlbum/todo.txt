@@ -1,9 +1,3 @@
-aLlow multiple choices on whereTaken
+allow multiple choices on whereTaken
 on change to any field, change saved markers
 add autocomplete feature to whereTaken, whenTaken
-create vague date popup
-   actual calendar select
-   season
-   year
-   decade
-   holiday

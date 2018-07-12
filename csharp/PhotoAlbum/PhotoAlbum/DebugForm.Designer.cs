@@ -38,23 +38,25 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.debugText.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.debugText.Location = new System.Drawing.Point(-1, 3);
-            this.debugText.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.debugText.Margin = new System.Windows.Forms.Padding(4);
             this.debugText.Multiline = true;
             this.debugText.Name = "debugText";
             this.debugText.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.debugText.Size = new System.Drawing.Size(567, 393);
+            this.debugText.Size = new System.Drawing.Size(1427, 486);
             this.debugText.TabIndex = 0;
+            this.debugText.TextChanged += new System.EventHandler(this.debugText_TextChanged);
             // 
             // DebugForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(596, 409);
+            this.ClientSize = new System.Drawing.Size(1456, 502);
             this.Controls.Add(this.debugText);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "DebugForm";
             this.Text = "DebugForm";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DebugForm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

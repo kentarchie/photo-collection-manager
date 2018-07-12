@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Threading;
 using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 
 namespace PhotoPageProcessor
 {
@@ -41,6 +42,11 @@ namespace PhotoPageProcessor
 
         bool AlbumChanged = false;
         Thread Thread1;
+        Image img;
+        Boolean mouseClicked;
+        Point startPoint = new Point();
+        Point endPoint = new Point();
+        Rectangle rectCropArea;
 
         public PPPForm()
         {
@@ -170,7 +176,8 @@ namespace PhotoPageProcessor
             PictureCounter = files.Length + 1;
         } // getInitialPictureNumber
 
-        private void updatePicture(string fname, Label fileNameLabel, RickApps.CropImage.RubberBand imageBox)
+        //private void updatePicture(string fname, Label fileNameLabel, RickApps.CropImage.RubberBand imageBox)
+        private void updatePicture(string fname, Label fileNameLabel, PictureBox imageBox)
         {
             var imageFileName = AlbumDirName + "\\" + fname;
             fileNameLabel.Text = fname;
@@ -188,7 +195,7 @@ namespace PhotoPageProcessor
 
             // is there a back of page image?
             if(PictureInfo[fname] != "") {
-                updatePicture(PictureInfo[fname], backOfPageFile, pageBackDisplay);
+                //updatePicture(PictureInfo[fname], backOfPageFile, pageBackDisplay);
             }
             
             pageList.SelectedIndex = pageList.FindString(fname);
@@ -264,9 +271,9 @@ namespace PhotoPageProcessor
 
         private void rotatePage_Click(object sender, EventArgs e)
         {
-            var pageImage = pageDisplay.Image;
+            var pageImage = pageDisplay2.Image;
             pageImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
-            pageDisplay.Image = pageImage;
+            pageDisplay2.Image = pageImage;
             var pagebackImage = pageBackDisplay.Image;
             pagebackImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
             pageBackDisplay.Image = pagebackImage;
@@ -274,7 +281,7 @@ namespace PhotoPageProcessor
 
         private void clipImage_Click(object sender, EventArgs e)
         {
-            OriginalImage = new Bitmap(pageDisplay.Image);
+            OriginalImage = new Bitmap(pageDisplay2.Image);
             //MessageBox.Show("clipImage clicked");
         } // clipImage_Click
 
@@ -283,7 +290,7 @@ namespace PhotoPageProcessor
             if (PictureCounter >= 100) return PictureCounter.ToString();
             if (PictureCounter >= 10) return "0" + PictureCounter.ToString();
             return "00" + PictureCounter.ToString();
-        } // makPictureString
+        } // makePictureString
 
         private void pageDone_Click(object sender, EventArgs e)
         {
@@ -304,7 +311,7 @@ namespace PhotoPageProcessor
                 }
             }
 
-            if (pageDisplay.Image != null) pageDisplay.Image.Dispose();
+            if (pageDisplay2.Image != null) pageDisplay2.Image.Dispose();
             displayPicture(getNextPage());
             Directory.CreateDirectory(dirPath);
             //MessageBox.Show("filePath=:"+filePath + ":");
@@ -319,6 +326,11 @@ namespace PhotoPageProcessor
         private void rotateLeft_Click(object sender, EventArgs e)
         {
             var pageImage = clippedImage.Image;
+            if(pageImage == null) {
+                MessageBox.Show("clippedImage.image == null");
+                return;
+            }
+            MessageBox.Show("clippedImage.type =" + clippedImage.Image.GetType());
             pageImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
             clippedImage.Image = pageImage;
         } // rotateLeft_Click
@@ -360,12 +372,123 @@ namespace PhotoPageProcessor
         private void OnImageCropped(object sender, EventArgs e)
         {
             // Get the cropped portion of our image
-            Image croppedImage = pageDisplay.SelectedImage;
+            Image croppedImage = pageDisplay2.SelectedImage;
             //MessageBox.Show("Image copied to your clipboard");
+            croppedImage = ScaleImage(croppedImage, clippedImage.Width, clippedImage.Height);
             clippedImage.Image = croppedImage;
             clipStatus.Text = "Picture UnSaved";
             pictureFileName.Text = string.Format("{0}{1}.png",showPicturePrefix.Text,makePictureCounterString());
         } // OnImageCropped
+
+        private void pageDisplay_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseClicked = false;
+
+            if (endPoint.X != -1)
+            {
+                Point currentPoint = new Point(e.X, e.Y);
+                // Display coordinates
+                //X2.Text = e.X.ToString();
+                //Y2.Text = e.Y.ToString();
+
+            }
+            endPoint.X = -1;
+            endPoint.Y = -1;
+            startPoint.X = -1;
+            startPoint.Y = -1;
+        }
+
+
+        private void pageDisplay_MouseDown(object sender, MouseEventArgs e)
+        {
+            mouseClicked = true;
+
+            startPoint.X = e.X;
+            startPoint.Y = e.Y;
+            // Display coordinates
+            //X1.Text = startPoint.X.ToString();
+            //Y1.Text = startPoint.Y.ToString();
+
+            endPoint.X = -1;
+            endPoint.Y = -1;
+
+            rectCropArea = new Rectangle(new Point(e.X, e.Y), new Size());
+        }
+
+
+        private void pageDisplay_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point ptCurrent = new Point(e.X, e.Y);
+
+            if (mouseClicked)
+            {
+                if (endPoint.X != -1)
+                {
+                    // Display Coordinates
+                    //X1.Text = startPoint.X.ToString();
+                    //Y1.Text = startPoint.Y.ToString();
+                    //X2.Text = e.X.ToString();
+                    //Y2.Text = e.Y.ToString();
+                }
+
+                endPoint = ptCurrent;
+
+                if (e.X > startPoint.X && e.Y > startPoint.Y)
+                {
+                    rectCropArea.Width = e.X - startPoint.X;
+                    rectCropArea.Height = e.Y - startPoint.Y;
+                }
+                else if (e.X < startPoint.X && e.Y > startPoint.Y)
+                {
+                    rectCropArea.Width = startPoint.X - e.X;
+                    rectCropArea.Height = e.Y - startPoint.Y;
+                    rectCropArea.X = e.X;
+                    rectCropArea.Y = startPoint.Y;
+                }
+                else if (e.X > startPoint.X && e.Y < startPoint.Y)
+                {
+                    rectCropArea.Width = e.X - startPoint.X;
+                    rectCropArea.Height = startPoint.Y - e.Y;
+                    rectCropArea.X = startPoint.X;
+                    rectCropArea.Y = e.Y;
+                }
+                else
+                {
+                    rectCropArea.Width = startPoint.X - e.X;
+                    rectCropArea.Height = startPoint.Y - e.Y;
+                    rectCropArea.X = e.X;
+                    rectCropArea.Y = e.Y;
+                }
+                pageDisplay.Refresh();
+            }
+        }
+
+        private void pageDisplay_Paint(object sender, PaintEventArgs e)
+        {
+            Pen drawLine = new Pen(Color.Red);
+            drawLine.DashStyle = DashStyle.Dash;
+            e.Graphics.DrawRectangle(drawLine, rectCropArea);
+        }
+
+        private void btnCrop_Click(object sender, EventArgs e)
+        {
+            clippedImage.Refresh();
+
+            Bitmap sourceBitmap = new Bitmap(pageDisplay.Image, pageDisplay.Width, pageDisplay.Height);
+            Graphics g = clippedImage.CreateGraphics();
+
+            g.DrawImage(sourceBitmap, new Rectangle(0, 0, clippedImage.Width, clippedImage.Height), rectCropArea, GraphicsUnit.Pixel);
+            Bitmap myBitmap = new Bitmap(clippedImage.Width, clippedImage.Height, g);
+            clippedImage.Image = (Image) myBitmap;
+            clippedImage.Refresh();
+            if(clippedImage.Image == null)
+                MessageBox.Show("btnCrop clippedImage null");
+            else
+                MessageBox.Show("btnCrop clippedImage NOT null");
+            //sourceBitmap.Dispose();
+            clipStatus.Text = "Picture UnSaved";
+            pictureFileName.Text = string.Format("{0}{1}.png",showPicturePrefix.Text,makePictureCounterString());
+        }
 
     } // class PPPForm
 } // PhotoPageProcessor

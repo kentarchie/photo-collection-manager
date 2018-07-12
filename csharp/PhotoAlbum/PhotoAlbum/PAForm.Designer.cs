@@ -52,7 +52,8 @@
             this.albumName = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.pictureBox = new Emgu.CV.UI.ImageBox();
+            this.pictureBox = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new Emgu.CV.UI.ImageBox();
             this.panel4 = new System.Windows.Forms.Panel();
             this.whoBox = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
@@ -69,6 +70,7 @@
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.panel4.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -291,6 +293,7 @@
             this.panel3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.panel3.Controls.Add(this.pictureBox);
+            this.panel3.Controls.Add(this.pictureBox2);
             this.panel3.Controls.Add(this.prevButton);
             this.panel3.Controls.Add(this.caption);
             this.panel3.Controls.Add(this.label6);
@@ -300,21 +303,28 @@
             this.panel3.Location = new System.Drawing.Point(273, 68);
             this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(731, 433);
+            this.panel3.Size = new System.Drawing.Size(741, 505);
             this.panel3.TabIndex = 30;
-            this.panel3.Paint += new System.Windows.Forms.PaintEventHandler(this.panel3_Paint);
             // 
             // pictureBox
             // 
-            this.pictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.pictureBox.Location = new System.Drawing.Point(37, 82);
+            this.pictureBox.Name = "pictureBox";
+            this.pictureBox.Size = new System.Drawing.Size(619, 297);
+            this.pictureBox.TabIndex = 51;
+            this.pictureBox.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox.Location = new System.Drawing.Point(12, 63);
-            this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(701, 363);
-            this.pictureBox.TabIndex = 2;
-            this.pictureBox.TabStop = false;
+            this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBox2.Location = new System.Drawing.Point(453, 266);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(261, 211);
+            this.pictureBox2.TabIndex = 2;
+            this.pictureBox2.TabStop = false;
             // 
             // panel4
             // 
@@ -487,6 +497,7 @@
             this.panel3.ResumeLayout(false);
             this.panel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             this.ResumeLayout(false);
@@ -512,7 +523,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox caption;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Button debugSwitch;
+        public System.Windows.Forms.Button debugSwitch;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label message;
         private System.Windows.Forms.TextBox albumName;
@@ -527,11 +538,12 @@
         public System.Windows.Forms.Label messages;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox whoBox;
-        private Emgu.CV.UI.ImageBox pictureBox;
+        private Emgu.CV.UI.ImageBox pictureBox2;
         private System.Windows.Forms.ComboBox whenTaken;
         private System.Windows.Forms.ComboBox whereTaken;
         private System.Windows.Forms.Button OpenDatePicker;
         private System.Windows.Forms.Button SettingsButton;
+        private System.Windows.Forms.PictureBox pictureBox;
     }
 }
 

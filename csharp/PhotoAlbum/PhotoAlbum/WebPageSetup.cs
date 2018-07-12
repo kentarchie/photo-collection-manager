@@ -14,25 +14,25 @@ namespace PhotoAlbum
         public static void updateThumbnails()
         {
             Image fileImage = null;
-            Utilities.logger("updateThumbnails start");
+            Utilities.logger("updateThumbnails: start");
             string thumbNailsPath = Path.Combine(PhotoAlbum.AlbumDirName, "thumbnails");
             if (!Directory.Exists(thumbNailsPath)) {
                 Directory.CreateDirectory(thumbNailsPath);
             }
-            Utilities.logger("thumbnails directory done");
+            Utilities.logger("updateThumbNails: thumbnails directory done");
 
             int numPictures = PhotoAlbum.Pictures.Count;
-            Utilities.logger("thumbnails: numPictures=:" + numPictures + ":");
+            Utilities.logger("updateThumbNails: numPictures=:" + numPictures + ":");
             int curPicture = 1;
             foreach (JObject pic in PhotoAlbum.Pictures) {
                 string fname = (string)pic["filename"];
                 string fpathString = Path.Combine(PhotoAlbum.AlbumDirName, fname);
                 string thumbPath = Path.Combine(thumbNailsPath, fname);
-                //Utilities.logger("thumbnails: thumbPath=:" + thumbPath + ":");
+                //Utilities.logger("updateThumbNails: thumbPath=:" + thumbPath + ":");
                 if (!File.Exists(thumbPath)) {
                     curPicture++;
                     if (curPicture % 10 == 0)
-                        Utilities.logger(String.Format("thumbnails: working on count={0} fname=:{1}", curPicture, fpathString));
+                        Utilities.logger(String.Format("updateThumbNails: working on count={0} fname=:{1}", curPicture, fpathString));
                     try {
                         fileImage = Image.FromFile(fpathString);
                         using ( Image thumb = ResizeImageFixedWidth(fileImage, THUMB_NAIL_WIDTH ) ) {
@@ -50,7 +50,7 @@ namespace PhotoAlbum
                     }
                 }
             } // for each picture
-            Utilities.logger("updateThumbnails done");
+            Utilities.logger("updateThumbnails: done");
         } // updateThumbnails
 
         // from http://stackoverflow.com/questions/8214562/resize-jpeg-image-to-fixed-width-while-keeping-aspect-ratio-as-it-is
@@ -98,7 +98,7 @@ namespace PhotoAlbum
                 }
                 catch (IOException ie)
                 {
-                    Utilities.logger( String.Format("CopyAll Failed exception=:{0}:",ie));
+                    Utilities.logger( String.Format("CopyAll: Failed exception=:{0}:",ie));
                     PhotoAlbum.mainForm.messages.Text = String.Format("CopyAll: {0}", ie);
                     PhotoAlbum.mainForm.messages.Refresh();
                 }
@@ -109,13 +109,13 @@ namespace PhotoAlbum
         {
             // where are we running this program?
             var webPageSourceDirectory = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
-            Utilities.logger("webPageSourceDirectory=:" + webPageSourceDirectory);
+            Utilities.logger("createWebPage: webPageSourceDirectory=:" + webPageSourceDirectory);
             // where is the template web page code and files?
             string sourcePath = Path.Combine(Path.GetDirectoryName(webPageSourceDirectory).Replace("file:\\",""), "webpage");
             
             // where should we copy the template web page to?
             string targetPath = Path.Combine(PhotoAlbum.AlbumDirName, "webpage");
-            Utilities.logger( String.Format("targetPath=:{0}: sourcePath=:{1}:",targetPath,sourcePath));
+            Utilities.logger( String.Format("createWebPage: targetPath=:{0}: sourcePath=:{1}:",targetPath,sourcePath));
 
             DirectoryInfo sourceInfo = new DirectoryInfo(sourcePath);
             DirectoryInfo targetInfo = new DirectoryInfo(targetPath);
@@ -131,19 +131,19 @@ namespace PhotoAlbum
         {
             // check for webpage directory
             if (!Directory.Exists(targetInfo.FullName)) {
-                Utilities.logger( String.Format("ReCopyIndexFile Failed target directory missing: {0}",targetInfo.FullName));
+                Utilities.logger( String.Format("ReCopyIndexFile: Failed target directory missing: {0}",targetInfo.FullName));
                 PhotoAlbum.mainForm.messages.Text = String.Format("ReCopyIndexFile: {0}", targetInfo.FullName);
                 PhotoAlbum.mainForm.messages.Refresh();
                 return;
             }
             string indexFilePath = Path.Combine(targetInfo.FullName, "index.html");
-            Utilities.logger( String.Format("ReCopyIndexFile indexFilePath :{0}: ",indexFilePath));
+            Utilities.logger( String.Format("ReCopyIndexFile: indexFilePath :{0}: ",indexFilePath));
             
             string[] lines = File.ReadAllLines(indexFilePath);
-            Utilities.logger( String.Format("ReCopyIndexFile input lines length :{0}: ",lines.Length));
+            Utilities.logger( String.Format("ReCopyIndexFile: input lines length :{0}: ",lines.Length));
             //var processed = lines.Select(line => string.Format("{0}", line.Replace(ALBUM_FILE_NAME , albumFileName)));
             for (int i=0; i< lines.Length; ++i) {
-                if(lines[i].Contains(ALBUM_FILE_NAME)) Utilities.logger("ReCopyIndexFile found file name");
+                if(lines[i].Contains(ALBUM_FILE_NAME)) Utilities.logger("ReCopyIndexFile: found file name");
                 lines[i] = lines[i].Replace(ALBUM_FILE_NAME, albumFileName);
             }
             File.WriteAllLines(indexFilePath, lines);

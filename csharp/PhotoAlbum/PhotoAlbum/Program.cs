@@ -11,9 +11,16 @@ namespace PhotoAlbum
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new PhotoAlbum());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new PhotoAlbum());
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("Main exception = :{0}:", e));
+            }
         }
     }
 }

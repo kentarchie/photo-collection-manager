@@ -10,10 +10,10 @@ namespace PhotoAlbum
         public static void logger(string str)
         {
             if (PhotoAlbum.Debug) {
-                PhotoAlbum.debugForm.LogText = str;
+                var timeStamp = DateTime.Now.ToString("HHmm:ss:ffff");
+                var newMessage = string.Format("{0} : {1}",timeStamp, str);
+                PhotoAlbum.debugForm.LogText = newMessage;
             }
         } // logger
-
-
     }
 }

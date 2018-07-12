@@ -62,17 +62,19 @@
             this.rotateRight = new System.Windows.Forms.Button();
             this.clipStatus = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.pageDisplay = new RickApps.CropImage.RubberBand();
+            this.pageDisplay2 = new RickApps.CropImage.RubberBand();
             this.pageBackDisplay = new RickApps.CropImage.RubberBand();
             this.label8 = new System.Windows.Forms.Label();
             this.pixPerPage = new System.Windows.Forms.NumericUpDown();
             this.label11 = new System.Windows.Forms.Label();
             this.unsavedPictures = new System.Windows.Forms.Label();
             this.addBackText = new System.Windows.Forms.Button();
+            this.pageDisplay = new System.Windows.Forms.PictureBox();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.clippedImage)).BeginInit();
-            this.panel2.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pixPerPage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pageDisplay)).BeginInit();
             this.SuspendLayout();
             // 
             // loadAlbum
@@ -224,7 +226,7 @@
             this.pageList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pageList.FormattingEnabled = true;
             this.pageList.ItemHeight = 16;
-            this.pageList.Location = new System.Drawing.Point(6, 4);
+            this.pageList.Location = new System.Drawing.Point(18, 145);
             this.pageList.Margin = new System.Windows.Forms.Padding(4);
             this.pageList.Name = "pageList";
             this.pageList.Size = new System.Drawing.Size(148, 546);
@@ -266,7 +268,7 @@
             // 
             // pageFileName
             // 
-            this.pageFileName.Location = new System.Drawing.Point(192, 123);
+            this.pageFileName.Location = new System.Drawing.Point(186, 119);
             this.pageFileName.Name = "pageFileName";
             this.pageFileName.Size = new System.Drawing.Size(172, 17);
             this.pageFileName.TabIndex = 55;
@@ -320,11 +322,10 @@
             this.panel2.AutoSize = true;
             this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.pageList);
             this.panel2.Location = new System.Drawing.Point(13, 137);
             this.panel2.Margin = new System.Windows.Forms.Padding(4);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(160, 556);
+            this.panel2.Size = new System.Drawing.Size(2, 2);
             this.panel2.TabIndex = 30;
             // 
             // rotateLeft
@@ -359,23 +360,23 @@
             // panel1
             // 
             this.panel1.AutoScroll = true;
-            this.panel1.Controls.Add(this.pageDisplay);
-            this.panel1.Location = new System.Drawing.Point(189, 142);
+            this.panel1.Controls.Add(this.pageDisplay2);
+            this.panel1.Location = new System.Drawing.Point(173, 625);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(557, 557);
+            this.panel1.Size = new System.Drawing.Size(576, 217);
             this.panel1.TabIndex = 69;
             // 
-            // pageDisplay
+            // pageDisplay2
             // 
-            this.pageDisplay.Disabled = false;
-            this.pageDisplay.Image = null;
-            this.pageDisplay.Location = new System.Drawing.Point(13, 17);
-            this.pageDisplay.Margin = new System.Windows.Forms.Padding(4);
-            this.pageDisplay.Name = "pageDisplay";
-            this.pageDisplay.Size = new System.Drawing.Size(530, 513);
-            this.pageDisplay.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pageDisplay.TabIndex = 0;
-            this.pageDisplay.ImageCropped += new System.EventHandler(this.OnImageCropped);
+            this.pageDisplay2.Disabled = false;
+            this.pageDisplay2.Image = null;
+            this.pageDisplay2.Location = new System.Drawing.Point(0, 15);
+            this.pageDisplay2.Margin = new System.Windows.Forms.Padding(4);
+            this.pageDisplay2.Name = "pageDisplay2";
+            this.pageDisplay2.Size = new System.Drawing.Size(530, 513);
+            this.pageDisplay2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pageDisplay2.TabIndex = 0;
+            this.pageDisplay2.ImageCropped += new System.EventHandler(this.OnImageCropped);
             // 
             // pageBackDisplay
             // 
@@ -438,11 +439,37 @@
             this.addBackText.UseVisualStyleBackColor = true;
             this.addBackText.Click += new System.EventHandler(this.addBackText_Click);
             // 
+            // pageDisplay
+            // 
+            this.pageDisplay.Location = new System.Drawing.Point(173, 145);
+            this.pageDisplay.Name = "pageDisplay";
+            this.pageDisplay.Size = new System.Drawing.Size(530, 463);
+            this.pageDisplay.TabIndex = 76;
+            this.pageDisplay.TabStop = false;
+            this.pageDisplay.Paint += new System.Windows.Forms.PaintEventHandler(this.pageDisplay_Paint);
+            this.pageDisplay.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pageDisplay_MouseDown);
+            this.pageDisplay.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pageDisplay_MouseMove);
+            this.pageDisplay.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pageDisplay_MouseUp);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(326, 47);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(127, 50);
+            this.button1.TabIndex = 77;
+            this.button1.Text = "CROP";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.btnCrop_Click);
+            // 
             // PPPForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1824, 789);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.pageDisplay);
+            this.Controls.Add(this.pageList);
             this.Controls.Add(this.addBackText);
             this.Controls.Add(this.unsavedPictures);
             this.Controls.Add(this.label11);
@@ -482,9 +509,9 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PPPForm_FormClosing);
             this.Load += new System.EventHandler(this.PPPForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.clippedImage)).EndInit();
-            this.panel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pixPerPage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pageDisplay)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -523,7 +550,7 @@
         private System.Windows.Forms.Button saveClip;
         private System.Windows.Forms.Label clipStatus;
         private System.Windows.Forms.Panel panel1;
-        private RickApps.CropImage.RubberBand pageDisplay;
+        private RickApps.CropImage.RubberBand pageDisplay2;
         private System.Windows.Forms.Button pageDone;
         private RickApps.CropImage.RubberBand pageBackDisplay;
         private System.Windows.Forms.Label label8;
@@ -531,6 +558,8 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label unsavedPictures;
         private System.Windows.Forms.Button addBackText;
+        private System.Windows.Forms.PictureBox pageDisplay;
+        private System.Windows.Forms.Button button1;
     }
 }
 

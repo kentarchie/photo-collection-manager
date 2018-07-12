@@ -14,6 +14,8 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using System.Collections.Generic;
 using PhotoAlbum.Properties;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 
 /*
     Format of album file
@@ -73,27 +75,19 @@ namespace PhotoAlbum
         {
             // main form setup
             InitializeComponent();
-            notesBox.WordWrap = true;
-      
-            debugForm = new DebugForm();
-            debugForm.Hide();
-
-            whenTaken.Focus();
-            
-            Utilities.logger("periodicSave: setup"); 
-            Thread1 = new Thread(new ThreadStart(periodicSave));
-            Thread1.Name = "periodicSave";
-            Thread1.Start();
             mainForm = this;
-
-            if(Thread1.IsAlive) Thread1.Abort("Done Running");
-            if(Thread1.IsAlive) Thread1.Join();
+            notesBox.WordWrap = true;
+            whenTaken.Focus();
+      
+            debugForm = new DebugForm(this);
+            debugForm.Hide();
             
-            //listBox1.Anchor =    (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
-            //listBox1.Anchor =    (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
-            //pictureBox1.Anchor = (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
-            //notesBox.Anchor =    (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
-            //logBox.Anchor =      (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right);
+            //Utilities.logger("PhotoAlbum: periodicSave: setup"); 
+            //Thread1 = new Thread(new ThreadStart(periodicSave));
+            //Thread1.Name = "periodicSave";
+            //Thread1.Start();
+
+            Utilities.logger("PhotoAlbum: Constructor Done");
         } // PhotoAlbum constructor
 
         public void periodicSave()
@@ -105,7 +99,7 @@ namespace PhotoAlbum
             }
             catch (ThreadInterruptedException te)
             {
-               Utilities.logger("periodicSave: thread exception: "+te.ToString()); 
+               MessageBox.Show("periodicSave: thread exception: "+te.ToString()); 
             }
         } // periodicSave
         
@@ -113,31 +107,32 @@ namespace PhotoAlbum
         // if not, create basic album object
         private void albumLoader(string dirName)
         {
-            Utilities.logger("dirName=:" + dirName + ":"); 
+            Utilities.logger("albumLoader: dirName=:" + dirName + ":"); 
             // find the album files, if more than one
             ArrayList albums = new ArrayList();
             foreach (string f in Directory.GetFiles(dirName, "*.album"))
                 albums.Add(f);
 
-            Utilities.logger("Albums count=:"+albums.Count+":"); 
+            Utilities.logger("albumLoader: Albums count=:"+albums.Count+":"); 
             if (albums.Count > 1) { // multiple albums, choose one
-                MessageBox.Show("Found more than one albm file");
+                MessageBox.Show("Found more than one album file");
             }
 
             if (albums.Count == 1) {
-                Utilities.logger("Album found is:" + albums[0] + ":");
+                Utilities.logger("albumLoader: Album found is:" + albums[0] + ":");
                 string albumText = File.ReadAllText((string)albums[0]); // load the entire file
                 
                 // turn the string into just JSON and parse
+                // The var Album= is there so the web page can load the data file without a server
                 CurrentAlbum = JObject.Parse(albumText.Replace("var Album=",""));
 
-                Utilities.logger("Album File Loaded");
+                Utilities.logger("albumLoader: Album File Loaded");
                 albumName.Text = (string)CurrentAlbum["albumname"];
-                Utilities.logger("albumname=:"+(string)CurrentAlbum["albumname"] +":");
+                Utilities.logger("albumLoader: albumname=:"+(string)CurrentAlbum["albumname"] +":");
 
                 Pictures  = (JArray)CurrentAlbum["pictures"];  // get the array of picture objects
                 NumPictures = Pictures.Count;
-                Utilities.logger("NumPictures=:"+NumPictures +":");
+                Utilities.logger("albumLoader: NumPictures=:"+NumPictures +":");
                 //Utilities.logger("Pictures[0] :"+((JObject)Pictures[0]).ToString() +":");
                 //Utilities.logger("CurrentAlbum['pictures'] :"+((JObject)CurrentAlbum["pictures"][0]).ToString() +":");
                 //Utilities.logger("notes for :"+(string)Pictures[0]["filename"]+": =:"+ (string)Pictures[0]["notes"] +":");
@@ -148,7 +143,7 @@ namespace PhotoAlbum
                     string fname = (string)f[FILENAME];
                     this.listBox1.Items.Add(fname.Trim());
                 }
-                Utilities.logger("Pictures Loaded");
+                Utilities.logger("albumLoader: Pictures Loaded");
                 showMessage("Pictures Loaded");
 
                 // get list of existing locations
@@ -167,13 +162,15 @@ namespace PhotoAlbum
                         foreach (string s in parts) whens.Add(s);
                     }
                 }
+                Utilities.logger("albumLoader: after where/when picture processing");
+
                 foreach (string s in locations) whereTaken.Items.Add(s);
                 foreach (string s in whens) whenTaken.Items.Add(s);
-
+                Utilities.logger("albumLoader: after where/when lists created");
             }
             else   // no album files set up and make new one
             {
-                Utilities.logger("No Album File");
+                Utilities.logger("albumLoader: No Album File");
                 CurrentAlbum = new JObject();
                 CurrentAlbum["albumname"] = albumName.Text;
                 Pictures = new JArray();
@@ -191,7 +188,7 @@ namespace PhotoAlbum
                 {
                    return f1.CreationTime.CompareTo(f2.CreationTime);
                 });
-                Utilities.logger("Found " + files.Count() + " pictures");
+                Utilities.logger("albumLoader: Found " + files.Count() + " pictures");
 
                 // make list of picture objects
                 foreach (FileInfo f in files)
@@ -207,11 +204,11 @@ namespace PhotoAlbum
                     newPicture[NOTES] = "";
                     Pictures.Add(newPicture);
                     NumPictures++;
-                    Utilities.logger("Added picture " + f.Name);
+                    Utilities.logger("albumLoader: Added picture " + f.Name);
                 } // foreach picture loading
                 CurrentAlbum["pictures"] = Pictures;
             }
-            Utilities.logger("albumLoader done");
+            Utilities.logger("albumLoader: DONE");
             WebPageSetup.updateThumbnails(); // make thumbnails for each picture we found
             string albumFileName = saveTheAlbum();
             WebPageSetup.createWebPage(albumFileName); // copy web page files to the album folder
@@ -221,46 +218,54 @@ namespace PhotoAlbum
         // action for loadAlbum button
         private void loadAlbum_Click(object sender, EventArgs e)
         {
+            Utilities.logger("loadAlbum_Clicked: START");
             folderBrowserDialog1.RootFolder = Environment.SpecialFolder.MyComputer;
             folderBrowserDialog1.SelectedPath = @"C:\pictures";
-            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) 
-            {
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK) {
                AlbumDirName = folderBrowserDialog1.SelectedPath;
-               Utilities.logger("loadAlbum_Clicked: AlbumDirName=:" + AlbumDirName + ":");
+               Utilities.logger(string.Format("loadAlbum_Clicked: AlbumDirName=:{0}",AlbumDirName));
                albumName.Text = Path.GetFileName(AlbumDirName);
                albumLoader(AlbumDirName);
-               displayPicture(0);
+                try
+                {
+                    Utilities.logger("loadAlbum_Clicked: calling displayPicture(0)");
+                    displayPicture(0);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("loadAlbum exception = :{0}:",ex));
+                }
             }
             Utilities.logger("loadAlbum_Click done");
         } // loadAlbum_Click
 
         private void notesBox_TextChanged(object sender, EventArgs e)
         {
-            Utilities.logger("noteBox_TextChanged");
+            Utilities.logger("noteBox_TextChanged: START");
             noticeChange();
         } // notesBox_TextChanged
 
         private void caption_TextChanged(object sender, EventArgs e)
         {
-            Utilities.logger("caption_TextChanged");
+            Utilities.logger("caption_TextChanged: START");
             noticeChange();
         } // caption_TextChanged
 
         private void whenTaken_TextChanged(object sender, EventArgs e)
         {
-            Utilities.logger("whenTaken_TextChanged");
+            Utilities.logger("whenTaken_TextChanged: START");
             noticeChange();
         } // whenTaken_TextChanged
 
         private void whereTaken_TextChanged(object sender, EventArgs e)
         {
-            Utilities.logger("whereTaken_TextChanged");
+            Utilities.logger("whereTaken_TextChanged: START");
             noticeChange();
         } // whereTaken_TextChanged
 
         private void whoBox_TextChanged(object sender, EventArgs e)
         {
-            Utilities.logger("whoBox_TextChanged");
+            Utilities.logger("whoBox_TextChanged: START");
             noticeChange();
         } // whoBox_TextChanged
 
@@ -277,6 +282,7 @@ namespace PhotoAlbum
 
         private void displayPicture(int imageNumber)
         {
+            Utilities.logger(string.Format("displayPicture start number = {0}",imageNumber));
             if((imageNumber < 0) || (imageNumber >= Pictures.Count)) {
                 pictureFileName.Text = "No Picture " + imageNumber;
                 return;
@@ -291,13 +297,17 @@ namespace PhotoAlbum
             pictureFileName.Text = fname;
 
             Image image = Image.FromFile(imageFileName);
-            Image<Bgr, Byte> bgrImage = new Image<Bgr, Byte>(imageFileName);
+            Image<Bgr, Byte> bgrImage = null;
+            //Image<Bgr, Byte> bgrImage = new Image<Bgr, Byte>(imageFileName);
             //pictureBox.Image = bgrImage;
+            //pictureBox.Image = image;
+            //pictureBox.Refresh();
 
-            CascadeClassifier _cascadeClassifier;
-            _cascadeClassifier = new CascadeClassifier(Application.StartupPath + "/haarcascade_frontalface_alt_tree.xml");
+            //CascadeClassifier _cascadeClassifier;
+            //_cascadeClassifier = new CascadeClassifier(Application.StartupPath + "/haarcascade_frontalface_alt_tree.xml");
 
             if (bgrImage != null) {
+                Utilities.logger("displayPicture: bgrImage != null");
                 //var grayframe = bgrImage.Convert<Gray, byte>().ConvertScale<Byte>(0,0);
                 //var faces = _cascadeClassifier.DetectMultiScale(grayframe, 1.1, 10, Size.Empty); //the actual face detection happens here
                 //grayframe.Dispose();
@@ -312,20 +322,39 @@ namespace PhotoAlbum
                 */
                 // https://stackoverflow.com/questions/15052419/how-to-resize-image-with-imagebox-emgucv
                 // To resize the image 
-                using (var resizedImage = ScaleImage(bgrImage,pictureBox.Width, pictureBox.Height))
+                using (var resizedImage = ScaleImage(bgrImage,pictureBox2.Width, pictureBox2.Height))
                 {
-                    if (pictureBox.Image != null) pictureBox.Image.Dispose();
-                    pictureBox.Image = resizedImage;                    
+                    if (pictureBox2.Image != null) pictureBox2.Image.Dispose();
+                    pictureBox2.Image = resizedImage;                    
                 }
             }
-            
+            else {
+                Utilities.logger("displayPicture: resizing Image image");
+                try
+                {
+                    using (var resizedImage = ScaleImage(image, pictureBox.Width, pictureBox.Height))
+                    {
+                        //if (pictureBox.Image != null) pictureBox.Image.Dispose();
+                        pictureBox.Image = resizedImage;
+                        pictureBox.Refresh();
+                        Utilities.logger("displayPicture: picture displayed");
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(string.Format("resizedImage exception = :{0}:", e));
+                }
+            }
+
+            listBox1.Tag = true;
             listBox1.SelectedIndex = listBox1.FindString(fname);
+            listBox1.Tag = null;
 
             // process and display the notes and other fields
             string notes = HttpUtility.UrlDecode((string)current[NOTES]);
             notesBox.Text = notes;
             //Utilities.logger("displayPicture: decoded notes=:"+HttpUtility.UrlDecode(notes)+":");
-            Utilities.logger("\nnotes=:"+ notes+":");
+            Utilities.logger(string.Format("displayPicture: notes=:{0}" , notes));
 
             string when = HttpUtility.UrlDecode((string)current[WHEN_TAKEN]);
             if(when == "") when = HttpUtility.UrlDecode((string)previous[WHEN_TAKEN]);
@@ -340,26 +369,31 @@ namespace PhotoAlbum
 
             string captionString = HttpUtility.UrlDecode((string)current[CAPTION]);
             caption.Text = captionString;
+            Utilities.logger(string.Format("displayPicture: done number = {0}",imageNumber));
         } // displayPicture
 
         // go back and forth through the Picture list
         private void nextButton_Click(object sender, EventArgs e)
         {
+            Utilities.logger("nextButton_Click: START");
             saveChanges(); 
             if (PictureCounter == NumPictures - 1)
                 PictureCounter = 0;
             else
                 PictureCounter++;
+            Utilities.logger(string.Format("nextButton_Click: calling displayPicture({0})",PictureCounter));
             displayPicture(PictureCounter);
         } // nextButton_Click
 
         private void prevButton_Click(object sender, EventArgs e)
         {
+            Utilities.logger("prevButton_Click: START");
             saveChanges(); 
             if (PictureCounter == 0)
                 PictureCounter = NumPictures-1;
             else
                 PictureCounter--;
+            Utilities.logger(string.Format("prevButton_Click: calling displayPicture({0})",PictureCounter));
             displayPicture(PictureCounter);
         } // prevButton_Click
 
@@ -380,6 +414,7 @@ namespace PhotoAlbum
         //https://www.arclab.com/en/kb/csharp/save-and-restore-position-size-windows-forms-application.html
         private void Form1_Load(object sender, EventArgs e)
         {
+            Utilities.logger("Form1_Load: START");
             if (Properties.Settings.Default.F1Size.Width == 0 || Properties.Settings.Default.F1Size.Height == 0)
             {
                 // first start
@@ -395,11 +430,12 @@ namespace PhotoAlbum
                 this.Location = Properties.Settings.Default.F1Location;
                 this.Size = Properties.Settings.Default.F1Size;
             }
+            Utilities.logger("Form1_Load: DONE");
         } // Form1_Load
 
         private void PhotoAlbum_FormClosing(object sender, FormClosingEventArgs e)
         {
-            MessageBox.Show("form closing called", "title",MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            Utilities.logger("PhotoAlbum_FormClosing: START");
             Properties.Settings.Default.F1State = this.WindowState;
             if (this.WindowState == FormWindowState.Normal)
             {
@@ -414,8 +450,28 @@ namespace PhotoAlbum
                 Properties.Settings.Default.F1Size = this.RestoreBounds.Size;
             }
 
+            if(Thread1 != null)
+            {
+                Utilities.logger("PhotoAlbum_FormClosing: Thread1 NOT null");
+                if (Thread1.IsAlive)
+                {
+                    Utilities.logger("PhotoAlbum_FormClosing: Thread1 alive");
+                    Thread1.Abort("Done Running");
+                    Thread1.Join();
+                }
+                else
+                {
+                    Utilities.logger("PhotoAlbum_FormClosing: Thread1 NOT alive");
+                }
+            } 
+            else
+            {
+                Utilities.logger("PhotoAlbum_FormClosing: Thread1 null");
+            }
+
             // don't forget to save the settings
             Properties.Settings.Default.Save();
+            //MessageBox.Show("form closing finished", "title",MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         } // PhotoAlbum_FormClosing
 
         // update the data structure for the current picture
@@ -432,6 +488,8 @@ namespace PhotoAlbum
         
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (listBox1.Tag != null) return;
+            Utilities.logger("listBox1_SelectedIndexChanged: START");
             string curItem = listBox1.SelectedItem.ToString(); 
             int count = 0;
             // find the chosen picture in the list
@@ -442,13 +500,14 @@ namespace PhotoAlbum
                 }
                 count++;
             }
+            Utilities.logger(string.Format("listBox1_SelectedIndexChanged: calling displayPicture({0})", PictureCounter));
             displayPicture(PictureCounter);
         } // listBox1_SelectedIndexChanged
 
         // generate the JSON data file for the album
         private String saveTheAlbum()
         {
-            Utilities.logger("saving album");
+            Utilities.logger("saveTheAlbum: saving album");
             AlbumStatus.BackColor = Color.Red;
             AlbumStatus.Text = "Saving";
             saveChanges();
@@ -474,6 +533,7 @@ namespace PhotoAlbum
         // what to do when something changes
         private void noticeChange()
         {
+            Utilities.logger("noticeChange: START");
             //saveNoteButton.BackColor = Color.Red;
             FormStatus.BackColor = Color.Red;
             FormStatus.Text = "Saving";
@@ -496,7 +556,7 @@ namespace PhotoAlbum
         } // showMessage
 
         // show/hide the logging control
-        private void debugSwitch_Click(object sender, EventArgs e)
+        public void debugSwitch_Click(object sender, EventArgs e)
         {
             if (debugSwitch.Text.Contains("Off"))
             {
@@ -504,8 +564,7 @@ namespace PhotoAlbum
                 debugSwitch.Text = debugSwitch.Text.Replace("Off", "On");
                 debugSwitch.BackColor = Color.Red;
                 debugForm.Show();
-                //logLabel.Show();
-                //logBox.Show();
+                Utilities.logger("debugSwitch_Click: Logging Start");
             }
             else
             {
@@ -513,8 +572,6 @@ namespace PhotoAlbum
                 debugSwitch.Text = debugSwitch.Text.Replace("On", "Off");
                 debugSwitch.BackColor = Color.Lime;
                 debugForm.Hide();
-                //logLabel.Hide();
-                //logBox.Hide();
             }
         } // debugSwitch
 
@@ -531,6 +588,7 @@ namespace PhotoAlbum
         // based on https://stackoverflow.com/questions/6501797/resize-image-proportionally-with-maxheight-and-maxwidth-constraints
         public static Image<Bgr, Byte> ScaleImage(Image<Bgr, Byte> image, int maxWidth, int maxHeight)
         {
+            Utilities.logger("ScaleImage: START Image<Bgr, Byte> ");
             var ratioX = (double)maxWidth / image.Width;
             var ratioY = (double)maxHeight / image.Height;
             var ratio = Math.Min(ratioX, ratioY);
@@ -543,9 +601,86 @@ namespace PhotoAlbum
             return newImage;
         } // ScaleImage
 
-        private void panel3_Paint(object sender, PaintEventArgs e)
+        // based on https://stackoverflow.com/questions/6501797/resize-image-proportionally-with-maxheight-and-maxwidth-constraints
+        public static Image ScaleImage(Image image, int maxWidth, int maxHeight)
         {
+            Utilities.logger("ScaleImage: START Image");
+            double ratioX=0.0, ratioY=0.0, ratio=0.0;
 
+            int newWidth = 0, newHeight = 0;
+            try
+            {
+                ratioX = (double)maxWidth / image.Width;
+                ratioY = (double)maxHeight / image.Height;
+                ratio = Math.Min(ratioX, ratioY);
+    
+                newWidth = (int)(image.Width * ratio);
+                newHeight = (int)(image.Height * ratio);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("scaleImage Image: get sizes exception = :{0}:", e));
+            }
+            Utilities.logger("scaleimage Image: after widths");
+
+            //var newImage = image.Resize(newWidth, newHeight, Inter.Linear);
+            Bitmap newImage = null;
+            try
+            {
+                newImage = ResizeImage(image, newWidth, newHeight);
+                Utilities.logger("scaleImage Image: after ResizeImage");
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format("resize exception = :{0}:", e));
+            }
+
+            return newImage;
+        } // ScaleImage
+
+        /// <summary>
+        /// 
+        /// https://stackoverflow.com/questions/1922040/resize-an-image-c-sharp
+        /// Resize the image to the specified width and height.
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        public static Bitmap ResizeImage(Image image, int width, int height)
+        {
+            Utilities.logger("ResizeImage: START");
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+            Utilities.logger("ResizeImage: after set resolution");
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                Utilities.logger("ResizeImage: after set graphics");
+
+                try
+                {
+                    using (var wrapMode = new ImageAttributes())
+                    {
+                        wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                        graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                        Utilities.logger("ResizeImage: after drawImage");
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(string.Format(" ResizeImage: Inner Exception = :{0}:",e));
+                }
+            }
+
+            return destImage;
         }
 
         private void OpenDatePicker_Click(object sender, EventArgs e)
@@ -568,8 +703,6 @@ namespace PhotoAlbum
                 if(result == DialogResult.OK) {
                 }
             }
-        }
-
-        
+        } // SettingsButton_Click
     }// class PhotoAlbum
 } // namespace PhotoAlbum
