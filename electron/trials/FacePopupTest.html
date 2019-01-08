@@ -1,0 +1,174 @@
+<html>
+	<head>
+		<meta charset='utf-8' />
+		<title>Face Popup Test</title>
+		<!--
+		https://stackoverflow.com/questions/14824747/overlay-html5-canvas-over-image
+		-->
+		<style>
+			/* from http://jsbin.com/owavu3/1/edit?html,css,js,output */
+			[contenteditable]:hover, [contenteditable]:focus {
+  				background: #FFFFD3;
+			}
+
+			[contenteditable]:hover:after {
+  				content: ' click to edit';
+  				font-style: italic;
+  				font-size: 12px;
+  				font-family: sans-serif;
+  				color: #ccc;
+  				.text-stroke(0);
+			}
+
+			[contenteditable]:focus {
+  				padding: 5px;
+			}
+
+			[contenteditable]:focus:after {
+  				content: '';
+			}
+
+			/* Popup box BEGIN */
+.hover_bkgr_fricc{
+    background-color: #fff;
+    box-shadow: 10px 10px 60px #555;
+    border-radius: 8px;
+    display:none;
+    position:fixed;
+    padding: 5px;
+    z-index:10000;
+}
+.hover_bkgr_fricc > div {
+    position: relative;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.popupCloseButton {
+    text-align:right;
+    cursor: pointer;
+    color: green;
+    font-family: arial;
+    font-weight: bold;
+    font-style: italic;
+    font-size: small;
+}
+.popupCloseButton:hover {
+    background-color: #ccc;
+}
+.trigger_popup_fricc {
+    cursor: pointer;
+    font-size: 20px;
+    margin: 20px;
+    display: inline-block;
+    font-weight: bold;
+}
+.nameField {
+    border: 1px solid rgba(255,0,0,.2);
+    margin-top: 3px;
+}
+.deleteFaceBox {
+    cursor: pointer;
+}
+		</style>
+
+	</head>
+	<body>
+
+		<button type='button' id='trigger_button' class='trigger_popup_fricc'>Click here</button>
+
+		<div class='hover_bkgr_fricc'>
+			<div class='popupCloseButton' title='close window and save any changes'>close</div>
+            <button type='button' class='deleteFaceBox' 
+                 title='Delete the face box selected and any name data'>Delete This Face Box</button>
+            <div contenteditable='true' id='firstName' class='nameField' 
+                 title='Enter or change the first name of the person pictured'>First Name</div>
+            <div contenteditable='true' id='lastName'  class='nameField' 
+                 title='Enter or change the last name of the person pictured'>Last Name</div>
+		</div>
+
+		<script type='text/javascript' src='TestAlbum/OrigTestData.json'></script>
+		<script type='text/javascript' src='js/jquery.js'></script>
+		<script>
+			$(document).ready(() => {
+    $("#trigger_button").click(function(){
+    	 var el = $('#trigger_button');
+    	 var offset = el.offset();
+			 var top = offset.top;
+       var height  = el.height();
+       var width  = el.width();
+    	 console.log("height=%d  width=%d ",height, width );
+    	 //var bottom = $(window).height() - top - el.height();
+    	 var bottom = top + el.height();
+    	 var right = offset.left + el.width();
+       console.log("left=%d  right= %d  top=%d bottom = %d",offset.left, right, top,bottom);
+			 showFaceChoices(right,bottom);
+	 });
+	 /*
+    $('.hover_bkgr_fricc').click(function(){
+        $('.hover_bkgr_fricc').hide();
+	 });
+	 */
+    $('.popupCloseButton').click(function(){
+        $('.hover_bkgr_fricc').hide();
+    });
+    $('#firstName').change(function(){
+		 console.log('firstName changed');
+    });
+});
+function showFaceChoices(x,y) 
+{
+		var el = $('.hover_bkgr_fricc');
+    el.css('left',x+'px');
+    el.css('top',y+'px');
+    console.log("NEW left=%s  top=%s ",el.css('left'), el.css('top') );
+		el.show();
+
+} // showFaceChoices
+
+// from http://jsbin.com/owavu3/1/edit?html,css,js,output
+document.addEventListener('keydown', function (event) {
+  var esc = event.which == 27,
+      nl = event.which == 13,
+      el = event.target,
+      input = el.nodeName != 'INPUT' && el.nodeName != 'TEXTAREA',
+      data = {};
+
+  if (input) {
+    if (esc) {
+      // restore state
+      document.execCommand('undo');
+      el.blur();
+    } else if (nl) {
+      // save
+      data[el.getAttribute('data-name')] = el.innerHTML;
+
+      // we could send an ajax request to update the field
+      /*
+      $.ajax({
+        url: window.location.toString(),
+        data: data,
+        type: 'post'
+      });
+      */
+      console.log(JSON.stringify(data));
+
+      el.blur();
+      event.preventDefault();
+    } // if nl
+  } // if input
+}, true);
+
+// from https://stackoverflow.com/questions/1403615/use-jquery-to-hide-a-div-when-the-user-clicks-outside-of-it
+$(document).mouseup(function(e) 
+{
+    var container = $('.hover_bkgr_fricc');
+
+    // if the target of the click isn't the container nor a descendant of the container
+    if (!container.is(e.target) && container.has(e.target).length === 0) 
+    {
+        container.hide();
+    }
+});
+		</script>
+	</body>
+</html>

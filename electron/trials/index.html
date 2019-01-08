@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Face Detect Test</title>
+		<!--
+		https://stackoverflow.com/questions/14824747/overlay-html5-canvas-over-image
+		-->
+		<link rel='stylesheet' href='../app/css/PictureDisplay.css' />
+		<style>
+		#testImage {
+			width : var(--image-width);
+			height: var(--image-height);
+		}
+		.pictureDisplay {
+			width : var(--image-width);
+			height: var(--image-height);
+			position:relative;
+		}
+		</style>
+
+	</head>
+	<body>
+		<h1>NEW ONE</h1>
+		<div>
+			<label for="choosePicture">Choose a picture:</label>
+			<select id='choosePicture' name='choosePicture'>
+				<option value='empty'>Choose a picture</option>
+			</select>
+		</div>
+		<div id='pictureDisplay' class='pictureDisplay'>
+		</div>
+		<!--<img src='TestAlbum/PD0005.jpg' />-->
+
+		<script type='text/javascript' src='../TestData/OrigTestData.json'></script>
+		<script type='text/javascript' src='../app/library/jquery.js'></script>
+		<script type='text/javascript' src='../app/js/ImageFaceHandling.js'></script>
+		<script type='text/javascript' src='js/main.js'></script>
+		<!-- <script type='text/javascript' src='js/ImageDisplay.js'></script> -->
+	</body>
+</html>

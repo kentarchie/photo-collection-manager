@@ -1,0 +1,52 @@
+	// from https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
+	// get the clicked position relative to the canvas
+	var getClickPosition = function(evt,canvasElement)
+	{
+		let clickX,clickY;
+		if (evt.pageX || evt.pageY) { 
+  			clickX = evt.pageX;
+  			clickY = evt.pageY;
+			console.log('ImageFaceHandling.getClickPosition: using pageX,Y');
+		}
+		else { 
+  			clickX = evt.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+  			clickY = evt.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+			console.log('ImageFaceHandling.getClickPosition: using clientX,Y');
+		} 
+		clickX -= canvasElement.offsetLeft;
+		clickY -= canvasElement.offsetTop;
+		console.log('ImageFaceHandling.getClickPosition: canvasElement.offsetLeft= %d canvasElement.offsetTop=%d',canvasElement.offsetLeft,  canvasElement.offsetTop);
+		let newPos =  {
+			x : clickX
+			,y : clickY
+		};
+		console.log('ImageFaceHandling.getClickPosition: ' + JSON.stringify(newPos,null,'\t'));
+		return newPos;
+	} // getClickPosition
+
+   	// this is use to differentiate between a single and double click
+	// Author:  Jacek Becela
+	// Source:  http://gist.github.com/399624
+	// License: MIT
+	// https://stackoverflow.com/questions/5497073/how-to-differentiate-single-click-event-and-double-click-event
+
+	jQuery.fn.single_double_click = function(single_click_callback, double_click_callback, timeout)
+	{
+ 		console.log ('ImageFaceHandling.single_double_click: START');
+  		return this.each(function(){
+    		var clicks = 0, self = this;
+    		jQuery(this).click(function(event){
+      		clicks++;
+      		if (clicks == 1) {
+        			setTimeout(function(){
+          			if(clicks == 1) {
+            			single_click_callback.call(self, event);
+          			} else {
+            			double_click_callback.call(self, event);
+          			}
+         			clicks = 0;
+        			}, timeout || 300);
+      		} // if(clicks == 1)
+    		}); // click handler
+  		});
+	} // single_double_click
