@@ -7,3 +7,14 @@ step in Getting Started
 npm install babel-preset-env --save-dev
 
 if using Git, make sure node-modules is in .gitignore
+
+notes on updating/installing node here
+https://websiteforstudents.com/install-the-latest-node-js-and-nmp-packages-on-ubuntu-16-04-18-04-lts/
+where the notes say 8, change to current node version
+
+some notes on installing electron
+https://electronjs.org/docs/tutorial/installation
+
+
+add this to path
+/home/kent/projects/photo-collection-manager/electron/node_modules/electron/dist/electron

@@ -1,5 +1,5 @@
 {
-  "name": "electron-photo-album",
+  "name": "photo-collection-manager",
   "version": "0.1.0",
   "description": "Collect information about photos and produce a web page album",
   "repository": {
@@ -13,7 +13,7 @@
   "author": "Kent Archie",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^1.8.7",
+    "electron": "^4.0.1",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
     "electron-packager": "^8.5.0",
