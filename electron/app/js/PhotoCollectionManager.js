@@ -1,7 +1,9 @@
-const {dialog} = require('electron').remote;
+const electron = require('electron');
+const {dialog} = electron.remote;
 const fsLib = require('fs');
 const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
+const yargs = require('yargs');
 
 const FILE_TREE_NODE_LABEL = 'name';
 const FILE_TREE_NODE_CHILDREN = 'children';
@@ -10,6 +12,7 @@ let FileList = [];
 let CurrentPicture = '';
 let AlbumPath = '';
 let AlbumName = '';
+let CliData = electron.remote.getCurrentWindow().cliData;
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 // base code from from https://gist.github.com/kethinov/6658166
@@ -36,14 +39,14 @@ function walkSync (dir, fileTree,fileList) {
 
 function makeThumbNails()
 {
-    logger('makeThumbNails: START:');
+    //logger('makeThumbNails: START:');
     //for(var index=0,len=FileList.length; index<len; ++index) {
      for(var index=0,len=2; index<len; ++index) {
         let sourcePath = AlbumPath + '\\' + FileList[index];
         let destPath = AlbumPath + '\\tn\\' + FileList[index];
-        logger('makeThumbNails: working on source :' + sourcePath + ':');
-        logger('makeThumbNails: working on dest :' + destPath + ':');
-    thumb({
+        //logger('makeThumbNails: working on source :' + sourcePath + ':');
+        //logger('makeThumbNails: working on dest :' + destPath + ':');
+        thumb({
             source: sourcePath
             ,destination: destPath
             ,width: 300
@@ -64,13 +67,24 @@ function makeThumbNails()
           }
     );
     */
-    logger('makeThumbNails: working on :' + sourcePath + ': done');
+    //logger('makeThumbNails: working on :' + sourcePath + ': done');
     } // for FileList
 } // makeThumbNails
 
-function showPicture(path)
+function showPicture(fname)
 {
-    $('#currentPicture').attr('src', path);
+	var newImg = new Image();
+	console.log('showPicture: fname = :%s:',fname);
+	let filename = Album_Data[fname]['filename'];
+	console.log('showPicture: filename is :%s:',filename);
+	newImg.src=  ImageHandlingSettings.albumName + '/' + fname;
+   newImg.onload = function() {
+		ImageFaceHandling.showPicture(fname);
+		console.log ('showPicture: The image natural size is %s(width) %s (height)',
+		    newImg.naturalWidth , newImg.naturalHeight);
+		ImageFaceHandling.drawFaces(fname);
+	} 
+    $('#currentPicture').attr('src', fname);
     $('#currentPicture').css('visibility','visible');
 } // showPicture
 
@@ -124,6 +138,20 @@ $(document).ready(function() {
      ]
    }
    */
+
+   console.log('ready: cliData.debug ->', CliData.debug);
+   console.log('ready: cliData.album ->', CliData.album);
+
+
+    let ImageHandlingSettings = {
+      wrapperID: 'pictureDisplay'
+        ,albumName: 'TestAlbum'
+	    ,lineWidth : 1
+	    ,strokeStyle : '#FF0000'
+    };
+	ImageFaceHandling.init(ImageHandlingSettings);
+	ImageFaceHandling.showConfig();
+	ImageFaceHandling.setup();
 
    ErrorDialog = $('#dialog-dataerror').dialog({
       autoOpen: false

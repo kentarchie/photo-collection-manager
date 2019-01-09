@@ -1,11 +1,23 @@
 const {app, BrowserWindow} = require('electron');
 const path = require('path');
 const url = require('url');
+const yargs = require('yargs');
 
 let mainWindow = null;
 
 function createWindow ()
 {
+  // for more options  handling, see https://github.com/yargs/yargs
+  let cliData = {};
+  var argv = require('yargs')
+    .usage('Usage: $0 -debug -album album_name')
+    .argv;
+  if(!argv.debug) argv.debug=false;
+  cliData.debug=argv.debug;
+  cliData.album=argv.album;
+  console.log('createWindow: argv.debug ->', argv.debug);
+  console.log('createWindow: argv.album ->', argv.album);
+
   // Create a new window
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -17,6 +29,7 @@ function createWindow ()
     show: false
   });
   mainWindow.loadURL('http://localhost:5262'); // Specify entry point
+  mainWindow.cliData = cliData;
 
   // Remove window once app is closed
   mainWindow.on('closed', function () {
@@ -31,7 +44,7 @@ function createWindow ()
   }));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if(cliData.debug) mainWindow.webContents.openDevTools();
 
   // Show window when page is ready
   mainWindow.once('ready-to-show', () => {
