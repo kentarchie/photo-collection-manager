@@ -12,7 +12,7 @@ let FileList = [];
 let CurrentPicture = '';
 let AlbumPath = '';
 let AlbumName = '';
-let CliData = electron.remote.getCurrentWindow().cliData;
+let CliData = electron.remote.getCurrentWindow().cliData; // parameters from the command line
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 // base code from from https://gist.github.com/kethinov/6658166
