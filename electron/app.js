@@ -20,15 +20,18 @@ function createWindow ()
 
   // Create a new window
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 700,
+    width: 1200
+    ,height: 700
     // Set the default background color of the window to match the CSS
     // background color of the page, this prevents any white flickering
-    backgroundColor: "#D6D8DC",
+    ,backgroundColor: "#D6D8DC"
     // Don't show the window until it's ready, this prevents any white flickering
-    show: false
+    ,show: false
+    ,webPreferences : {
+      nodeIntegration : false
+    }
   });
-  mainWindow.loadURL('http://localhost:5262'); // Specify entry point
+  /*mainWindow.loadURL('http://localhost:5262');*/ // Specify entry point
   mainWindow.cliData = cliData;
 
   // Remove window once app is closed

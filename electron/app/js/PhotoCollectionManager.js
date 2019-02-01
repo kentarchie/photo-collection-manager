@@ -2,7 +2,7 @@ const electron = require('electron');
 const {dialog} = electron.remote;
 const fsLib = require('fs');
 const pathLib = require('path');
-const thumb = require('node-thumbnail').thumb;
+const thumb = require('node-thumbnail');
 const yargs = require('yargs');
 
 const FILE_TREE_NODE_LABEL = 'name';

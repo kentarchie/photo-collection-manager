@@ -4,7 +4,10 @@
 	   <meta http-equiv='content-language' content='en' />
 	   <meta name='author' content='Kent Archie' />
 	   <meta name='copyright' content='Copyright Kent Archie 2019' />
-	   <meta name='description' content='Photo Collection Manager' />
+       <meta name='description' content='Photo Collection Manager' />
+       <!--
+       <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'inline'; img-src 'self';" />
+       -->
 
       <!--
       <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
@@ -98,7 +101,9 @@
 
    <!-- https://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined -->
    <!-- Insert this line above script imports  -->
+   <!--
    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+   -->
 
    <script type='text/javascript' src='js/library/jquery.js'></script>
    <script type='text/javascript' src='js/library/jquery.leanModal.min.js'></script>
@@ -113,7 +118,9 @@
    <script type='text/javascript' src='js/PhotoCollectionManager.js'></script>
 
    <!-- Insert this line after script imports -->
+   <!--
    <script>if (window.module) module = window.module;</script>
+   -->
 
     <footer>
         <div class='center copyright'>Copyright Kent Archie <span>year</span></div>
