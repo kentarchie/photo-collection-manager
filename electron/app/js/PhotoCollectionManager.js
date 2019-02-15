@@ -2,8 +2,7 @@ const electron = require('electron');
 const {dialog} = electron.remote;
 const fsLib = require('fs');
 const pathLib = require('path');
-const thumb = require('node-thumbnail');
-const yargs = require('yargs');
+const thumb = require('node-thumbnail').thumb;
 
 const FILE_TREE_NODE_LABEL = 'name';
 const FILE_TREE_NODE_CHILDREN = 'children';
@@ -141,7 +140,8 @@ $(document).ready(function() {
 
    console.log('ready: cliData.debug ->', CliData.debug);
    console.log('ready: cliData.album ->', CliData.album);
-
+   let settings = new SettingsForm('settingsForm','openSettings',100,250,'right');
+   settings.initializeForm();
 
     let ImageHandlingSettings = {
       wrapperID: 'pictureDisplay'

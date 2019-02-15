@@ -1,16 +1,25 @@
+// this code handles all interactions with the host operating system
+// this is the 'server' process
+
 const {app, BrowserWindow} = require('electron');
 const path = require('path');
 const url = require('url');
-const yargs = require('yargs');
+//const configuration = require('./configuration');
+
+const DEFAULT_WIDTH = 1200;
+const DEFAULT_HEIGHT = 700;
+const DEBUG_WIDTH = 1800;
+const DEBUG_HEIGHT = 800;
 
 let mainWindow = null;
 
 function createWindow ()
 {
+  // process any command line args
   // for more options  handling, see https://github.com/yargs/yargs
   let cliData = {};
   var argv = require('yargs')
-    .usage('Usage: $0 -debug -album album_name')
+    .usage('Usage: $0 [-debug] -album album_name')
     .argv;
   if(!argv.debug) argv.debug=false;
   cliData.debug=argv.debug;
@@ -18,20 +27,20 @@ function createWindow ()
   console.log('createWindow: argv.debug ->', argv.debug);
   console.log('createWindow: argv.album ->', argv.album);
 
-  // Create a new window
+  let winHeight = (cliData.debug) ? DEBUG_HEIGHT : DEFAULT_HEIGHT;
+  let winWidth =  (cliData.debug) ? DEBUG_WIDTH : DEFAULT_WIDTH;
+
+  // Create the main window
   mainWindow = new BrowserWindow({
-    width: 1200
-    ,height: 700
-    // Set the default background color of the window to match the CSS
+     width : winWidth
+    ,height: winHeight
     // background color of the page, this prevents any white flickering
     ,backgroundColor: "#D6D8DC"
-    // Don't show the window until it's ready, this prevents any white flickering
-    ,show: false
+    ,show: false // Don't show the window until it's ready, this prevents any white flickering
     ,webPreferences : {
       nodeIntegration : false
     }
   });
-  /*mainWindow.loadURL('http://localhost:5262');*/ // Specify entry point
   mainWindow.cliData = cliData;
 
   // Remove window once app is closed
@@ -51,6 +60,13 @@ function createWindow ()
 
   // Show window when page is ready
   mainWindow.once('ready-to-show', () => {
+    /*
+    if(!configuration.readSettings('debug'))
+    {
+      configuration.saveSettings('debug',false);
+      configuration.saveSettings('pictureBase','C:/pictures');
+    }
+    */
     mainWindow.show()
   });
 } // createWindow

@@ -18,6 +18,9 @@
       <link rel='stylesheet' type='text/css' href="css/library/defaultTheme.css" media="screen"/>
       <link rel='stylesheet' type='text/css' href='css/library/easytabs.css' />
       <link rel='stylesheet' type='text/css' href='css/PhotoCollectionManager.css' />
+      <!--
+      <link rel='stylesheet' type='text/css' href='css/settingsMenu.css' />
+      -->
    </head>
 <body>
    <header class=''>
@@ -25,9 +28,24 @@
            <img class='title' src='images/menuIcon.png' width=32 height=32 alt='Menu' />
        </a>
        <span class='center'>Photo Collection Manager</span>
-       <span class='left'>Stuff</span>
+        <button type='button' class='left' id='openSettings' >Change Settings</button>
     </header>  <!-- header -->
 
+    <!--
+    <nav role="navigation">
+        <div id="settingsForm" class=''>
+           <div>
+              <label for='debug'>Debug On</label>
+              <input type='checkbox' id='debug' />
+              <br />
+           
+              <label for='pictureBase'>Picture Base</label>
+              <input type='input' id='pictureBase' size=7 />
+           </div>
+        </div>
+     </nav>  
+    -->
+     
     <!-- popup ideas from https://codepen.io/imprakash/pen/GgNMXO -->
     <div id="popup1" class="overlay">
         <div class="popup">
@@ -112,10 +130,13 @@
    <script type='text/javascript' src='js/library/jquery-ui.min.js'></script>
    <script type='text/javascript' src='js/library/jquery.datetimepicker.js'></script>
    <script type='text/javascript' src='js/library/jquery.fixedheadertable.min.js'></script>
-
    <script type='text/javascript' src='js/library/moment.min.js'></script>
+
    <script type='text/javascript' src='js/ImageFaceHandling.js'></script>
-   <script type='text/javascript' src='js/PhotoCollectionManager.js'></script>
+   <!-- 
+       <script type='text/javascript' src='js/settingsForm.js'></script>
+    -->
+   <script type='text/javascript' src='js/PhotoCollectionManager.js' ></script>
 
    <!-- Insert this line after script imports -->
    <!--
