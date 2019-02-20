@@ -2,9 +2,12 @@
 // this is the 'server' process
 
 const {app, BrowserWindow} = require('electron');
-const path = require('path');
-const url = require('url');
-//const configuration = require('./configuration');
+//const path = require('path');
+//const url = require('url');
+//const dialog = require('electron').remote;
+//const fsLib = require('fs');
+//const pathLib = require('path');
+//const thumb = require('node-thumbnail').thumb;
 
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 700;
@@ -21,26 +24,36 @@ function createWindow ()
   var argv = require('yargs')
     .usage('Usage: $0 [-debug] -album album_name')
     .argv;
-  if(!argv.debug) argv.debug=false;
+
+  //if(!argv.debug) argv.debug=false;
   cliData.debug=argv.debug;
   cliData.album=argv.album;
   console.log('createWindow: argv.debug ->', argv.debug);
   console.log('createWindow: argv.album ->', argv.album);
 
-  let winHeight = (cliData.debug) ? DEBUG_HEIGHT : DEFAULT_HEIGHT;
-  let winWidth =  (cliData.debug) ? DEBUG_WIDTH : DEFAULT_WIDTH;
+  let winHeight = DEFAULT_HEIGHT;
+  let winWidth = DEFAULT_WIDTH;
+
+  if(cliData.debug) {
+    winHeight = DEBUG_HEIGHT;
+    winWidth = DEBUG_WIDTH;
+  }
 
   // Create the main window
   mainWindow = new BrowserWindow({
      width : winWidth
     ,height: winHeight
-    // background color of the page, this prevents any white flickering
-    ,backgroundColor: "#D6D8DC"
-    ,show: false // Don't show the window until it's ready, this prevents any white flickering
-    ,webPreferences : {
-      nodeIntegration : false
-    }
   });
+    // background color of the page, this prevents any white flickering
+    //,backgroundColor: "#D6D8DC"
+    //,show: false // Don't show the window until it's ready, this prevents any white flickering
+    //,webPreferences : {
+    //  nodeIntegration : false
+    //}
+  let urlToLoad = 'file://' + __dirname + '/app/index.html';
+  console.log('createWindow: loading url ->', urlToLoad);
+  mainWindow.loadURL(urlToLoad);
+
   mainWindow.cliData = cliData;
 
   // Remove window once app is closed
@@ -49,11 +62,14 @@ function createWindow ()
     });
 
   // Load a URL in the window to the local index.html path
+  /*
   mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'app/index.html'),
+    pathname: path.join("file://",__dirname, 'app/index.html'),
     protocol: 'file:',
     slashes: true
   }));
+  */
+
 
   // Open the DevTools.
   if(cliData.debug) mainWindow.webContents.openDevTools();

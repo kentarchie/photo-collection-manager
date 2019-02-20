@@ -1,5 +1,10 @@
-const electron = require('electron');
-const {dialog} = electron.remote;
+
+const {remote} = require('electron');
+const {Menu, BrowserWindow, MenuItem, shell} = remote;
+
+
+//const {electron} = require('electron');
+//const remote = require('remote');
 const fsLib = require('fs');
 const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
@@ -11,7 +16,8 @@ let FileList = [];
 let CurrentPicture = '';
 let AlbumPath = '';
 let AlbumName = '';
-let CliData = electron.remote.getCurrentWindow().cliData; // parameters from the command line
+//let CliData = electron.remote.getCurrentWindow().cliData; // parameters from the command line
+let CliData = remote.getCurrentWindow().cliData; // parameters from the command line
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 // base code from from https://gist.github.com/kethinov/6658166
@@ -166,7 +172,7 @@ $(document).ready(function() {
    $('#selectAlbum').click(function(evt)
    {
        logger('selectAlbum clicked');
-       dialog.showOpenDialog({
+       remote.dialog.showOpenDialog({
            'title':"Select a folder"
            ,'defaultPath': 'C:'
            ,'properties': ["openDirectory"]

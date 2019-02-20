@@ -12,11 +12,13 @@
       <!--
       <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
       -->
+      <!--
       <link rel="stylesheet" type='text/css' href="css/library/jquery-ui.min.css" />
       <link rel="stylesheet" type='text/css' href="css/library/jquery-ui-1.8.16.custom.css" />
       <link rel='stylesheet' type='text/css' href='css/library/jquery.datetimepicker.css' />
       <link rel='stylesheet' type='text/css' href="css/library/defaultTheme.css" media="screen"/>
       <link rel='stylesheet' type='text/css' href='css/library/easytabs.css' />
+      -->
       <link rel='stylesheet' type='text/css' href='css/PhotoCollectionManager.css' />
       <!--
       <link rel='stylesheet' type='text/css' href='css/settingsMenu.css' />
@@ -119,11 +121,10 @@
 
    <!-- https://stackoverflow.com/questions/32621988/electron-jquery-is-not-defined -->
    <!-- Insert this line above script imports  -->
-   <!--
    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-   -->
 
-   <script type='text/javascript' src='js/library/jquery.js'></script>
+   <script type='text/javascript' src='js/library/jquery-3.3.1.js'></script>
+   <!--
    <script type='text/javascript' src='js/library/jquery.leanModal.min.js'></script>
    <script type='text/javascript' src='js/library/jquery.event.drag-2.2.js'></script>
    <script type='text/javascript' src='js/library/jquery.easytabs.min.js'></script>
@@ -131,17 +132,14 @@
    <script type='text/javascript' src='js/library/jquery.datetimepicker.js'></script>
    <script type='text/javascript' src='js/library/jquery.fixedheadertable.min.js'></script>
    <script type='text/javascript' src='js/library/moment.min.js'></script>
+   -->
 
+   <script type='text/javascript' src='js/settingsForm.js'></script>
    <script type='text/javascript' src='js/ImageFaceHandling.js'></script>
-   <!-- 
-       <script type='text/javascript' src='js/settingsForm.js'></script>
-    -->
-   <script type='text/javascript' src='js/PhotoCollectionManager.js' ></script>
+   <script type='text/javascript' src='js/PhotoCollectionManager.js'></script>
 
    <!-- Insert this line after script imports -->
-   <!--
    <script>if (window.module) module = window.module;</script>
-   -->
 
     <footer>
         <div class='center copyright'>Copyright Kent Archie <span>year</span></div>
