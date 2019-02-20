@@ -159,12 +159,14 @@ $(document).ready(function() {
 	ImageFaceHandling.showConfig();
 	ImageFaceHandling.setup();
 
+    /*
    ErrorDialog = $('#dialog-dataerror').dialog({
       autoOpen: false
       ,height: 300
       ,width: 350
       ,modal: true
    });
+   */
 
    $('#prevImage').click(prevPicture)
    $('#nextImage').click(nextPicture)
