@@ -2,9 +2,6 @@
 const {remote} = require('electron');
 const {Menu, BrowserWindow, MenuItem, shell} = remote;
 
-
-//const {electron} = require('electron');
-//const remote = require('remote');
 const fsLib = require('fs');
 const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;

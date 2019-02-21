@@ -43,13 +43,11 @@ function createWindow ()
   mainWindow = new BrowserWindow({
      width : winWidth
     ,height: winHeight
+    ,backgroundColor: "#D6D8DC" // background color of the page, this prevents any white flickering
+    ,show: false // Don't show the window until it's ready, this prevents any white flickering
   });
-    // background color of the page, this prevents any white flickering
-    //,backgroundColor: "#D6D8DC"
-    //,show: false // Don't show the window until it's ready, this prevents any white flickering
-    //,webPreferences : {
-    //  nodeIntegration : false
-    //}
+
+  // Load a URL in the window to the local index.html path
   let urlToLoad = 'file://' + __dirname + '/app/index.html';
   console.log('createWindow: loading url ->', urlToLoad);
   mainWindow.loadURL(urlToLoad);
@@ -60,16 +58,6 @@ function createWindow ()
   mainWindow.on('closed', function () {
       mainWindow = null;
     });
-
-  // Load a URL in the window to the local index.html path
-  /*
-  mainWindow.loadURL(url.format({
-    pathname: path.join("file://",__dirname, 'app/index.html'),
-    protocol: 'file:',
-    slashes: true
-  }));
-  */
-
 
   // Open the DevTools.
   if(cliData.debug) mainWindow.webContents.openDevTools();
