@@ -1,7 +1,5 @@
 
 const {remote} = require('electron');
-const {Menu, BrowserWindow, MenuItem, shell} = remote;
-
 const fsLib = require('fs');
 const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
@@ -13,8 +11,30 @@ let FileList = [];
 let CurrentPicture = '';
 let AlbumPath = '';
 let AlbumName = '';
+let ImageExtensions = [
+'tif'
+,'tiff'
+,'gif'
+,'jpeg'
+,'jpg'
+,'jif'
+,'jfif'
+,'jp2'
+,'jpx'
+,'j2k'
+,'j2c'
+,'png'
+];
 //let CliData = electron.remote.getCurrentWindow().cliData; // parameters from the command line
 let CliData = remote.getCurrentWindow().cliData; // parameters from the command line
+
+// check the filename extension against the list of image file extensions
+function isImage(fname)
+{
+    let ext = pathLib.extname(fname).toLowerCase().replace('.','');
+    console.log('looking for :%s:',ext);
+    return(ImageExtensions.indexOf(ext) > 0);
+} // isImage
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 // base code from from https://gist.github.com/kethinov/6658166
@@ -23,10 +43,11 @@ function walkSync (dir, fileTree,fileList) {
   var getFiles = fsLib.readdirSync(dir);
   getFiles.forEach(function(file) {
       if (fsLib.statSync(dir + '/' + file).isDirectory()) {
-          if((file == 'thumbnails') || (file == 'webpage')) return;
+          if((file == 'thumbnails') || (file == 'webpage')) return;  // skip folders I made
           //fileTree = walkSync(dir + '/' + file + '/', fileTree);
       }
       else {
+          if(!isImage(file)) return; // only show image files
           let pathParts = pathLib.parse(dir + '/' + file);
           let node = {};
           node[FILE_TREE_NODE_LABEL] = pathParts.base;
@@ -73,14 +94,79 @@ function makeThumbNails()
     } // for FileList
 } // makeThumbNails
 
+   /*
+   file tree format
+   const root = {
+     "name": "root"
+     ,"children" : [
+         { "name": "bar", "children": [] }
+         ,{ "name": "foo", "children": [] }
+         ,{ "name": "nyarf", "children": [] }
+     ]
+   }
+   */
+function makeImageFileTree(evt)
+{
+    logger('selectAlbum clicked');
+    remote.dialog.showOpenDialog({
+        'title':"Select a folder"
+        ,'defaultPath': 'C:'
+        ,'properties': ["openDirectory"]
+    }, (folderPaths) => {
+        // folderPaths is an array that contains all the selected paths
+        if(folderPaths === undefined) {
+            logger("showOpenDialog: No destination folder selected");
+            return;
+        }
+        else {
+            //we only use the first selected path
+            // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
+            // example Album  :TestData
+
+            let pathParts = pathLib.parse(folderPaths[0]);
+            AlbumPath = folderPaths[0];
+            AlbumName = pathParts.base;
+            logger('showOpenDialog: AlbumPath:' + AlbumPath + ': AlbumName:' + AlbumName+':');
+            $('#albumName').val(AlbumName);
+
+            FileTree[FILE_TREE_NODE_LABEL] = pathParts.base;
+            FileTree[FILE_TREE_NODE_CHILDREN] = [];
+            walkSync(AlbumPath, FileTree,FileList);  // build data structure of file folder
+            // makeThumbNails();
+
+            let tree = require('electron-tree-view')({
+            root       : FileTree
+            ,container : document.querySelector('.container')
+            ,children  : c => c[FILE_TREE_NODE_CHILDREN]
+            ,label     : c => c[FILE_TREE_NODE_LABEL]
+            });
+
+            tree.on('selected', item => {
+                logger('tree: item selected:' + item.name + ':')
+                let fullPath = AlbumPath + '/' + item.name;
+                if (fsLib.statSync(fullPath).isDirectory()) {
+                    return;
+                }
+
+                logger('tree: full path :' + fullPath + ':')
+                CurrentPicture = item.name;
+                showPicture(fullPath);
+            });
+
+            logger('showOpenDialog: after walkSync');
+            //logger('showOpenDialog: fileTree:' + JSON.stringify(fileTree,null,'\t'));
+        }
+    });
+} // makeImageFileTree
+
 function showPicture(fname)
 {
-	var newImg = new Image();
 	console.log('showPicture: fname = :%s:',fname);
+	var newImg = new Image();
 	let filename = Album_Data[fname]['filename'];
 	console.log('showPicture: filename is :%s:',filename);
 	newImg.src=  ImageHandlingSettings.albumName + '/' + fname;
-   newImg.onload = function() {
+    newImg.onload = function() {
 		ImageFaceHandling.showPicture(fname);
 		console.log ('showPicture: The image natural size is %s(width) %s (height)',
 		    newImg.naturalWidth , newImg.naturalHeight);
@@ -129,20 +215,8 @@ function prevPicture(evt)
 $(document).ready(function() {
    logger('init: START ');
 
-   /*
-   file tree format
-   const root = {
-     "name": "root"
-     ,"children" : [
-         { "name": "bar", "children": [] }
-         ,{ "name": "foo", "children": [] }
-         ,{ "name": "nyarf", "children": [] }
-     ]
-   }
-   */
-
-   console.log('ready: cliData.debug ->', CliData.debug);
-   console.log('ready: cliData.album ->', CliData.album);
+   logger('ready: cliData.debug ->', CliData.debug);
+   logger('ready: cliData.album ->', CliData.album);
    let settings = new SettingsForm('settingsForm','openSettings',100,250,'right');
    settings.initializeForm();
 
@@ -165,59 +239,9 @@ $(document).ready(function() {
    });
    */
 
+   $('#selectAlbum').click(makeImageFileTree);
    $('#prevImage').click(prevPicture)
    $('#nextImage').click(nextPicture)
-
-   $('#selectAlbum').click(function(evt)
-   {
-       logger('selectAlbum clicked');
-       remote.dialog.showOpenDialog({
-           'title':"Select a folder"
-           ,'defaultPath': 'C:'
-           ,'properties': ["openDirectory"]
-       }, (folderPaths) => {
-          // folderPaths is an array that contains all the selected paths
-          if(folderPaths === undefined) {
-              logger("showOpenDialog: No destination folder selected");
-              return;
-          }
-          else {
-              let pathParts = pathLib.parse(folderPaths[0]);
-              AlbumPath = folderPaths[0];
-              logger('showOpenDialog: folderPaths:' + folderPaths);
-              logger('showOpenDialog: album:' + pathParts.base);
-              AlbumName = pathParts.base;
-              $('#albumName').val(AlbumName);
-
-              FileTree[FILE_TREE_NODE_LABEL] = pathParts.base;
-              FileTree[FILE_TREE_NODE_CHILDREN] = [];
-              walkSync(folderPaths[0], FileTree,FileList);
-              makeThumbNails();
-
-              let tree = require('electron-tree-view')({
-                root       : FileTree
-                ,container : document.querySelector('.container')
-                ,children  : c => c[FILE_TREE_NODE_CHILDREN]
-                ,label     : c => c[FILE_TREE_NODE_LABEL]
-              });
-
-              tree.on('selected', item => {
-                  logger('tree: item selected:' + item.name + ':')
-                  let fullPath = AlbumPath + '/' + item.name;
-                  if (fsLib.statSync(fullPath).isDirectory()) {
-                      return;
-                  }
-
-                  logger('tree: full path :' + fullPath + ':')
-                  CurrentPicture = item.name;
-                  showPicture(fullPath);
-              });
-
-              logger('showOpenDialog: after walkSync');
-              //logger('showOpenDialog: fileTree:' + JSON.stringify(fileTree,null,'\t'));
-          }
-      });
-   });
 
    var copyRightYear = new Date().getFullYear();
    logger('init:  copyRightYear=:'+copyRightYear+':');

@@ -9,6 +9,11 @@
        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'inline'; img-src 'self';" />
        -->
 
+      <!--
+      <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+      -->
+      <!--
+      -->
       <link rel='stylesheet' type='text/css' href='css/PhotoCollectionManager.css' />
       <!--
       <link rel='stylesheet' type='text/css' href='css/settingsMenu.css' />
@@ -53,9 +58,14 @@
     </div>
 
     <div class='content'>
+        <!--
+        <input type='file' webkitdirectory id='albumSelect' name='files[]' accept='application/json' />
+    -->
+        <button type="button" value="Choose a file" id="selectAlbum">Choose an album</button>
        <div class='albumName'>
-           <button type='button' id='selectAlbum'>Choose an album</button>
-           <span type='text' id='albumName' name='albumName' class=''>Select</span>
+           <label for='albumName'>Album Name</label>
+           <input type='text' id='albumName' name='albumName' class='' />
+           <span id='messages' class='messageBox'></span>
        </div>  <!--albumName -->
 
        <div class='pictureBlock'>
