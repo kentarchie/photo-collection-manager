@@ -1,6 +1,7 @@
 // this code handles all interactions with the host operating system
 // this is the 'server' process
 
+global.__base = __dirname + '/';
 const {app, BrowserWindow} = require('electron');
 //const path = require('path');
 //const url = require('url');
