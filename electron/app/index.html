@@ -1,67 +1,27 @@
 <html>
    <head>
-      <title>Photo Collection Manager</title>
+      <title>Photome</title>
 	   <meta http-equiv='content-language' content='en' />
-	   <meta name='author' content='Kent Archie' />
-	   <meta name='copyright' content='Copyright Kent Archie 2019' />
-       <meta name='description' content='Photo Collection Manager' />
+	   <meta name='author'      content='Kent Archie' />
+	   <meta name='copyright'   content='Copyright Kent Archie 2019' />
+       <meta name='description' content='Photo Collection Manager (Photome)' />
        <!--
-       <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'inline'; img-src 'self';" />
+       <meta http-equiv='Content-Security-Policy' content='default-src self'; style-src 'self'; script-src 'inline'; img-src 'self';'' />
        -->
 
-      <!--
-      <link rel="stylesheet" type='text/css' href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
-      -->
-      <!--
-      -->
       <link rel='stylesheet' type='text/css' href='css/PhotoCollectionManager.css' />
-      <!--
-      <link rel='stylesheet' type='text/css' href='css/settingsMenu.css' />
-      -->
    </head>
 <body>
    <header class=''>
-       <a class="button" href="#popup1">
+       <a class='button' href='#popup1'>
            <img class='title' src='images/menuIcon.png' width=32 height=32 alt='Menu' />
        </a>
        <span class='center'>Photo Collection Manager</span>
-        <button type='button' class='left' id='openSettings' >Change Settings</button>
+       <button type='button' id='openSettings' name='openSettings' class='left'>Change Settings</button>
     </header>  <!-- header -->
 
-    <!--
-    <nav role="navigation">
-        <div id="settingsForm" class=''>
-           <div>
-              <label for='debug'>Debug On</label>
-              <input type='checkbox' id='debug' />
-              <br />
-           
-              <label for='pictureBase'>Picture Base</label>
-              <input type='input' id='pictureBase' size=7 />
-           </div>
-        </div>
-     </nav>  
-    -->
-     
-    <!-- popup ideas from https://codepen.io/imprakash/pen/GgNMXO -->
-    <div id="popup1" class="overlay">
-        <div class="popup">
-            <a class="close" href="#">&times;</a>
-            <div class="content">
-                <ul>
-                    <li>Settings</li>
-                    <li>Export</li>
-                    <li>Exit</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
     <div class='content'>
-        <!--
-        <input type='file' webkitdirectory id='albumSelect' name='files[]' accept='application/json' />
-    -->
-        <button type="button" value="Choose a file" id="selectAlbum">Choose an album</button>
+       <button type='button' id='selectAlbum' name='selectAlbum' value='Choose a file'>Choose an album</button>
        <div class='albumName'>
            <label for='albumName'>Album Name</label>
            <input type='text' id='albumName' name='albumName' class='' />
@@ -73,26 +33,53 @@
            </div>  <!--fileTree -->
 
            <div class='pictureView'>
-                   <div class='pictureButtons'>
-                       <button type='button'
-                                id='prevImage'
-                                name='prevImage'
-                                title='Previous Picture'
-                                class='pictureButton'>
-                                Prev
+                <div class='pictureButtons'>
+                    <button type='button'
+                            id='prevImage'
+                            name='prevImage'
+                            title='Previous Picture'
+                            class='pictureButton'>
+                            Prev
+                    </button>
+                    <span id='pictureFileName' title='Picture File Name'></span>
+                    <button type='button'
+                            id='nextImage'
+                            name='nextImage'
+                            title='Next Picture'
+                            class='pictureButton'>
+                            Next
+                    </button>
+                </div> <!-- pictureButtons -->
+                <div id='pictureDisplay' class='pictureDisplay IFH_WrapperClass' style='width: 450px; height: 450px;'>
+                    <div class='IHF_Buttons_Block'>
+                        <button type='button' id='IFH_UndoDelete' name='IFH_UndoDelete' 
+                                class='IFH_ButtonBaseClass IFH_UndoButtonClass'
+                                title='Delete Face Box'>
+                                ⎌ Delete
                         </button>
-                        <span id='pictureFileName' title='Picture File Name'></span>
-                        <button type='button'
-                                id='nextImage'
-                                name='nextImage'
-                                title='Next Picture'
-                                class='pictureButton'>
-                                Next
+                        <button type='button' id='IFH_UndoCreate' name='IFH_UndoDelete' 
+                                class='IFH_ButtonBaseClass IFH_UndoButtonClass'
+                                title='Create Face Box'>
+                                ⎌ Create
                         </button>
-                    </div> <!-- pictureButtons -->
-                    <!--<img id='currentPicture' src='' height=450px width=450px alt='Current Picture' />-->
-		            <div id='pictureDisplay' class='pictureDisplay'>
-		            </div>
+                        <button type='button' id='IFH_CreateFace' name='IFH_UndoDelete' 
+                                class='IFH_ButtonBaseClass IFH_CreateButtonClass'
+                                title='Identify Face'>
+                                Mark Face
+                        </button>
+                        <button type='button' id='IFH_DeleteFace' name='IFH_UndoDelete' 
+                                class='IFH_ButtonBaseClass IFH_DeleteButtonClass'
+                                title='Delete Face'>
+                                Delete Face
+                        </button>
+                    </div>
+                    <div class='IFH_ImageGroupClass'>
+                        <img id='IFH_ImageTag' src='#' alt='image to display' 
+                             class='IFH_ImageTagClass' width='450px' height='450px' data-file=''>
+                        <canvas id='IFH_CanvasTag' class='IFH_CoveringCanvas' 
+                                width='450px' height='450px' style='top: auto; left: auto;'></canvas>
+                    </div>
+                </div> <!-- pictureDisplay -->
            </div>  <!--pictureView -->
 
            <div class='pictureData'>
@@ -127,8 +114,8 @@
    <!-- Insert this line after script imports -->
    <script>if (window.module) module = window.module;</script>
 
-    <footer>
-        <div class='center copyright'>Copyright Kent Archie <span>year</span></div>
-    </footer>
+   <footer>
+        <div class='center copyright'>Copyright Kent Archie<span>year</span></div>
+   </footer>
 </body>
 </html>

@@ -3,6 +3,7 @@ const {remote} = require('electron');
 const fsLib = require('fs');
 const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
+const MakeReadAlbumData = require(`${__dirname}/js/MakeReadAlbumData.js`);
 
 const FILE_TREE_NODE_LABEL = 'name';
 const FILE_TREE_NODE_CHILDREN = 'children';
@@ -126,6 +127,8 @@ function makeImageFileTree(evt)
             let pathParts = pathLib.parse(folderPaths[0]);
             AlbumPath = folderPaths[0];
             AlbumName = pathParts.base;
+            let albumData = new MakeReadAlbumData(AlbumPath);
+            Album_Data = albumData.get();
             logger('showOpenDialog: AlbumPath:' + AlbumPath + ': AlbumName:' + AlbumName+':');
             $('#albumName').val(AlbumName);
 
