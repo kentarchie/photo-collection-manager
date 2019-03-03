@@ -61,7 +61,7 @@ parseDataFile()
     try {
         if (fs.existsSync(this.fullPath)) { //file exists
             console.log('MakeReadAlbumData.parseDataFile filePath (%s) exists',this.fullPath);
-            try {1G
+            try {
                 fileContents = fs.readFileSync(this.fullPath);
                 console.log('parseDataFile: fileContents (%s)',fileContents);
             } catch(error) {
