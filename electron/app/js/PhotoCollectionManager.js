@@ -12,6 +12,9 @@ let FileList = [];
 let CurrentPicture = '';
 let AlbumPath = '';
 let AlbumName = '';
+let Album_Data = null;
+let ImageHandlingSettings = {};
+
 let ImageExtensions = [
 'tif'
 ,'tiff'
@@ -67,7 +70,7 @@ function makeThumbNails()
     //for(var index=0,len=FileList.length; index<len; ++index) {
      for(var index=0,len=2; index<len; ++index) {
         let sourcePath = AlbumPath + '\\' + FileList[index];
-        let destPath = AlbumPath + '\\tn\\' + FileList[index];
+        let destPath = AlbumPath + '\\thumbnails\\' + FileList[index];
         //logger('makeThumbNails: working on source :' + sourcePath + ':');
         //logger('makeThumbNails: working on dest :' + destPath + ':');
         thumb({
@@ -124,12 +127,16 @@ function makeImageFileTree(evt)
             // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
             // example Album  :TestData
 
-            let pathParts = pathLib.parse(folderPaths[0]);
             AlbumPath = folderPaths[0];
+            let pathParts = pathLib.parse(AlbumPath);
             AlbumName = pathParts.base;
             let albumData = new MakeReadAlbumData(AlbumPath);
             Album_Data = albumData.get();
             logger('showOpenDialog: AlbumPath:' + AlbumPath + ': AlbumName:' + AlbumName+':');
+            let albumData = new MakeReadAlbumData(AlbumPath);
+            Album_Data = albumData.get();
+            logger('makeImageFileTree loaded album data');
+            //logger('makeImageFileTree: Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
             $('#albumName').val(AlbumName);
 
             FileTree[FILE_TREE_NODE_LABEL] = pathParts.base;
@@ -164,18 +171,24 @@ function makeImageFileTree(evt)
 
 function showPicture(fname)
 {
-	console.log('showPicture: fname = :%s:',fname);
+    console.log('showPicture: fname = :%s:',fname);
+    let pathParts = pathLib.parse(fname);
+    let baseName = pathParts.base;
+    console.log('showPicture: baseName = :%s:',baseName);
 	var newImg = new Image();
-	let filename = Album_Data[fname]['filename'];
+    logger('showPicture: Album_Data[images][baseName]:' + JSON.stringify(Album_Data['images'][baseName],null,'\t'));
+    //logger('showPicture: Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
+	let filename = Album_Data['images'][baseName]['filename'];
 	console.log('showPicture: filename is :%s:',filename);
-	newImg.src=  ImageHandlingSettings.albumName + '/' + fname;
+	//newImg.src=  ImageHandlingSettings.albumName + '/' + baseName;
+	newImg.src = filename;
     newImg.onload = function() {
-		ImageFaceHandling.showPicture(fname);
-		console.log ('showPicture: The image natural size is %s(width) %s (height)',
+		ImageFaceHandling.showPicture(baseName);
+		console.log ('showPicture: onLoad: The image natural size is %s(width) %s (height)',
 		    newImg.naturalWidth , newImg.naturalHeight);
-		ImageFaceHandling.drawFaces(fname);
+		ImageFaceHandling.drawFaces(baseName);
 	} 
-    $('#currentPicture').attr('src', fname);
+    $('#currentPicture').attr('src', baseName);
     $('#currentPicture').css('visibility','visible');
 } // showPicture
 
@@ -223,7 +236,7 @@ $(document).ready(function() {
    let settings = new SettingsForm('settingsForm','openSettings',100,250,'right');
    settings.initializeForm();
 
-    let ImageHandlingSettings = {
+    ImageHandlingSettings = {
       wrapperID: 'pictureDisplay'
         ,albumName: 'TestAlbum'
 	    ,lineWidth : 1
@@ -242,6 +255,9 @@ $(document).ready(function() {
    });
    */
 
+   let mainWindow; //do this so that the window object doesn't get GC'd
+
+
    $('#selectAlbum').click(makeImageFileTree);
    $('#prevImage').click(prevPicture)
    $('#nextImage').click(nextPicture)
@@ -249,7 +265,7 @@ $(document).ready(function() {
    var copyRightYear = new Date().getFullYear();
    logger('init:  copyRightYear=:'+copyRightYear+':');
    $('.copyright span').html(copyRightYear);
-}); // init function
+}); // ready function
 
 function logger(str)
 {

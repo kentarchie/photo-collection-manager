@@ -156,8 +156,10 @@ var ImageFaceHandling = (function () {
 	 // called as part of the main page picture select onChange
 	var showPicture = function(fname)
 	{
+		console.log('ImageFaceHandling.showPicture: Config.albumName :%s: fname :%s: ',Config.albumName,fname);
 		Config.jImage.attr('src', Config.albumName + '/' + fname);
-		console.log('ImageFaceHandling.showPicture: src :%s:',Config.image.src);
+		console.log('ImageFaceHandling.showPicture: jImage.src :%s:',Config.jImage.src);
+		console.log('ImageFaceHandling.showPicture: image.src :%s:',Config.image.src);
 		Config.jImage.attr('data-File',fname);
 	} // showPicture
 
