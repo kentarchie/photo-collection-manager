@@ -24,15 +24,15 @@ class ImageDisplayManagement
         //let testImage = document.getElementById('imageTag');
         console.log('imageDisplay.pictureSelected: testImage src before = :%s:', testImage.src);
         console.log('imageDisplay.pictureSelected: testImage attr src before = :%s:', testImage.attr('src'));
-        testImage.attr('filename', imageName);
+        testImage.attr('filename', filename);
         testImage.css('width',DISPLAY_BOX_WIDTH+'px');
         testImage.css('height',DISPLAY_BOX_HEIGHT+'px');
         testImage.attr('src',imagePath);
-        testImage.src = imagePath;
+        testImage.src = filename;
         console.log('imageDisplay.pictureSelected: testImage src = :%s:', testImage.attr('src'));
         var newImg = new Image();
         console.log('imageDisplay.pictureSelected: after image object creation');
-        newImg.src= imagePath;
+        newImg.src= filename;
         console.log('imageDisplay.pictureSelected: image src set');
         testImage.src = newImg.src;
         console.log('imageDisplay.pictureSelected: testImage src after copy = :%s:', testImage.attr('src'));

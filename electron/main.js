@@ -40,6 +40,8 @@ function createWindow ()
     winWidth = DEBUG_WIDTH;
   }
 
+  cliData['AppPath'] = app.getAppPath();
+
   // Create the main window
   mainWindow = new BrowserWindow({
      width : winWidth

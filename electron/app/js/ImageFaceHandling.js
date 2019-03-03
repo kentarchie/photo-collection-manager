@@ -42,7 +42,8 @@ var ImageFaceHandling = (function () {
 
 	 var setup = function()
 	 {
-		Config.wrapperTag = createDOM();
+		//Config.wrapperTag = createDOM();
+		Config.wrapperTag = $('#pictureDisplay');
 
 		setTimeout(function(){
 			Config.jImage  = $('#' + IFH_ImageElementID);
@@ -188,7 +189,8 @@ var ImageFaceHandling = (function () {
 	// and draw the boxes arond all the faces
 	var drawFaces = function(fname)
 	{
-		const faceData = Album_Data[fname]['faces']['faceList'];
+		console.log('ImageFaceHandling.drawFaces fname %s',fname);
+		const faceData = Album_Data['images'][fname]['faces']['faceList'];
 
 			//console.log('ImageFaceHandling.drawFaces fname %s faceData %s:',fname, JSON.stringify(faceData,null,'\t'));
 			//console.log ('ImageFaceHandling.drawFaces: The image id is :%s:',Config.jImage.attr('id'));

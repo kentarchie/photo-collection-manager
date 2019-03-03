@@ -133,8 +133,6 @@ function makeImageFileTree(evt)
             let albumData = new MakeReadAlbumData(AlbumPath);
             Album_Data = albumData.get();
             logger('showOpenDialog: AlbumPath:' + AlbumPath + ': AlbumName:' + AlbumName+':');
-            let albumData = new MakeReadAlbumData(AlbumPath);
-            Album_Data = albumData.get();
             logger('makeImageFileTree loaded album data');
             //logger('makeImageFileTree: Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
             $('#albumName').val(AlbumName);
@@ -160,7 +158,8 @@ function makeImageFileTree(evt)
 
                 logger('tree: full path :' + fullPath + ':')
                 CurrentPicture = item.name;
-                showPicture(fullPath);
+                logger('tree: CurrentPicture :' + CurrentPicture + ':')
+                showPicture(CurrentPicture);
             });
 
             logger('showOpenDialog: after walkSync');
@@ -172,23 +171,18 @@ function makeImageFileTree(evt)
 function showPicture(fname)
 {
     console.log('showPicture: fname = :%s:',fname);
-    let pathParts = pathLib.parse(fname);
-    let baseName = pathParts.base;
-    console.log('showPicture: baseName = :%s:',baseName);
 	var newImg = new Image();
-    logger('showPicture: Album_Data[images][baseName]:' + JSON.stringify(Album_Data['images'][baseName],null,'\t'));
-    //logger('showPicture: Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
-	let filename = Album_Data['images'][baseName]['filename'];
+    logger('showPicture: Album_Data[images][fname]:' + JSON.stringify(Album_Data['images'][fname],null,'\t'));
+	let filename = Album_Data['images'][fname]['filename'];
 	console.log('showPicture: filename is :%s:',filename);
-	//newImg.src=  ImageHandlingSettings.albumName + '/' + baseName;
 	newImg.src = filename;
     newImg.onload = function() {
-		ImageFaceHandling.showPicture(baseName);
+		ImageFaceHandling.showPicture(fname);
 		console.log ('showPicture: onLoad: The image natural size is %s(width) %s (height)',
 		    newImg.naturalWidth , newImg.naturalHeight);
-		ImageFaceHandling.drawFaces(baseName);
+		ImageFaceHandling.drawFaces(fname);
 	} 
-    $('#currentPicture').attr('src', baseName);
+    $('#currentPicture').attr('src', fname);
     $('#currentPicture').css('visibility','visible');
 } // showPicture
 
@@ -231,8 +225,10 @@ function prevPicture(evt)
 $(document).ready(function() {
    logger('init: START ');
 
-   logger('ready: cliData.debug ->', CliData.debug);
-   logger('ready: cliData.album ->', CliData.album);
+   logger('ready: cliData.debug -> :'+ CliData.debug +':');
+   logger('ready: cliData.album -> :'+ CliData.album +':');
+   logger('ready: cliData.AppPath -> :'+ CliData.AppPath +':');
+
    let settings = new SettingsForm('settingsForm','openSettings',100,250,'right');
    settings.initializeForm();
 
