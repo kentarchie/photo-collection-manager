@@ -4,45 +4,39 @@ const fsLib = require('fs');
 const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
 const MakeReadAlbumData = require(`${__dirname}/js/MakeReadAlbumData.js`);
+const ImageDisplayManagement = require(`${__dirname}/js/ImageDisplayManagement.js`);
 
+// used in the file tree viewer
 const FILE_TREE_NODE_LABEL = 'name';
 const FILE_TREE_NODE_CHILDREN = 'children';
 let FileTree = {};
 let FileList = [];
-let CurrentPicture = '';
-let AlbumPath = '';
-let AlbumName = '';
-let Album_Data = null;
-let ImageHandlingSettings = {};
 
-let ImageExtensions = [
-'tif'
-,'tiff'
-,'gif'
-,'jpeg'
-,'jpg'
-,'jif'
-,'jfif'
-,'jp2'
-,'jpx'
-,'j2k'
-,'j2c'
-,'png'
+let CurrentPicture = '';  // image we are working on
+let AlbumPath = ''; // full path to the directory containing the album
+let AlbumName = ''; // name of the directory containing the album
+let Album_Data = null; // contents of the JSON file describing the album
+let ImageHandlingSettings = {};
+let ImageDisplay = null;
+
+// extensions of allowed image files
+let ImageExtensions = [ 'tif' ,'tiff' ,'gif' ,'jpeg' ,'jpg' ,'jif'
+                        ,'jfif' ,'jp2' ,'jpx' ,'j2k' ,'j2c' ,'png'
 ];
-//let CliData = electron.remote.getCurrentWindow().cliData; // parameters from the command line
 let CliData = remote.getCurrentWindow().cliData; // parameters from the command line
 
 // check the filename extension against the list of image file extensions
 function isImage(fname)
 {
     let ext = pathLib.extname(fname).toLowerCase().replace('.','');
-    console.log('looking for :%s:',ext);
+    //console.log('looking for :%s:',ext);
     return(ImageExtensions.indexOf(ext) > 0);
 } // isImage
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 // base code from from https://gist.github.com/kethinov/6658166
 // modified to build a data structure for the electron-tree-view
+// TODO: not recursive, should thisprocess sub directories of images? 
 function walkSync (dir, fileTree,fileList) {
   var getFiles = fsLib.readdirSync(dir);
   getFiles.forEach(function(file) {
@@ -64,6 +58,7 @@ function walkSync (dir, fileTree,fileList) {
   return fileTree;
 } // walkSync
 
+// not currently used. If we do this here, remove thumnail production from the AlbumPreProcess code
 function makeThumbNails()
 {
     //logger('makeThumbNails: START:');
@@ -86,14 +81,6 @@ function makeThumbNails()
                     console.log('Error', e);
                 });
 
-          /*
-          function(files, err, stdout, stderr)
-          {
-            logger('makeThumbNails: source file ' + sourcePath + ' done!');
-            logger('makeThumbNails: dest file ' + destPath + ' done!');
-          }
-    );
-    */
     //logger('makeThumbNails: working on :' + sourcePath + ': done');
     } // for FileList
 } // makeThumbNails
@@ -109,6 +96,8 @@ function makeThumbNails()
      ]
    }
    */
+  //TODO: tghis is written assuming we are on Linux, how should we deal with
+  // file path designation oon multiple OS's
 function makeImageFileTree(evt)
 {
     logger('selectAlbum clicked');
@@ -128,6 +117,7 @@ function makeImageFileTree(evt)
             // example Album  :TestData
 
             AlbumPath = folderPaths[0];
+            ImageDisplay.init(AlbumPath);
             let pathParts = pathLib.parse(AlbumPath);
             AlbumName = pathParts.base;
             let albumData = new MakeReadAlbumData(AlbumPath);
@@ -143,29 +133,31 @@ function makeImageFileTree(evt)
             // makeThumbNails();
 
             let tree = require('electron-tree-view')({
-            root       : FileTree
-            ,container : document.querySelector('.container')
-            ,children  : c => c[FILE_TREE_NODE_CHILDREN]
-            ,label     : c => c[FILE_TREE_NODE_LABEL]
+                root       : FileTree
+                ,container : document.querySelector('.container')
+                ,children  : c => c[FILE_TREE_NODE_CHILDREN]
+                ,label     : c => c[FILE_TREE_NODE_LABEL]
             });
 
+            // what to do when an image is selected from the file tree
             tree.on('selected', item => {
                 logger('tree: item selected:' + item.name + ':')
                 let fullPath = AlbumPath + '/' + item.name;
-                if (fsLib.statSync(fullPath).isDirectory()) {
+                if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
                     return;
                 }
 
                 logger('tree: full path :' + fullPath + ':')
                 CurrentPicture = item.name;
                 logger('tree: CurrentPicture :' + CurrentPicture + ':')
-                showPicture(CurrentPicture);
+                //showPicture(CurrentPicture);
+                ImageDisplay.pictureSelected(CurrentPicture);
             });
 
             logger('showOpenDialog: after walkSync');
             //logger('showOpenDialog: fileTree:' + JSON.stringify(fileTree,null,'\t'));
         }
-    });
+    }); // showOpenDialog
 } // makeImageFileTree
 
 function showPicture(fname)
@@ -225,10 +217,7 @@ function prevPicture(evt)
 $(document).ready(function() {
    logger('init: START ');
 
-   logger('ready: cliData.debug -> :'+ CliData.debug +':');
-   logger('ready: cliData.album -> :'+ CliData.album +':');
-   logger('ready: cliData.AppPath -> :'+ CliData.AppPath +':');
-
+   ImageDisplay = new ImageDisplayManagement();
    let settings = new SettingsForm('settingsForm','openSettings',100,250,'right');
    settings.initializeForm();
 
@@ -252,7 +241,6 @@ $(document).ready(function() {
    */
 
    let mainWindow; //do this so that the window object doesn't get GC'd
-
 
    $('#selectAlbum').click(makeImageFileTree);
    $('#prevImage').click(prevPicture)

@@ -214,10 +214,10 @@
 			const ctx = canvas.getContext('2d');
 
 			const faceData = Album_Data[picFileName]['faces']['faceList']
-		console.log('imageDisplay.run.setup: Canvas.tagName = %s id=%s', Jcanvas.prop("tagName"), Jcanvas.prop("id"));
-		console.log('imageDisplay.run.setup: Canvas.width= %d Canvas.height= %d', canvas.width,canvas.height);
-		console.log('imageDisplay.run.setup: Canvas.top= %s Canvas.left= %s', Jcanvas.css('top'),Jcanvas.css('left'));
-		console.log ('imageDisplay.run.setup The canvas left offset %f  top offset %f',Jcanvas.offset().left,Jcanvas.offset().top);
+			console.log('imageDisplay.run.setup: Canvas.tagName = %s id=%s', Jcanvas.prop("tagName"), Jcanvas.prop("id"));
+			console.log('imageDisplay.run.setup: Canvas.width= %d Canvas.height= %d', canvas.width,canvas.height);
+			console.log('imageDisplay.run.setup: Canvas.top= %s Canvas.left= %s', Jcanvas.css('top'),Jcanvas.css('left'));
+			console.log ('imageDisplay.run.setup The canvas left offset %f  top offset %f',Jcanvas.offset().left,Jcanvas.offset().top);
 
 			console.log('imageDisplay.run: code start ');
 			//var rect = canvas.getBoundingClientRect();
@@ -225,10 +225,10 @@
 			//rect = chosenImage.getBoundingClientRect();
 			//console.log('imageDisplay.run.chosenImage boundingbox BEFORE %s',JSON.stringify(rect,null,'\t'));
 
-      	console.log ('imageDisplay.run: DISPLAY values  %d (width),%d (height)',DISPLAY_BOX_WIDTH,DISPLAY_BOX_HEIGHT);
-      	let height = chosenImage.naturalHeight;
-      	let width = chosenImage.naturalWidth;
-      	console.log ('imageDisplay.run: The image natural size is %d(width) * %d(height)',width,height);
+      		console.log ('imageDisplay.run: DISPLAY values  %d (width),%d (height)',DISPLAY_BOX_WIDTH,DISPLAY_BOX_HEIGHT);
+      		let height = chosenImage.naturalHeight;
+      		let width = chosenImage.naturalWidth;
+      		console.log ('imageDisplay.run: The image natural size is %d(width) * %d(height)',width,height);
 			adjustCanvas(canvas,DISPLAY_BOX_WIDTH,DISPLAY_BOX_HEIGHT);
 			//rect = canvas.getBoundingClientRect();
 			//console.log('imageDisplay.run.canvas boundingbox AFTER %s',JSON.stringify(rect,null,'\t'));
@@ -239,11 +239,11 @@
 			Album_Data[picFileName]['deltaHeight'] = deltaHeight;
 			console.log ('imageDisplay.onload: The delta size is %f * %f',deltaWidth,deltaHeight);
 
-		ctx.strokeStyle = '#0000FF';
-		ctx.lineWidth = 2;
-		ctx.beginPath();
-		ctx.strokeRect(0, 0, 235, 142);
-		ctx.closePath();
+			ctx.strokeStyle = '#0000FF';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.strokeRect(0, 0, 235, 142);
+			ctx.closePath();
 
 
 			faceData.forEach((fd, i) => {
