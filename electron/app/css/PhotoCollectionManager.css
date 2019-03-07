@@ -145,18 +145,18 @@ header span.left {
 }
 .fileTree {
 	float:left;
-	width:30%;
+	width:15%;
 	border:1px solid black;
 }
 
 .pictureView {
 	float:left;
-	width:30%;
+	width:50%;
 	border:1px solid black;
 }
 
 .pictureView img {
-	visibility: hidden;
+	/* visibility: hidden;*/
 }
 .pictureButtons {
 	border-bottom:1px solid black;
@@ -187,7 +187,7 @@ header span.left {
 
 .pictureData {
 	clear:right;
-	width:30%;
+	width:20%;
 	border:1px solid red;
 	display: flex;
 	flex-direction: column;

@@ -13,21 +13,23 @@
 }
 
 .IFH_ImageGroupClass {
+	position:absolute;
 }
 .IFH_ImageTagClass {
 	width : var(--image-width);
 	height: var(--image-height);
-	position: absolute;
+	position: relative;
 	border: 4px solid red;
+	z-index: 1;
 }
 .IFH_CoveringCanvas {
 	width : var(--image-width);
 	height: var(--image-height);
-	position: relative;
-   top:0px; left:0px;
-	/*opacity: 0.33;*/
-   /*background-color: coral;*/
-	border: 3px solid green;
+	position: absolute;
+	z-index: 10;
+	opacity: 0.33;
+   background-color: coral;
+	border: 3px solid coral;
 }
 
 .IHF_Buttons_Block {

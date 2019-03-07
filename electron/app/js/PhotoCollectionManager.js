@@ -229,7 +229,8 @@ $(document).ready(function() {
     };
 	ImageFaceHandling.init(ImageHandlingSettings);
 	ImageFaceHandling.showConfig();
-	ImageFaceHandling.setup();
+    ImageFaceHandling.setup();
+
 
     /*
    ErrorDialog = $('#dialog-dataerror').dialog({
