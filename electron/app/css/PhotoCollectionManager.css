@@ -18,64 +18,8 @@ body {
 
 label { font-size: normal; font-variant: small-caps; }
 
-/* popup ideas from https://codepen.io/imprakash/pen/GgNMXO */
-.overlay {
-	/*
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  transition: opacity 500ms;
-  */
-  position: fixed;
-  visibility: hidden;
-  opacity: 0;
-}
-.overlay:target {
-  visibility: visible;
-  opacity: 1;
-}
-.popup {
-  /*
-  margin: 70px auto;
-  padding: 20px;
-  */
-  background: #ccc;
-  border-radius: 5px;
-  width: 10em;
-  position: relative;
-  transition: all 5s ease-in-out;
-}
-
-.popup .close {
-  position: absolute;
-  top: 2px;
-  right: 3px;
-  transition: all 200ms;
-  font-size: 30px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #333;
-}
-.popup .close:hover {
-  color: #06D85F;
-}
-.popup .content {
-  max-height: 30%;
-  /* overflow: auto; */
-}
-.popup ul {
-	list-style: none;
-}
 
 footer {
-    /*
-	position:absolute;
-    clear:both;
-    bottom:0px;
-    left:0px;
-	*/
     border:1px solid green;
     width:100%;
     height:1em;
@@ -88,7 +32,8 @@ header {
 }
 
 .copyright  {
-    float:right; position:relative; font-size :  small; }
+    float:right; position:relative; font-size :  small;
+}
 
 .wrapper {
     min-height: 100%;

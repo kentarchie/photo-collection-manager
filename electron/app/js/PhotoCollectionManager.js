@@ -1,5 +1,6 @@
 
 const {remote} = require('electron');
+const { ipcRenderer } = require('electron')
 const fsLib = require('fs');
 const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
@@ -100,7 +101,7 @@ function makeThumbNails()
   // file path designation oon multiple OS's
 function makeImageFileTree(evt)
 {
-    logger('selectAlbum clicked');
+    logger('makeImageFileTree: START');
     remote.dialog.showOpenDialog({
         'title':"Select a folder"
         ,'defaultPath': 'C:'
@@ -218,8 +219,6 @@ $(document).ready(function() {
    logger('init: START ');
 
    ImageDisplay = new ImageDisplayManagement();
-   let settings = new SettingsForm('settingsForm','openSettings',100,250,'right');
-   settings.initializeForm();
 
     ImageHandlingSettings = {
       wrapperID: 'pictureDisplay'
@@ -243,7 +242,11 @@ $(document).ready(function() {
 
    let mainWindow; //do this so that the window object doesn't get GC'd
 
-   $('#selectAlbum').click(makeImageFileTree);
+   ipcRenderer.on('open-album', (event, arg) => {
+        makeImageFileTree();
+        console.log(arg) // prints "pong"
+    })
+   //$('#selectAlbum').click(makeImageFileTree);
    $('#prevImage').click(prevPicture)
    $('#nextImage').click(nextPicture)
 

@@ -26,8 +26,8 @@ class ImageDisplayManagement
 		canvasTag.height = this.DISPLAY_BOX_HEIGHT+'px';
 		canvasTag.css('top',imagePos.top+'px');
 		canvasTag.css('left', imagePos.left+'px');
-		imageTag.css('top',imagePos.top+'px');
-		imageTag.css('left', imagePos.left+'px');
+		//imageTag.css('top',imagePos.top+'px');
+		//imageTag.css('left', imagePos.left+'px');
         console.log('ImageDisplayManagement.init canvas.top (%s) canvas.left (%s)',canvasTag.css('top'),canvasTag.css('left'));
         console.log('ImageDisplayManagement.init image.top (%s) image.left (%s)',imageTag.css('top'),imageTag.css('left'));
     } // init
@@ -116,11 +116,13 @@ class ImageDisplayManagement
 		Album_Data['images'][picFileName]['deltaHeight'] = deltaHeight;
 		console.log ('ImageDisplayManagement.onload: The delta size is %f * %f',deltaWidth,deltaHeight);
 
+		/*
 		ctx.strokeStyle = '#0000FF';
 		ctx.lineWidth = 2;
 		ctx.beginPath();
 		ctx.strokeRect(0, 0, 235, 142);
 		ctx.closePath();
+		*/
 
 		faceData.forEach((fd, i) => {
 			console.log('ImageDisplayManagement.drawImage ' + JSON.stringify(fd,null,'\t'));
