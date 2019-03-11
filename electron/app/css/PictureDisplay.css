@@ -62,7 +62,44 @@
 	color: #fff;
 }
 
-.faceDraw {
-	cursor: crosshair;
-	border: 1px solid #000000;
+.pictureBlock {
+	display: flex;
+	flex-direction: row;
+}
+
+.pictureView {
+	float:left;
+	width:50%;
+	border:1px solid black;
+}
+
+.pictureButtons {
+	border-bottom:1px solid black;
+	display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.pictureButton {
+	background-color:blue;
+	color:white;
+	font-weight:bold;
+	font-variant: small-caps;
+	flex:0 0 auto; /* Forces side columns to stay same width */
+    width:100px; /* Sets the width of side columns */
+}
+
+#pictureFileName  {
+		height: 1em;
+		text-align:center;
+		background-color:yellow;
+		border:1px solid green;
+		flex:1 1 auto; /* Lets middle column shrink/grow to available width */
+}
+
+.pictureData {
+	clear:right;
+	width:20%;
+	border:1px solid red;
+	display: flex;
+	flex-direction: column;
 }
