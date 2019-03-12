@@ -3,7 +3,7 @@ class ImageDisplayManagement
 {
     constructor()
     {
-        console.log('ImageDisplayManagement.constructor START ');
+		console.log('ImageDisplayManagement.constructor START ');
 		this.DISPLAY_BOX_WIDTH = 450;
     	this.DISPLAY_BOX_HEIGHT = 450;
 		this.LINE_WIDTH = 2;
@@ -18,19 +18,24 @@ class ImageDisplayManagement
 		// the canvas and image must be in the same place and the same size
 		let imageTag  = $('#IFH_ImageTag');
 		let canvasTag = $('#IFH_CanvasTag');
-		let imagePos = imageTag.offset();
-        console.log('ImageDisplayManagement.init imagePos.top (%s) imagePos.left (%s)',imagePos.top,imagePos.left);
 		imageTag.width(this.DISPLAY_BOX_WIDTH+'px');
 		imageTag.height(this.DISPLAY_BOX_HEIGHT+'px');
-		canvasTag.width  = this.DISPLAY_BOX_WIDTH+'px';
-		canvasTag.height = this.DISPLAY_BOX_HEIGHT+'px';
-		canvasTag.css('top',imagePos.top+'px');
-		canvasTag.css('left', imagePos.left+'px');
-		//imageTag.css('top',imagePos.top+'px');
-		//imageTag.css('left', imagePos.left+'px');
+		canvasTag.width(this.DISPLAY_BOX_WIDTH+'px');
+		canvasTag.height(this.DISPLAY_BOX_HEIGHT+'px');
+		// put the convas on top of the image
+		canvasTag.position({ 
+  			my: "left top",
+  			at: "left top",
+  			of: "#IFH_ImageTag"
+		});
         console.log('ImageDisplayManagement.init canvas.top (%s) canvas.left (%s)',canvasTag.css('top'),canvasTag.css('left'));
         console.log('ImageDisplayManagement.init image.top (%s) image.left (%s)',imageTag.css('top'),imageTag.css('left'));
-    } // init
+	} // init
+	
+	setFileList(fileList)
+	{
+		this.FileList = fileList;
+	}
 
 	// from https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
 	getClickPosition(evt,canvasElement)
@@ -57,23 +62,6 @@ class ImageDisplayManagement
 		return newPos;
 	} // getClickPosition
 
-	// adjust the canvas size to match the image
-	adjustCanvas(canvas,width,height) 
-	{
-		console.log('ImageDisplayManagement.adjustCanvas: width= %d height= %d', width,height);
-		//$('.outsideWrapper').css('width',width);
-		//$('.outsideWrapper').css('height',height);
-		//canvas.width =  width + 'px';
-		//canvas.height = height + 'px';
-		//canvas.css('height',height+'px');
-		//canvas.css('width',width+'px');
-		canvas.attr('height',height+'px');
-		canvas.attr('width',width+'px');
-		console.log('ImageDisplayManagement.adjustCanvas: Canvas.id= %s ', canvas.id);
-		console.log('ImageDisplayManagement.adjustCanvas: canvas.width= %s canvas.height= %s', canvas.width,canvas.height);
-		//console.log('ImageDisplayManagement.adjustCanvas: Canvas.top= %d Canvas.left= %d', canvas.css('top'),canvas.left);
-	} // adjustCanvas
-
 	adjustFaceBox(boxSpec,deltaWidth,deltaHeight)
 	{
 		let result = {};
@@ -87,42 +75,20 @@ class ImageDisplayManagement
 	drawImage(picFileName,chosenImage)
 	{
 		const canvas = $('#IFH_CanvasTag').get(0);
-		const Jcanvas = $('#IFH_CanvasTag');
 		const ctx = canvas.getContext('2d');
 
 		const faceData = Album_Data['images'][picFileName]['faces']['faceList']
-		console.log('ImageDisplayManagement.drawImage.setup: Canvas.tagName = %s id=%s', Jcanvas.prop("tagName"), Jcanvas.prop("id"));
 		console.log('ImageDisplayManagement.drawImage.setup: Canvas.width= %d Canvas.height= %d', canvas.width,canvas.height);
-		console.log('ImageDisplayManagement.drawImage.setup: Canvas.top= %s Canvas.left= %s', Jcanvas.css('top'),Jcanvas.css('left'));
-		console.log ('ImageDisplayManagement.drawImage.setup The canvas left offset %f  top offset %f',Jcanvas.offset().left,Jcanvas.offset().top);
-
-		console.log('ImageDisplayManagement.drawImage: code start ');
-				//var rect = canvas.getBoundingClientRect();
-				//console.log('ImageDisplayManagement.drawImage.canvas boundingbox BEFORE %s',JSON.stringify(rect,null,'\t'));
-				//rect = chosenImage.getBoundingClientRect();
-				//console.log('ImageDisplayManagement.drawImage.chosenImage boundingbox BEFORE %s',JSON.stringify(rect,null,'\t'));
 
 		console.log ('ImageDisplayManagement.drawImage: DISPLAY values  %d (width),%d (height)',this.DISPLAY_BOX_WIDTH,this.DISPLAY_BOX_HEIGHT);
 		let height = chosenImage.naturalHeight;
 		let width = chosenImage.naturalWidth;
 		console.log ('ImageDisplayManagement.drawImage: The image natural size is %d(width) * %d(height)',width,height);
-		//this.adjustCanvas(canvas,this.DISPLAY_BOX_WIDTH,this.DISPLAY_BOX_HEIGHT);
-				//rect = canvas.getBoundingClientRect();
-				//console.log('ImageDisplayManagement.drawImage.canvas boundingbox AFTER %s',JSON.stringify(rect,null,'\t'));
-				//console.log('ImageDisplayManagement.drawImage: Canvas.top= %d Canvas.left= %d', canvas.css('top'),canvas.css('left'));
 		let deltaWidth = this.DISPLAY_BOX_WIDTH / width;
 		let deltaHeight = this.DISPLAY_BOX_HEIGHT / height;
-		Album_Data['images'][picFileName]['deltaWidth'] = deltaWidth;
-		Album_Data['images'][picFileName]['deltaHeight'] = deltaHeight;
+		//Album_Data['images'][picFileName]['deltaWidth'] = deltaWidth;
+		//Album_Data['images'][picFileName]['deltaHeight'] = deltaHeight;
 		console.log ('ImageDisplayManagement.onload: The delta size is %f * %f',deltaWidth,deltaHeight);
-
-		/*
-		ctx.strokeStyle = '#0000FF';
-		ctx.lineWidth = 2;
-		ctx.beginPath();
-		ctx.strokeRect(0, 0, 235, 142);
-		ctx.closePath();
-		*/
 
 		faceData.forEach((fd, i) => {
 			console.log('ImageDisplayManagement.drawImage ' + JSON.stringify(fd,null,'\t'));
@@ -141,43 +107,55 @@ class ImageDisplayManagement
     pictureSelected(imageName)
 	{
 		console.log('ImageDisplayManagement.pictureSelected: START imageName = :%s: ',imageName);
+        $('#pictureFileName').html(imageName);
 		let that=this;
-        let imagePath = this.AlbumPath + '/' + imageName;
         let filename = Album_Data['images'][imageName].filename;
-        console.log('ImageDisplayManagement.pictureSelected: filename is :%s: imagePath = :%s:',filename,imagePath);
 		let imageTag = $('#IFH_ImageTag'); // where to display the image
 
         imageTag.on('load', function() {
-            console.log('ImageDisplayManagement.pictureSelected: image object loaded');
-			console.log('ImageDisplayManagement.pictureSelected: this.src = :%s:', this.src);
-          	let height = this.naturalHeight;
-      		let width = this.naturalWidth;
-      		console.log ('ImageDisplayManagement.pictureSelected: The image natural size is %d(width) %d(height)',width,height);
-			//imageTag.attr('src',this.src);
-			//imageTag.src = this;
-			//console.log('ImageDisplayManagement.pictureSelected: imageTag src after attr set = :%s:', imageTag.attr('src'));
+            console.log('ImageDisplayManagement.pictureSelected: image object loaded this.src = :%s:', this.src);
 			that.drawImage(imageName,this);
 		}); // onload
 
         imageTag.attr('filename', filename);
-        imageTag.css('width',this.DISPLAY_BOX_WIDTH+'px');
-        imageTag.css('height',this.DISPLAY_BOX_HEIGHT+'px');
-		console.log('ImageDisplayManagement.pictureSelected: imageTag width = :%s: height = :%s:' ,this.DISPLAY_BOX_WIDTH,this.DISPLAY_BOX_HEIGHT);
-
-        console.log('ImageDisplayManagement.pictureSelected: imageTag src before = :%s:', imageTag.src);
-        console.log('ImageDisplayManagement.pictureSelected: imageTag attr src before = :%s:', imageTag.attr('src'));
-        imageTag.src = filename;
         imageTag.attr('src',filename);
-        console.log('ImageDisplayManagement.pictureSelected: imageTag src after = :%s:', imageTag.src);
-        console.log('ImageDisplayManagement.pictureSelected: imageTag attr src after = :%s:', imageTag.attr('src'));
-        //var newImg = new Image();
-        //console.log('ImageDisplayManagement.pictureSelected: after image object creation');
-        //newImg.src= filename;
-        //console.log('ImageDisplayManagement.pictureSelected: image src set');
-        //imageTag.src = newImg.src;
-        //console.log('ImageDisplayManagement.pictureSelected: imageTag src after copy = :%s:', imageTag.attr('src'));
-
 	} // pictureSelected
+
+	findPicture()
+	{
+    	console.log('ImageDisplayManagement.findPicture: START ');
+    	return(this.FileList.indexOf(CurrentPicture));
+	} // findPicture
+
+	nextPicture()
+	{
+    	console.log('ImageDisplayManagement.nextPicture: START ');
+    	console.log('ImageDisplayManagement.nextPicture: FileList.length=' + this.FileList.length)
+    	let index = findPicture(CurrentPicture);
+    	console.log('ImageDisplayManagement.nextPicture: initial index=' + index)
+    	index++;
+    	if(index >= this.FileList.length) index = 0;
+    	console.log('ImageDisplayManagement.nextPicture: final index=' + index);
+    	let path = AlbumPath + '/' + this.FileList[index];
+    	CurrentPicture = this.FileList[index];
+    	console.log('ImageDisplayManagement.nextPicture: path=' + path);
+    	drawImage(CurrentPicture,$('#IFH_ImageTag'));
+	} // nextPicture
+
+	prevPicture(evt)
+	{
+    	console.log('ImageDisplayManagement.prevPicture: START ');
+    	console.log('ImageDisplayManagement.prevPicture: FileList.length=' + this.FileList.length);
+    	let index = findPicture(CurrentPicture);
+    	console.log('ImageDisplayManagement.prevPicture: initial index=' + index)
+    	index--;
+    	if(index <= 0) index = this.FileList.length-1;
+    	console.log('ImageDisplayManagement.prevPicture: final index=' + index);
+    	let path = AlbumPath + '/' + this.FileList[index];
+    	CurrentPicture = this.FileList[index];
+    	console.log('ImageDisplayManagement.prevPicture: path=' + path);
+    	drawImage(CurrentPicture,$('#IFH_ImageTag'));
+	} // prevPicture
 
 } // ImageDisplayManagement
 

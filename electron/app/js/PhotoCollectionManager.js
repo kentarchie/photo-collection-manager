@@ -38,7 +38,7 @@ function isImage(fname)
 // base code from from https://gist.github.com/kethinov/6658166
 // modified to build a data structure for the electron-tree-view
 // TODO: not recursive, should thisprocess sub directories of images? 
-function walkSync (dir, fileTree,fileList) {
+function walkSync (dir, fileTree,fileList,postAction) {
   var getFiles = fsLib.readdirSync(dir);
   getFiles.forEach(function(file) {
       if (fsLib.statSync(dir + '/' + file).isDirectory()) {
@@ -56,6 +56,7 @@ function walkSync (dir, fileTree,fileList) {
           //logger('walkSync: file =:'+file +':')
       }
   });
+  postAction();
   return fileTree;
 } // walkSync
 
@@ -130,7 +131,9 @@ function makeImageFileTree(evt)
 
             FileTree[FILE_TREE_NODE_LABEL] = pathParts.base;
             FileTree[FILE_TREE_NODE_CHILDREN] = [];
-            walkSync(AlbumPath, FileTree,FileList);  // build data structure of file folder
+            walkSync(AlbumPath, FileTree,FileList,() => {
+                ImageDisplay.setFileList(FileList);
+            });  // build data structure of file folder
             // makeThumbNails();
 
             let tree = require('electron-tree-view')({
@@ -179,46 +182,14 @@ function showPicture(fname)
     $('#currentPicture').css('visibility','visible');
 } // showPicture
 
-function findPicture()
-{
-    logger('findPicture: START ');
-    return(FileList.indexOf(CurrentPicture));
-} // findPicture
-
-function nextPicture(evt)
-{
-    logger('nextPicture: START ');
-    logger('nextPicture: FileList.length=' + FileList.length)
-    let index = findPicture(CurrentPicture);
-    logger('nextPicture: initial index=' + index)
-    index++;
-    if(index >= FileList.length) index = 0;
-    logger('nextPicture: final index=' + index);
-    let path = AlbumPath + '/' + FileList[index];
-    CurrentPicture = FileList[index];
-    logger('nextPicture: path=' + path);
-    showPicture(path);
-} // nextPicture
-
-function prevPicture(evt)
-{
-    logger('prevPicture: START ');
-    logger('prevPicture: FileList.length=' + FileList.length);
-    let index = findPicture(CurrentPicture);
-    logger('prevPicture: initial index=' + index)
-    index--;
-    if(index <= 0) index = FileList.length-1;
-    logger('prevPicture: final index=' + index);
-    let path = AlbumPath + '/' + FileList[index];
-    CurrentPicture = FileList[index];
-    logger('prevPicture: path=' + path);
-    showPicture(path);
-} // prevPicture
 
 $(document).ready(function() {
-   logger('init: START ');
+   logger('ready: START ');
 
-   ImageDisplay = new ImageDisplayManagement();
+    ImageDisplay = new ImageDisplayManagement(FileList);
+    $('#prevImage').click(ImageDisplay.prevPicture)
+    $('#nextImage').click(ImageDisplay.nextPicture)
+    console.log('ready: after naxt/prev setup');
 
     ImageHandlingSettings = {
       wrapperID: 'pictureDisplay'
@@ -229,7 +200,7 @@ $(document).ready(function() {
 	ImageFaceHandling.init(ImageHandlingSettings);
 	ImageFaceHandling.showConfig();
     ImageFaceHandling.setup();
-
+    console.log('ready: after ImageFaceHandling setup');
 
     /*
    ErrorDialog = $('#dialog-dataerror').dialog({
@@ -244,11 +215,8 @@ $(document).ready(function() {
 
    ipcRenderer.on('open-album', (event, arg) => {
         makeImageFileTree();
-        console.log(arg) // prints "pong"
+        console.log('ready: album select setup');
     })
-   //$('#selectAlbum').click(makeImageFileTree);
-   $('#prevImage').click(prevPicture)
-   $('#nextImage').click(nextPicture)
 
    var copyRightYear = new Date().getFullYear();
    logger('init:  copyRightYear=:'+copyRightYear+':');
