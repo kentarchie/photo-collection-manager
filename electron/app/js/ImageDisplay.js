@@ -4,9 +4,9 @@
 		let DISPLAY_BOX_WIDTH = 450;
 		let DISPLAY_BOX_HEIGHT = 450;
 
-		function pictureSelected()
+		function pictureSelected(fname)
 		{
-			let fname = $(this).val();
+			//let fname = $(this).val();
 			let imagePath = 'TestAlbum/' + fname;
 			let filename = Album_Data[fname].filename;
 			console.log('imageDisplay.pictureSelected: filename is :%s: fname = :%s: imagePath = :%s:',filename,fname,imagePath);

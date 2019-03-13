@@ -56,6 +56,8 @@ function walkSync (dir, fileTree,fileList,postAction) {
           //logger('walkSync: file =:'+file +':')
       }
   });
+  console.log('walkSync: fileList length = %d',fileList.length);
+  console.log('walkSync: FileList length = %d',FileList.length);
   postAction();
   return fileTree;
 } // walkSync
@@ -134,6 +136,7 @@ function makeImageFileTree(evt)
             walkSync(AlbumPath, FileTree,FileList,() => {
                 ImageDisplay.setFileList(FileList);
             });  // build data structure of file folder
+            console.log('makeImageFileTree: FileList length = %d',FileList.length);
             // makeThumbNails();
 
             let tree = require('electron-tree-view')({
@@ -186,10 +189,14 @@ function showPicture(fname)
 $(document).ready(function() {
    logger('ready: START ');
 
-    ImageDisplay = new ImageDisplayManagement(FileList);
-    $('#prevImage').click(ImageDisplay.prevPicture)
-    $('#nextImage').click(ImageDisplay.nextPicture)
-    console.log('ready: after naxt/prev setup');
+    ImageDisplay = new ImageDisplayManagement('PATH');
+    $('#prevImage').click((evt) => {
+        ImageDisplay.nextPrevPicture(evt);
+    });
+    $('#nextImage').click((evt) => {
+        ImageDisplay.nextPrevPicture(evt);
+    });
+    console.log('ready: after next/prev setup');
 
     ImageHandlingSettings = {
       wrapperID: 'pictureDisplay'

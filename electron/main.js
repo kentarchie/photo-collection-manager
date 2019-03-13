@@ -7,7 +7,7 @@ const { ipcMain } = require('electron')
 
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 700;
-const DEBUG_WIDTH = 1800;
+const DEBUG_WIDTH = 2000;
 const DEBUG_HEIGHT = 800;
 
 let MainWindow = null;

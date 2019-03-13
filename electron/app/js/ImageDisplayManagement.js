@@ -9,6 +9,7 @@ class ImageDisplayManagement
 		this.LINE_WIDTH = 2;
 		this.STROKE_STYLE = '#FF0000';
     	this.AlbumPath = '';
+    	this.FileList = []
 	} // constructor
 
     init(albumPath)
@@ -34,7 +35,9 @@ class ImageDisplayManagement
 	
 	setFileList(fileList)
 	{
+        console.log('ImageDisplayManagement.setFileList fileList length (%d)',fileList.length);
 		this.FileList = fileList;
+        console.log('ImageDisplayManagement.setFileList this.FileList length (%d)',this.FileList.length);
 	}
 
 	// from https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
@@ -76,20 +79,19 @@ class ImageDisplayManagement
 	{
 		const canvas = $('#IFH_CanvasTag').get(0);
 		const ctx = canvas.getContext('2d');
+		console.log('ImageDisplayManagement.drawImage: picFileName= %s', picFileName);
+        console.log('ImageDisplayManagement.drawImage this.FileList length (%d)',this.FileList.length);
 
 		const faceData = Album_Data['images'][picFileName]['faces']['faceList']
-		console.log('ImageDisplayManagement.drawImage.setup: Canvas.width= %d Canvas.height= %d', canvas.width,canvas.height);
 
-		console.log ('ImageDisplayManagement.drawImage: DISPLAY values  %d (width),%d (height)',this.DISPLAY_BOX_WIDTH,this.DISPLAY_BOX_HEIGHT);
 		let height = chosenImage.naturalHeight;
 		let width = chosenImage.naturalWidth;
 		console.log ('ImageDisplayManagement.drawImage: The image natural size is %d(width) * %d(height)',width,height);
 		let deltaWidth = this.DISPLAY_BOX_WIDTH / width;
 		let deltaHeight = this.DISPLAY_BOX_HEIGHT / height;
-		//Album_Data['images'][picFileName]['deltaWidth'] = deltaWidth;
-		//Album_Data['images'][picFileName]['deltaHeight'] = deltaHeight;
 		console.log ('ImageDisplayManagement.onload: The delta size is %f * %f',deltaWidth,deltaHeight);
 
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		faceData.forEach((fd, i) => {
 			console.log('ImageDisplayManagement.drawImage ' + JSON.stringify(fd,null,'\t'));
 			let newFaceBox = this.adjustFaceBox(fd,deltaWidth,deltaHeight);
@@ -107,6 +109,7 @@ class ImageDisplayManagement
     pictureSelected(imageName)
 	{
 		console.log('ImageDisplayManagement.pictureSelected: START imageName = :%s: ',imageName);
+        console.log('ImageDisplayManagement.pictureSelected this.FileList length (%d)',this.FileList.length);
         $('#pictureFileName').html(imageName);
 		let that=this;
         let filename = Album_Data['images'][imageName].filename;
@@ -121,41 +124,29 @@ class ImageDisplayManagement
         imageTag.attr('src',filename);
 	} // pictureSelected
 
-	findPicture()
+	findPicture(picture)
 	{
     	console.log('ImageDisplayManagement.findPicture: START ');
-    	return(this.FileList.indexOf(CurrentPicture));
+    	return(this.FileList.indexOf(picture));
 	} // findPicture
 
-	nextPicture()
+	nextPrevPicture(evt)
 	{
-    	console.log('ImageDisplayManagement.nextPicture: START ');
-    	console.log('ImageDisplayManagement.nextPicture: FileList.length=' + this.FileList.length)
-    	let index = findPicture(CurrentPicture);
-    	console.log('ImageDisplayManagement.nextPicture: initial index=' + index)
-    	index++;
-    	if(index >= this.FileList.length) index = 0;
-    	console.log('ImageDisplayManagement.nextPicture: final index=' + index);
-    	let path = AlbumPath + '/' + this.FileList[index];
-    	CurrentPicture = this.FileList[index];
-    	console.log('ImageDisplayManagement.nextPicture: path=' + path);
-    	drawImage(CurrentPicture,$('#IFH_ImageTag'));
-	} // nextPicture
-
-	prevPicture(evt)
-	{
-    	console.log('ImageDisplayManagement.prevPicture: START ');
-    	console.log('ImageDisplayManagement.prevPicture: FileList.length=' + this.FileList.length);
-    	let index = findPicture(CurrentPicture);
-    	console.log('ImageDisplayManagement.prevPicture: initial index=' + index)
-    	index--;
+		let id = evt.target.id;
+    	console.log('ImageDisplayManagement.nextPrevPicture: START button id = %s' , id);
+    	let index = this.findPicture(CurrentPicture);
+    	console.log('ImageDisplayManagement.nextPrevPicture: initial index= %d' , index);
+    	index = (id.startsWith('prev')) ? index -1 : index +1;
     	if(index <= 0) index = this.FileList.length-1;
-    	console.log('ImageDisplayManagement.prevPicture: final index=' + index);
+    	if(index >= this.FileList.length) index = 0;
+		console.log('ImageDisplayManagement.nextPrevPicture: final index= %d' , index);
+
     	let path = AlbumPath + '/' + this.FileList[index];
+    	console.log('ImageDisplayManagement.nextPrevPicture: path= %s' , path);
     	CurrentPicture = this.FileList[index];
-    	console.log('ImageDisplayManagement.prevPicture: path=' + path);
-    	drawImage(CurrentPicture,$('#IFH_ImageTag'));
-	} // prevPicture
+		this.pictureSelected(CurrentPicture);
+    	this.drawImage(CurrentPicture,$('#IFH_ImageTag'));
+	} // nextPrevPicture
 
 } // ImageDisplayManagement
 
