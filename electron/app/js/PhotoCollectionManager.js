@@ -43,7 +43,7 @@ function walkSync (dir, fileTree,fileList,postAction) {
   getFiles.forEach(function(file) {
       if (fsLib.statSync(dir + '/' + file).isDirectory()) {
           if((file == 'thumbnails') || (file == 'webpage')) return;  // skip folders I made
-          //fileTree = walkSync(dir + '/' + file + '/', fileTree);
+          return(walkSync(dir + '/' + file + '/', fileTree,fileList,postAction));
       }
       else {
           if(!isImage(file)) return; // only show image files
@@ -53,7 +53,6 @@ function walkSync (dir, fileTree,fileList,postAction) {
           node[FILE_TREE_NODE_CHILDREN] =  [];
           fileTree[FILE_TREE_NODE_CHILDREN].push(node);
           fileList.push(pathParts.base);
-          //logger('walkSync: file =:'+file +':')
       }
   });
   console.log('walkSync: fileList length = %d',fileList.length);
@@ -151,13 +150,13 @@ function makeImageFileTree(evt)
                 logger('tree: item selected:' + item.name + ':')
                 let fullPath = AlbumPath + '/' + item.name;
                 if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
+                    logger('tree: clicked on directory');
                     return;
                 }
 
                 logger('tree: full path :' + fullPath + ':')
                 CurrentPicture = item.name;
                 logger('tree: CurrentPicture :' + CurrentPicture + ':')
-                //showPicture(CurrentPicture);
                 ImageDisplay.pictureSelected(CurrentPicture);
             });
 
@@ -166,25 +165,6 @@ function makeImageFileTree(evt)
         }
     }); // showOpenDialog
 } // makeImageFileTree
-
-function showPicture(fname)
-{
-    console.log('showPicture: fname = :%s:',fname);
-	var newImg = new Image();
-    logger('showPicture: Album_Data[images][fname]:' + JSON.stringify(Album_Data['images'][fname],null,'\t'));
-	let filename = Album_Data['images'][fname]['filename'];
-	console.log('showPicture: filename is :%s:',filename);
-	newImg.src = filename;
-    newImg.onload = function() {
-		ImageFaceHandling.showPicture(fname);
-		console.log ('showPicture: onLoad: The image natural size is %s(width) %s (height)',
-		    newImg.naturalWidth , newImg.naturalHeight);
-		ImageFaceHandling.drawFaces(fname);
-	} 
-    $('#currentPicture').attr('src', fname);
-    $('#currentPicture').css('visibility','visible');
-} // showPicture
-
 
 $(document).ready(function() {
    logger('ready: START ');
