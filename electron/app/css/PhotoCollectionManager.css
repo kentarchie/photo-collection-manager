@@ -57,6 +57,13 @@ header span.left {
 	display: flex;
 }
 
+.fileList {
+	list-style-type: none;
+}
+.fileList li {
+	cursor: pointer;
+}
+
 .albumName {
 	width:100%;
 	background-color:coral;
