@@ -42,8 +42,23 @@ function appEventHandling(app)
 function processArgs(app)
 {
   let cliData = {};
+  /*
   var argv = require('yargs')
     .usage('Usage: $0 [-debug]')
+    .argv;
+    */
+
+    var argv = require('yargs')
+    .usage('Usage: $0 <command> [options]')
+    .command('debug', 'open browser debug window')
+    .example('$0 debuf -f full/path/to/album', 'Load in the specified album')
+    .alias('f', 'album')
+    .nargs('f', 1)
+    .describe('f', 'Load an album')
+    .demandOption(['f'])
+    .help('h')
+    .alias('h', 'help')
+    .epilog('copyright 2019')
     .argv;
 
   cliData.debug=argv.debug;
@@ -51,6 +66,8 @@ function processArgs(app)
   cliData['AppPath'] = app.getAppPath();
   console.log('ready: cliData.debug -> :%s:', cliData.debug);
   console.log('ready: cliData.AppPath -> :%s:', cliData.AppPath);
+  cliData['album'] = argv.f;
+  console.log('ready: cliData.album -> :%s:', cliData.album);
   return cliData;
 } //processArgs
 
