@@ -86,6 +86,51 @@ function makeThumbNails()
     } // for FileList
 } // makeThumbNails
 
+function processAlbum(albumPath)
+{
+    AlbumPath = albumPath
+    ImageDisplay.init(AlbumPath);
+    let pathParts = pathLib.parse(AlbumPath);
+    AlbumName = pathParts.base;
+    let albumData = new MakeReadAlbumData(AlbumPath);
+    Album_Data = albumData.get();
+    logger('processAlbum: AlbumPath:' + AlbumPath + ': AlbumName:' + AlbumName+':');
+    logger('processAlbum loaded album data');
+    //logger('processAlbum: Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
+    $('#albumName').val(AlbumName);
+
+    collectImageFiles(AlbumPath, '', FileList,() => {
+        ImageDisplay.setFileList(FileList);
+    });  // build data structure of file folder
+    console.log('processAlbum: FileList length after collectImageFiles = %d',FileList.length);
+    // makeThumbNails();
+    let imgList = [];
+    for(img in FileList) {
+        console.log('processAlbum: adding (%s)',FileList[img])
+        imgList.push('<li data-name="'+FileList[img]+'">' + FileList[img] + '</>');
+    }
+    $('#fileList').html(imgList.join(''));
+    console.log('processAlbum: added image list');
+
+    // what to do when an image is selected from the file tree
+    //$('#fileList').on('click', (evt) => {
+    document.getElementById('fileList').addEventListener('click',function (evt) {
+        logger('processAlbum: evt.target.innerHTML:' + evt.target.innerHTML);
+        let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
+        logger('processAlbum: item selected:' + imageName + ':')
+        let fullPath = AlbumPath + '/' + imageName;
+        if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
+            logger('processAlbum: clicked on directory fullpath = :'+fullPath+':');
+            return;
+        }
+
+        logger('processAlbum: full path :' + fullPath + ':')
+        CurrentPicture = imageName;
+        logger('processAlbum: CurrentPicture :' + CurrentPicture + ':')
+        ImageDisplay.pictureSelected(CurrentPicture);
+    });
+} // processAlbum
+
   //TODO: this is written assuming we are on Linux, how should we deal with
   // file path designation oon multiple OS's
 function makeImageFileTree(evt)
@@ -106,66 +151,30 @@ function makeImageFileTree(evt)
             // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
             // example Album  :TestData
 
-            AlbumPath = folderPaths[0];
-            ImageDisplay.init(AlbumPath);
-            let pathParts = pathLib.parse(AlbumPath);
-            AlbumName = pathParts.base;
-            let albumData = new MakeReadAlbumData(AlbumPath);
-            Album_Data = albumData.get();
-            logger('showOpenDialog: AlbumPath:' + AlbumPath + ': AlbumName:' + AlbumName+':');
-            logger('makeImageFileTree loaded album data');
-            //logger('makeImageFileTree: Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
-            $('#albumName').val(AlbumName);
-
-            collectImageFiles(AlbumPath, '', FileList,() => {
-                ImageDisplay.setFileList(FileList);
-            });  // build data structure of file folder
-            console.log('makeImageFileTree: FileList length after collectImageFiles = %d',FileList.length);
-            // makeThumbNails();
-            let imgList = [];
-            for(img in FileList) {
-                console.log('showOpenDialog: adding (%s)',FileList[img])
-                imgList.push('<li data-name="'+FileList[img]+'">' + FileList[img] + '</>');
-            }
-            $('#fileList').html(imgList.join(''));
-            console.log('showOpenDialog: added image list');
-
-            // what to do when an image is selected from the file tree
-            //$('#fileList').on('click', (evt) => {
-            document.getElementById('fileList').addEventListener('click',function (evt) {
-                logger('makeImageFileTree: evt.target.innerHTML:' + evt.target.innerHTML);
-                let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
-                logger('tree: item selected:' + imageName + ':')
-                let fullPath = AlbumPath + '/' + imageName;
-                if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
-                    logger('tree: clicked on directory fullpath = :'+fullPath+':');
-                    return;
-                }
-
-                logger('tree: full path :' + fullPath + ':')
-                CurrentPicture = imageName;
-                logger('tree: CurrentPicture :' + CurrentPicture + ':')
-                ImageDisplay.pictureSelected(CurrentPicture);
-            });
-
+            console.log('makeImageFileTree: before processAlbum');
+            processAlbum(folderPaths[0]);
         }
     }); // showOpenDialog
 } // makeImageFileTree
 
-$(document).ready(function() {
-   logger('ready: START ');
+$(document).ready(function()
+{
+    logger('ready: START ');
 
-    ImageDisplay = new ImageDisplayManagement('PATH');
-    $('#prevImage').click((evt) => {
-        ImageDisplay.nextPrevPicture(evt);
-    });
-    $('#nextImage').click((evt) => {
-        ImageDisplay.nextPrevPicture(evt);
-    });
+    ImageDisplay = new ImageDisplayManagement('');
+    console.log('ready: CliData.album :' + CliData.album + ':');
+    if(CliData.album) {
+        console.log('ready: Clidata.album set')
+        ImageDisplay.init(CliData.album);
+        processAlbum(CliData.album);
+    }
+
+    $('#prevImage').click((evt) => { ImageDisplay.nextPrevPicture(evt); });
+    $('#nextImage').click((evt) => { ImageDisplay.nextPrevPicture(evt); });
     console.log('ready: after next/prev setup');
 
     ImageHandlingSettings = {
-      wrapperID: 'pictureDisplay'
+        wrapperID: 'pictureDisplay'
         ,albumName: 'TestAlbum'
 	    ,lineWidth : 1
 	    ,strokeStyle : '#FF0000'
@@ -175,21 +184,13 @@ $(document).ready(function() {
     ImageFaceHandling.setup();
     console.log('ready: after ImageFaceHandling setup');
 
-    /*
-   ErrorDialog = $('#dialog-dataerror').dialog({
-      autoOpen: false
-      ,height: 300
-      ,width: 350
-      ,modal: true
-   });
-   */
-
    let mainWindow; //do this so that the window object doesn't get GC'd
 
    ipcRenderer.on('open-album', (event, arg) => {
+        console.log('ready: open-album received');
         makeImageFileTree();
         console.log('ready: album select setup');
-    })
+    });
 
    var copyRightYear = new Date().getFullYear();
    logger('init:  copyRightYear=:'+copyRightYear+':');

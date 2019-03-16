@@ -42,32 +42,26 @@ function appEventHandling(app)
 function processArgs(app)
 {
   let cliData = {};
-  /*
-  var argv = require('yargs')
-    .usage('Usage: $0 [-debug]')
-    .argv;
-    */
+  var copyRightYear = new Date().getFullYear();
 
-    var argv = require('yargs')
+  var argv = require('yargs')
     .usage('Usage: $0 <command> [options]')
     .command('debug', 'open browser debug window')
-    .example('$0 debuf -f full/path/to/album', 'Load in the specified album')
-    .alias('f', 'album')
-    .nargs('f', 1)
-    .describe('f', 'Load an album')
-    .demandOption(['f'])
+    .example('$0 --debug --album full/path/to/album', 'Load in the specified album')
+    .alias('album', 'album')
+    .describe('album', 'Load an album')
     .help('h')
     .alias('h', 'help')
-    .epilog('copyright 2019')
+    .epilog('copyright ' + copyRightYear)
     .argv;
 
+  cliData.album='';
   cliData.debug=argv.debug;
-  console.log('createWindow: argv.debug ->', argv.debug);
   cliData['AppPath'] = app.getAppPath();
-  console.log('ready: cliData.debug -> :%s:', cliData.debug);
-  console.log('ready: cliData.AppPath -> :%s:', cliData.AppPath);
-  cliData['album'] = argv.f;
-  console.log('ready: cliData.album -> :%s:', cliData.album);
+  cliData['album'] = argv.album;
+  console.log('processArgs: cliData.album -> :%s:', cliData.album);
+  console.log('processArgs: cliData.debug -> :%s:', cliData.debug);
+  console.log('processArgs: cliData.AppPath -> :%s:', cliData.AppPath);
   return cliData;
 } //processArgs
 
@@ -103,7 +97,10 @@ function createWindow (app)
   MainWindow.on('closed', () => { MainWindow = null; });
 
   // Show window when page is ready
-  MainWindow.once('ready-to-show', () => { MainWindow.show() });
+  MainWindow.once('ready-to-show', () => { 
+    MainWindow.show();
+    if(cliData.album != '') MainWindow.webContents.send('open-album', 'click!'); 
+  });
 
   //  require(`${__dirname}/mainMenu.js`);
   let menu = createMainMenu();
@@ -116,37 +113,37 @@ function createMainMenu()
 {
   let menu = Menu.buildFromTemplate([
     {
-        label: 'Menu'
-        ,submenu: [
-             {
-               label:'Open Album'
-                ,click() { 
-                  // run the open album code on the renderer
-                  MainWindow.webContents.send('open-album', 'click!'); 
-                }
-             }
-            ,{
-                label:'Settings'
-                ,click() { 
-                }
-             }
-            ,{
-                label:'Toggle Debug'
-                ,accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I'
-                ,click (item, focusedWindow) {
-                  if (focusedWindow) focusedWindow.webContents.toggleDevTools()
-                }
-             }
-            ,{type:'separator'} 
-            ,{
-              label:'Exit'
-              ,role : 'quit'
-             ,click() { 
-                    app.quit() 
-              }
-              ,accelerator: 'CmdOrCtrl+Shift+Q'
-            } // exit menu item
-        ]
+      label: 'Menu'
+      ,submenu: [
+        {
+          label:'Open Album'
+          ,click() { 
+            // run the open album code on the renderer
+            MainWindow.webContents.send('open-album', 'click!'); 
+          }
+        }
+        ,{
+          label:'Settings'
+          ,click() { 
+          }
+        }
+        ,{
+          label:'Toggle Debug'
+          ,accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I'
+          ,click (item, focusedWindow) {
+            if (focusedWindow) focusedWindow.webContents.toggleDevTools();
+          }
+        }
+        ,{type:'separator'} 
+        ,{
+          label:'Exit'
+          ,role : 'quit'
+          ,accelerator: 'CmdOrCtrl+Shift+Q'
+          ,click() { 
+            app.quit() 
+          }
+        } // exit menu item
+      ]
     } // Menu top menu item
     ,{
         label: 'About'
