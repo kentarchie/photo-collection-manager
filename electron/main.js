@@ -4,6 +4,7 @@
 global.__base = __dirname + '/';
 const {app, BrowserWindow,Menu} = require('electron');
 const { ipcMain } = require('electron')
+const settings = require('electron-settings');
 
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 700;
