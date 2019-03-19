@@ -5,6 +5,7 @@ global.__base = __dirname + '/';
 const {app, BrowserWindow,Menu} = require('electron');
 const { ipcMain } = require('electron')
 const settings = require('electron-settings');
+const pathLib = require('path');
 
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 700;
@@ -82,6 +83,7 @@ function createWindow (app)
   MainWindow = new BrowserWindow({
      width : winWidth
     ,height: winHeight
+    ,icon : pathLib.join(__dirname , 'images/TaskBar.png')
     ,backgroundColor: "#D6D8DC" // background color of the page, this prevents any white flickering
     ,show: false // Don't show the window until it's ready, this prevents any white flickering
   });
