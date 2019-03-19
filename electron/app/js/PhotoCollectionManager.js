@@ -27,13 +27,13 @@ Settings['imageDirectoryFilter'] = [
 let ImageExtensions = [ 'tif' ,'tiff' ,'gif' ,'jpeg' ,'jpg' ,'jif'
                         ,'jfif' ,'jp2' ,'jpx' ,'j2k' ,'j2c' ,'png'
 ];
-let CliData = remote.getCurrentWindow().cliData; // parameters from the command line
+let CliData = remote.getCurrentWindow().CliData; // parameters from the command line
 
 // check the filename extension against the list of image file extensions
 function isImage(fname)
 {
     let ext = pathLib.extname(fname).toLowerCase().replace('.','');
-    //console.log('looking for :%s:',ext);
+    //logger('looking for :%s:',ext);
     return(ImageExtensions.indexOf(ext) > 0);
 } // isImage
 
@@ -54,7 +54,7 @@ function collectImageFiles (dir, base,fileList,postAction) {
           fileList.push(base + '/' + file);
       }
   });
-  console.log('collectImageFiles: FileList length = %d',FileList.length);
+  logger('collectImageFiles: FileList length = %d',FileList.length);
   postAction();
   return fileList;
 } // collectImageFiles
@@ -77,9 +77,9 @@ function makeThumbNails()
             ,overwrite: true
             ,concurrency: 4
         }).then(function() {
-                console.log('Success');
+                logger('Success');
                 }).catch(function(e) {
-                    console.log('Error', e);
+                    logger('Error', e);
                 });
 
     //logger('makeThumbNails: working on :' + sourcePath + ': done');
@@ -102,15 +102,15 @@ function processAlbum(albumPath)
     collectImageFiles(AlbumPath, '', FileList,() => {
         ImageDisplay.setFileList(FileList);
     });  // build data structure of file folder
-    console.log('processAlbum: FileList length after collectImageFiles = %d',FileList.length);
+    logger('processAlbum: FileList length after collectImageFiles = %d',FileList.length);
     // makeThumbNails();
     let imgList = [];
     for(img in FileList) {
-        console.log('processAlbum: adding (%s)',FileList[img])
+        logger('processAlbum: adding (%s)',FileList[img])
         imgList.push('<li data-name="'+FileList[img]+'">' + FileList[img] + '</>');
     }
     $('#fileList').html(imgList.join(''));
-    console.log('processAlbum: added image list');
+    logger('processAlbum: added image list');
 
     // what to do when an image is selected from the file tree
     //$('#fileList').on('click', (evt) => {
@@ -151,7 +151,7 @@ function makeImageFileTree(evt)
             // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
             // example Album  :TestData
 
-            console.log('makeImageFileTree: before processAlbum');
+            logger('makeImageFileTree: before processAlbum');
             processAlbum(folderPaths[0]);
         }
     }); // showOpenDialog
@@ -162,16 +162,16 @@ $(document).ready(function()
     logger('ready: START ');
 
     ImageDisplay = new ImageDisplayManagement('');
-    console.log('ready: CliData.album :' + CliData.album + ':');
+    logger('ready: CliData.album :' + CliData.album + ':');
     if(CliData.album) {
-        console.log('ready: Clidata.album set')
+        logger('ready: Clidata.album set')
         ImageDisplay.init(CliData.album);
         processAlbum(CliData.album);
     }
 
     $('#prevImage').click((evt) => { ImageDisplay.nextPrevPicture(evt); });
     $('#nextImage').click((evt) => { ImageDisplay.nextPrevPicture(evt); });
-    console.log('ready: after next/prev setup');
+    logger('ready: after next/prev setup');
 
     ImageHandlingSettings = {
         wrapperID: 'pictureDisplay'
@@ -182,14 +182,14 @@ $(document).ready(function()
 	ImageFaceHandling.init(ImageHandlingSettings);
 	ImageFaceHandling.showConfig();
     ImageFaceHandling.setup();
-    console.log('ready: after ImageFaceHandling setup');
+    logger('ready: after ImageFaceHandling setup');
 
    let mainWindow; //do this so that the window object doesn't get GC'd
 
    ipcRenderer.on('open-album', (event, arg) => {
-        console.log('ready: open-album received');
+        logger('ready: open-album received');
         makeImageFileTree();
-        console.log('ready: album select setup');
+        logger('ready: album select setup');
     });
 
    var copyRightYear = new Date().getFullYear();
@@ -197,7 +197,12 @@ $(document).ready(function()
    $('.copyright span').html(copyRightYear);
 }); // ready function
 
-function logger(str)
+// ideas from https://gist.github.com/robatron/5681424
+function logger()
 {
-    if(window.console && console.log) console.log('PCM: ' + str);
+  if(CliData.debug) {
+    let args = Array.prototype.slice.call(arguments);
+    args.unshift('RENDER: ');
+    console.log.apply(console, args);
+  }
 } // logger

@@ -13,6 +13,7 @@ const DEBUG_WIDTH = 2000;
 const DEBUG_HEIGHT = 800;
 
 let MainWindow = null;
+let CliData = {};  // hold command line parameters
 appEventHandling(app);
 
 function appEventHandling(app)
@@ -43,7 +44,6 @@ function appEventHandling(app)
  // for more options  handling, see https://github.com/yargs/yargs
 function processArgs(app)
 {
-  let cliData = {};
   var copyRightYear = new Date().getFullYear();
 
   var argv = require('yargs')
@@ -57,24 +57,20 @@ function processArgs(app)
     .epilog('copyright ' + copyRightYear)
     .argv;
 
-  cliData.album='';
-  cliData.debug=argv.debug;
-  cliData['AppPath'] = app.getAppPath();
-  cliData['album'] = argv.album;
-  console.log('processArgs: cliData.album -> :%s:', cliData.album);
-  console.log('processArgs: cliData.debug -> :%s:', cliData.debug);
-  console.log('processArgs: cliData.AppPath -> :%s:', cliData.AppPath);
-  return cliData;
+  CliData['debug']=argv.debug;
+  CliData['AppPath'] = app.getAppPath();
+  CliData['album'] = argv.album;
+  logger('processArgs: CliData %s', JSON.stringify(CliData,null,'\t'));
 } //processArgs
 
 function createWindow (app)
 {
-  let cliData = processArgs(app);
+  processArgs(app);
 
   let winHeight = DEFAULT_HEIGHT;
   let winWidth = DEFAULT_WIDTH;
 
-  if(cliData.debug) {
+  if(CliData.debug) {
     winHeight = DEBUG_HEIGHT;
     winWidth = DEBUG_WIDTH;
   }
@@ -90,11 +86,11 @@ function createWindow (app)
 
   // Load a URL in the window to the local index.html path
   let urlToLoad = 'file://' + __dirname + '/app/index.html';
-  console.log('createWindow: loading url ->', urlToLoad);
+  logger('createWindow: loading url ->', urlToLoad);
   MainWindow.loadURL(urlToLoad);
 
-  MainWindow.cliData = cliData;  // make CLI data available to  the renderer
-  if(cliData.debug) MainWindow.webContents.openDevTools(); // Open the DevTools.
+  MainWindow.CliData = CliData;  // make CLI data available to  the renderer
+  if(CliData.debug) MainWindow.webContents.openDevTools(); // Open the DevTools.
 
   // Remove window once app is closed
   MainWindow.on('closed', () => { MainWindow = null; });
@@ -102,14 +98,14 @@ function createWindow (app)
   // Show window when page is ready
   MainWindow.once('ready-to-show', () => { 
     MainWindow.show();
-    if(cliData.album != '') MainWindow.webContents.send('open-album', 'click!'); 
+    if(CliData.album != '') MainWindow.webContents.send('open-album', 'click!'); 
   });
 
   //  require(`${__dirname}/mainMenu.js`);
   let menu = createMainMenu();
-  console.log('createWindow: got menu template');
+  logger('createWindow: got menu template');
   Menu.setApplicationMenu(menu); 
-  console.log('createWindow: menu set');
+  logger('createWindow: menu set');
 } // createWindow
 
 function createMainMenu()
@@ -154,3 +150,13 @@ function createMainMenu()
   ]);
   return menu;
 } // createMainMenu
+
+// ideas from https://gist.github.com/robatron/5681424
+function logger()
+{
+  if(CliData.debug) {
+    let args = Array.prototype.slice.call(arguments);
+    args.unshift('MAIN: ');
+    console.log.apply(console, args);
+  }
+} // logger
