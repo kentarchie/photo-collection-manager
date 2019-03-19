@@ -13,6 +13,7 @@ const DEBUG_WIDTH = 2000;
 const DEBUG_HEIGHT = 800;
 
 let MainWindow = null;
+let AboutWindow = null
 let CliData = {};  // hold command line parameters
 appEventHandling(app);
 
@@ -146,10 +147,43 @@ function createMainMenu()
     } // Menu top menu item
     ,{
         label: 'About'
+        ,submenu: [
+          {
+            label:'About'
+            ,click() { 
+              openAboutWindow();
+            }
+          }
+        ]
     } // About top menu item
   ]);
   return menu;
 } // createMainMenu
+
+function openAboutWindow()
+{
+  logger('openAboutWindow: START');
+  if(AboutWindow) {
+    AboutWindow.focus();
+    return;
+  }
+  AboutWindow = new BrowserWindow({
+     width : 500
+    ,height: 400
+    ,resizable : false
+    ,title : ''
+    ,minimizable : false
+    ,fullscreenable : false
+    ,backgroundColor: "#d7ef77" 
+  });
+  AboutWindow.setMenu(null);
+
+  let urlToLoad = 'file://' + __dirname + '/app/about.html';
+  logger('openAboutWindow: loading url ->', urlToLoad);
+  AboutWindow.loadURL(urlToLoad);
+
+  AboutWindow.on('closed', () => { AboutWindow = null; });
+} // openAboutWindow
 
 // ideas from https://gist.github.com/robatron/5681424
 function logger()
