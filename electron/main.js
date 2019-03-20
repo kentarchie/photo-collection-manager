@@ -87,7 +87,8 @@ function createWindow (app)
 
   // Load a URL in the window to the local index.html path
   let urlToLoad = 'file://' + __dirname + '/app/index.html';
-  logger('createWindow: loading url ->', urlToLoad);
+  logger('createWindow: loading url ->%s', urlToLoad);
+  logger('TEST x= %d, y= %d',1,2);
   MainWindow.loadURL(urlToLoad);
 
   MainWindow.CliData = CliData;  // make CLI data available to  the renderer
@@ -179,7 +180,7 @@ function openAboutWindow()
   AboutWindow.setMenu(null);
 
   let urlToLoad = 'file://' + __dirname + '/app/about.html';
-  logger('openAboutWindow: loading url ->', urlToLoad);
+  logger('openAboutWindow: loading url ->%s', urlToLoad);
   AboutWindow.loadURL(urlToLoad);
 
   AboutWindow.on('closed', () => { AboutWindow = null; });
@@ -190,7 +191,12 @@ function logger()
 {
   if(CliData.debug) {
     let args = Array.prototype.slice.call(arguments);
-    args.unshift('MAIN: ');
-    console.log.apply(console, args);
+    //args.unshift('MAIN: ');
+    let template = 'MAIN: ' + args[0];
+    console.log('template = :%s:',template);
+    args.splice(0,1);
+    console.log(args);
+    //console.log.apply(console, args);
+    console.log(template, args);
   }
 } // logger

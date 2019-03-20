@@ -182,9 +182,11 @@ $(document).ready(function()
 	ImageFaceHandling.init(ImageHandlingSettings);
 	ImageFaceHandling.showConfig();
     ImageFaceHandling.setup();
+    document.getElementById('IFH_CanvasTag').addEventListener('contextmenu', (e) => {
+        logger('ready: context menu detected');
+        ImageFaceHandling.faceEdit(e);
+    }, false)
     logger('ready: after ImageFaceHandling setup');
-
-   let mainWindow; //do this so that the window object doesn't get GC'd
 
    ipcRenderer.on('open-album', (event, arg) => {
         logger('ready: open-album received');
@@ -200,6 +202,7 @@ $(document).ready(function()
 // ideas from https://gist.github.com/robatron/5681424
 function logger()
 {
+    console.log('PhotoCollectionManager.logger start');
   if(CliData.debug) {
     let args = Array.prototype.slice.call(arguments);
     args.unshift('RENDER: ');
