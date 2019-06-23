@@ -6,9 +6,9 @@
     "type": "git",
     "url": "git://github.com/kentarchie/photo-collection-manager.git"
   },
-  "main": "main.js",
+  "main": "MainProcess/main.js",
   "scripts": {
-    "start": "./node_modules/.bin/electron app.js"
+    "start": "electron MainProcess/main.js"
   },
   "author": "Kent Archie",
   "license": "MIT",

@@ -86,7 +86,7 @@ function createWindow (app)
   });
 
   // Load a URL in the window to the local index.html path
-  let urlToLoad = 'file://' + __dirname + '/app/index.html';
+  let urlToLoad = 'file://' + __dirname + '/../Renderer/index.html';
   logger('createWindow: loading url ->%s', urlToLoad);
   logger('TEST x= %d, y= %d',1,2);
   MainWindow.loadURL(urlToLoad);
