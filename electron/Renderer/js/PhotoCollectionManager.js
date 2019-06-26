@@ -10,7 +10,6 @@ const ImageDisplayManagement = require(`${__dirname}/js/ImageDisplayManagement.j
 let Settings = {};
 let FileList = [];
 
-let CurrentPicture = '';  // image we are working on
 let AlbumPath = ''; // full path to the directory containing the album
 let AlbumName = ''; // name of the directory containing the album
 let Album_Data = null; // contents of the JSON file describing the album
@@ -112,23 +111,6 @@ function processAlbum(albumPath)
     $('#fileList').html(imgList.join(''));
     logger('processAlbum: added image list');
 
-    // what to do when an image is selected from the file tree
-    //$('#fileList').on('click', (evt) => {
-    document.getElementById('fileList').addEventListener('click',function (evt) {
-        logger('processAlbum: evt.target.innerHTML:' + evt.target.innerHTML);
-        let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
-        logger('processAlbum: item selected:' + imageName + ':')
-        let fullPath = AlbumPath + '/' + imageName;
-        if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
-            logger('processAlbum: clicked on directory fullpath = :'+fullPath+':');
-            return;
-        }
-
-        logger('processAlbum: full path :' + fullPath + ':')
-        CurrentPicture = imageName;
-        logger('processAlbum: CurrentPicture :' + CurrentPicture + ':')
-        ImageDisplay.pictureSelected(CurrentPicture);
-    });
 } // processAlbum
 
   //TODO: this is written assuming we are on Linux, how should we deal with
@@ -157,6 +139,42 @@ function makeImageFileTree(evt)
     }); // showOpenDialog
 } // makeImageFileTree
 
+function setupEventHandlers()
+{
+	 document.getElementById('IFH_CanvasTag').addEventListener('contextmenu', (e) => {
+        logger('setupEventHandlers: contextmenu : detected');
+        ImageFaceHandling.faceEdit(e);
+	 });
+	 logger('setupEventHandlers: contextmenu: after faceEdit setup');
+
+    var prevImage = document.getElementById('prevImage');
+	 logger('setupEventHandlers: prevImage:' + prevImage);
+    document.getElementById('prevImage').addEventListener('click',function (evt) { ImageDisplay.nextPrevPicture(evt); });
+    document.getElementById('nextImage').addEventListener('click',function (evt) { ImageDisplay.nextPrevPicture(evt); });
+    logger('setupEventHandlers: after next/prev setup');
+
+    // what to do when an image is selected from the file tree
+    document.getElementById('fileList').addEventListener('click',function (evt) {
+        logger('setupEventHandlers: fileList: evt.target.innerHTML:' + evt.target.innerHTML);
+        let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
+        logger('setupEventHandlers: fileList: item selected:' + imageName + ':')
+        let fullPath = AlbumPath + '/' + imageName;
+        if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
+            logger('setupEventHandlers: fileList: clicked on directory fullpath = :'+fullPath+':');
+            return;
+        }
+
+        logger('setupEventHandlers: fileList: full path :' + fullPath + ':')
+        logger('setupEventHandlers: fileList: imageName :' + imageName + ':')
+        ImageDisplay.pictureSelected(imageName);
+    });
+
+	 // A face is selected, add or update the face information
+    document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) {
+        logger('setupEventHandlers: createFace(): evt.target.innerHTML:' + evt.target.innerHTML);
+    });
+} // setupEventHandlers
+
 $(document).ready(function()
 {
     logger('ready: START ');
@@ -169,10 +187,6 @@ $(document).ready(function()
         processAlbum(CliData.album);
     }
 
-    $('#prevImage').click((evt) => { ImageDisplay.nextPrevPicture(evt); });
-    $('#nextImage').click((evt) => { ImageDisplay.nextPrevPicture(evt); });
-    logger('ready: after next/prev setup');
-
     ImageHandlingSettings = {
         wrapperID: 'pictureDisplay'
         ,albumName: 'TestAlbum'
@@ -181,12 +195,8 @@ $(document).ready(function()
     };
 	ImageFaceHandling.init(ImageHandlingSettings);
 	ImageFaceHandling.showConfig();
-    ImageFaceHandling.setup();
-    document.getElementById('IFH_CanvasTag').addEventListener('contextmenu', (e) => {
-        logger('ready: context menu detected');
-        ImageFaceHandling.faceEdit(e);
-    }, false)
-    logger('ready: after ImageFaceHandling setup');
+   ImageFaceHandling.setup();
+	setupEventHandlers();
 
    ipcRenderer.on('open-album', (event, arg) => {
         logger('ready: open-album received');
@@ -195,14 +205,14 @@ $(document).ready(function()
     });
 
    var copyRightYear = new Date().getFullYear();
-   logger('init:  copyRightYear=:'+copyRightYear+':');
+   logger('ready:  copyRightYear=:'+copyRightYear+':');
    $('.copyright span').html(copyRightYear);
 }); // ready function
 
 // ideas from https://gist.github.com/robatron/5681424
 function logger()
 {
-    console.log('PhotoCollectionManager.logger start');
+  //console.log('PhotoCollectionManager.logger start');
   if(CliData.debug) {
     let args = Array.prototype.slice.call(arguments);
     args.unshift('RENDER: ');

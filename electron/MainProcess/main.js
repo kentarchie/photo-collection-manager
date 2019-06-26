@@ -58,7 +58,7 @@ function processArgs(app)
     .epilog('copyright ' + copyRightYear)
     .argv;
 
-  CliData['debug']=argv.debug;
+  CliData['debug'] = argv.debug;
   CliData['AppPath'] = app.getAppPath();
   CliData['album'] = argv.album;
   logger('processArgs: CliData %s', JSON.stringify(CliData,null,'\t'));
@@ -193,7 +193,7 @@ function logger()
     let args = Array.prototype.slice.call(arguments);
     //args.unshift('MAIN: ');
     let template = 'MAIN: ' + args[0];
-    console.log('template = :%s:',template);
+    //console.log('template = :%s:',template);
     args.splice(0,1);
     console.log(args);
     //console.log.apply(console, args);

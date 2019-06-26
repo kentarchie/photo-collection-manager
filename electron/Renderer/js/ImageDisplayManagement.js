@@ -1,4 +1,3 @@
-
 class ImageDisplayManagement 
 {
     constructor()
@@ -14,8 +13,8 @@ class ImageDisplayManagement
 
     init(albumPath)
     {
-        this.AlbumPath = albumPath;
-        console.log('ImageDisplayManagement.init albumPath (%s)',albumPath);
+      this.AlbumPath = albumPath;
+      console.log('ImageDisplayManagement.init albumPath (%s)',albumPath);
 		// the canvas and image must be in the same place and the same size
 		let imageTag  = $('#IFH_ImageTag');
 		let canvasTag = $('#IFH_CanvasTag');
@@ -29,15 +28,15 @@ class ImageDisplayManagement
   			at: "left top",
   			of: "#IFH_ImageTag"
 		});
-        console.log('ImageDisplayManagement.init canvas.top (%s) canvas.left (%s)',canvasTag.css('top'),canvasTag.css('left'));
-        console.log('ImageDisplayManagement.init image.top (%s) image.left (%s)',imageTag.css('top'),imageTag.css('left'));
+      console.log('ImageDisplayManagement.init canvas.top (%s) canvas.left (%s)',canvasTag.css('top'),canvasTag.css('left'));
+      console.log('ImageDisplayManagement.init image.top (%s) image.left (%s)',imageTag.css('top'),imageTag.css('left'));
 	} // init
 	
 	setFileList(fileList)
 	{
-        console.log('ImageDisplayManagement.setFileList fileList length (%d)',fileList.length);
+      console.log('ImageDisplayManagement.setFileList fileList length (%d)',fileList.length);
 		this.FileList = fileList;
-        console.log('ImageDisplayManagement.setFileList this.FileList length (%d)',this.FileList.length);
+      console.log('ImageDisplayManagement.setFileList this.FileList length (%d)',this.FileList.length);
 	}
 
 	// from https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
@@ -80,7 +79,7 @@ class ImageDisplayManagement
 		const canvas = $('#IFH_CanvasTag').get(0);
 		const ctx = canvas.getContext('2d');
 		console.log('ImageDisplayManagement.drawImage: picFileName= %s', picFileName);
-        console.log('ImageDisplayManagement.drawImage this.FileList length (%d)',this.FileList.length);
+      console.log('ImageDisplayManagement.drawImage this.FileList length (%d)',this.FileList.length);
 
 		const faceData = Album_Data['images'][picFileName]['faces']['faceList']
 
@@ -109,19 +108,19 @@ class ImageDisplayManagement
     pictureSelected(imageName)
 	{
 		console.log('ImageDisplayManagement.pictureSelected: START imageName = :%s: ',imageName);
-        console.log('ImageDisplayManagement.pictureSelected this.FileList length (%d)',this.FileList.length);
-        $('#pictureFileName').html(imageName);
+      console.log('ImageDisplayManagement.pictureSelected this.FileList length (%d)',this.FileList.length);
+      $('#pictureFileName').html(imageName);
 		let that=this;
-        let filename = Album_Data['images'][imageName].filename;
+      let filename = Album_Data['images'][imageName].filename;
 		let imageTag = $('#IFH_ImageTag'); // where to display the image
 
-        imageTag.on('load', function() {
-            console.log('ImageDisplayManagement.pictureSelected: image object loaded this.src = :%s:', this.src);
+      imageTag.on('load', function() {
+         console.log('ImageDisplayManagement.pictureSelected: image object loaded this.src = :%s:', this.src);
 			that.drawImage(imageName,this);
 		}); // onload
 
-        imageTag.attr('filename', filename);
-        imageTag.attr('src',filename);
+      imageTag.attr('filename', filename);
+      imageTag.attr('src',filename);
 	} // pictureSelected
 
 	findPicture(picture)

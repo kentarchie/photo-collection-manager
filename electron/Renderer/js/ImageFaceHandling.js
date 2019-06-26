@@ -20,7 +20,7 @@ var ImageFaceHandling = (function () {
 		{
 			logger('ImageFaceHandling.init: START');
       		Config = {
-         		wrapperID: 'IFH_pictureDisplay'
+         	wrapperID: 'IFH_pictureDisplay'
         		,wrapperClass: 'IFH_WrapperClass'
         		,albumName: 'testAlbum'
 				,lineWidth : 2
@@ -29,9 +29,7 @@ var ImageFaceHandling = (function () {
 				,displayBoxHeight : 450
 				,wrapperTag : null
 				,image : null
-				,jImage : null
 				,canvas : null
-				,Jcanvas : null
 				,ctx : null
         };
  
@@ -43,32 +41,30 @@ var ImageFaceHandling = (function () {
 
 	 var setup = function()
 	 {
-		//Config.wrapperTag = createDOM();
-		Config.wrapperTag = $('#pictureDisplay');
+		Config.wrapperTag = document.getElementById('pictureDisplay');
 
 		setTimeout(function(){
-			Config.jImage  = $('#' + IFH_ImageElementID);
-			Config.jCanvas = $('#'+IFH_CanvasElementID);
-			Config.canvas  = Config.jCanvas.get(0);
+
+			Config.canvas  = document.getElementById(IFH_CanvasElementID);
 			Config.ctx     = Config.canvas.getContext('2d');
-			Config.image   = Config.jImage.get(0);
-      	logger ('ImageFaceHandling.setup: The Config.canvas.top is %s left %s',Config.jCanvas.css('top'),Config.jCanvas.css('left'));
-      	logger ('ImageFaceHandling.setup: The Config.image.id is %s',Config.jImage.attr('id'));
+			Config.image  = document.getElementById(IFH_ImageElementID);
+      	logger ('ImageFaceHandling.setup: The Config.canvas.top is %s left %s',Config.canvas.style.top,Config.canvas.style.left);
+      	logger ('ImageFaceHandling.setup: The Config.image.id is %s',Config.image.getAttribute('id'));
 
 			// the canvas and image must be in the same place and the same size
 			Config.wrapperTag.width(Config.displayBoxWidth);
 			Config.wrapperTag.height(Config.displayBoxHeight);
-			Config.jCanvas.width  = Config.displayBoxWidth;
-			Config.jCanvas.height = Config.displayBoxHeight;
-			Config.jCanvas.css('top',Config.jCanvas.css('top'));
-			Config.jCanvas.css('left', Config.jCanvas.css('left'));
+
+			Config.canvas.width  = Config.displayBoxWidth;
+			Config.canvas.height = Config.displayBoxHeight;
+			//Config.canvas.style.top = Config.canvas.style.top;
+			//Config.canvas.style.left =  Config.canvas.style.left;
 
 			Config.ctx.lineWidth   = Config.lineWidth;
 			Config.ctx.strokeStyle = Config.strokeStyle;
 
-			//Config.jCanvas.single_double_click(onImageClick,onImageDoubleClick);
-			Config.jCanvas.click(onImageClick);
-			Config.jCanvas.dblclick(onImageDoubleClick);
+			Config.canvas.addEventListener('click',(e) => { onImageClick();});
+			Config.canvas.addEventListener('dblclick', (e) => { onImageDoubleClick(e);});
 		},100);
 	 } // setup
  
@@ -159,13 +155,13 @@ var ImageFaceHandling = (function () {
 	var showPicture = function(fname)
 	{
 		logger('ImageFaceHandling.showPicture: Config.albumName :%s: fname :%s: ',Config.albumName,fname);
-		Config.jImage.attr('src', Config.albumName + '/' + fname);
-		logger('ImageFaceHandling.showPicture: jImage.src :%s:',Config.jImage.src);
+		Config.image.setAttribute('src', Config.albumName + '/' + fname);
+
 		logger('ImageFaceHandling.showPicture: image.src :%s:',Config.image.src);
-		Config.jImage.attr('data-File',fname);
+		Config.image.setAttribute('data-File',fname);
 	} // showPicture
 
-	// the position and size of teh box around a face is
+	// the position and size of the box around a face is
 	// based on the original image size and has to be 
 	// adjusted to the size of the display
 
@@ -181,10 +177,7 @@ var ImageFaceHandling = (function () {
 		return result;
 	} // adjustFaceBox
 
-	var showConfig = function()
-	{
-		logger('ImageFaceHandling.showConfig :' + JSON.stringify(Config,null,'\t'));
-	} // showConfig
+	var showConfig = () => { logger('ImageFaceHandling.showConfig :' + JSON.stringify(Config,null,'\t')); }
 
 	// go through the album data for the displayed image
 	// and draw the boxes arond all the faces
@@ -194,16 +187,16 @@ var ImageFaceHandling = (function () {
 		const faceData = Album_Data['images'][fname]['faces']['faceList'];
 
 			//logger('ImageFaceHandling.drawFaces fname %s faceData %s:',fname, JSON.stringify(faceData,null,'\t'));
-			//logger ('ImageFaceHandling.drawFaces: The image id is :%s:',Config.jImage.attr('id'));
+			//logger ('ImageFaceHandling.drawFaces: The image id is :%s:',Config.inage.getAttribute('id'));
 			//logger('ImageFaceHandling.drawFaces: scrollX,scrollY %s,%s',window.scrollX, window.scrollY);
-			//logger('ImageFaceHandling.drawFaces: canvas width,height %s,%s',Config.jCanvas.width, Config.jCanvas.height);
+			//logger('ImageFaceHandling.drawFaces: canvas width,height %s,%s',Config.canvas.width, Config.canvas.height);
 			//logger ('ImageFaceHandling.drawFaces: albumName is :%s:',Config.albumName);
 
 		let im = new Image();
 		im.src = Config.albumName + '/' + fname;
       	//logger ('ImageFaceHandling.drawFaces: The box sizes are %f * %f',Config.displayBoxHeight,Config.displayBoxWidth);
 			//logger ('ImageFaceHandling.drawFaces: The im natural sizes are %f(height) * %f(width)',im.naturalHeight,im.naturalWidth);
-			//logger ('ImageFaceHandling.drawFaces: The canvas left offset %f  top offset %f',Config.jCanvas.offset().left,Config.jCanvas.offset().top);
+			//logger ('ImageFaceHandling.drawFaces: The canvas left offset %f  top offset %f',Config.canvas.offset().left,Config.canvas.offset().top);
 
 		let deltaWidth = Config.displayBoxWidth / im.naturalWidth;
 		let deltaHeight = Config.displayBoxHeight / im.naturalHeight;
@@ -231,8 +224,8 @@ var ImageFaceHandling = (function () {
 		logger('ImageFaceHandling.onImageClick : START');
 
 		let target = e.currentTarget;
-		//let fname = Config.jImage.attr('data-file');
-		let fname = $('#pictureFileName').text();
+		//let fname = Config.image.getAttribute('data-file');
+		let fname = document.getElementById('pictureFileName').text();
 		let deltaWidth = Config.displayBoxWidth / Config.image.naturalWidth;
 		let deltaHeight = Config.displayBoxHeight / Config.image.naturalHeight;
 		var rect = target.getBoundingClientRect();
@@ -265,7 +258,7 @@ var ImageFaceHandling = (function () {
 		logger('ImageFaceHandling.onImageDoubleClick : START');
 		ev.stopPropagation();
 		let target = ev.currentTarget;
-		let fname = Config.jImage.attr('data-file');
+		let fname = Config.image.getAttribute('data-file');
 		var rect = target.getBoundingClientRect();
 		logger('onImageDoubleClick: fname %s target.id %s target.tag %s',fname,target.id,target.tagName);
 
@@ -306,8 +299,10 @@ var ImageFaceHandling = (function () {
 	var isFaceClicked	= function (picFileName, pos,rect,deltaWidth,deltaHeight)
 		{
 			logger('imageFaceHandling.isFaceClicked: x=%d y=%d',pos.x,pos.y);
-			logger('imageFaceHandling.isFaceClicked: picFileName=:%s:',picFileName);
+			console.log('imageFaceHandling.isFaceClicked: picFileName=:'+picFileName+':');
+			//logger('ImageFaceHandling.isFaceClicked Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
 			let faceData = Album_Data['images'][picFileName]['faces']['faceList'];
+			//let faceData = Album_Data['images'][picFileName]['faceList'];
 			let i = 0;
 			for(var fd of faceData) {
 				let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
@@ -336,10 +331,6 @@ var ImageFaceHandling = (function () {
 	// https://jsfiddle.net/richardcwc/ukqhf54k/
 	function drawBox()
 	{
-		//Canvas
-		var canvas = Config.canvas;
-		var ctx = canvas.getContext('2d');
-		//Variables
 		var canvasx = $(Config.canvas).offset().left;
 		var canvasy = $(Config.canvas).offset().top;
 		var last_mousex = last_mousey = 0;
@@ -382,13 +373,19 @@ var ImageFaceHandling = (function () {
 		logger('ImageFaceHandling.faceEdit : START');
 		ev.stopPropagation();
 		let target = ev.currentTarget;
-		let fname = Config.jImage.attr('data-file');
+		//let fname = Config.image.getAttribute('data-file');
+		let fnamePath = document.getElementById('IFH_ImageTag').getAttribute('filename');
+		console.log('ImageFaceHandling.faceEdit: fnamePath :' + fnamePath + ':');
+    	let pathParts = pathLib.parse(fnamePath);
+    	let fname = pathParts.base;
+		console.log('ImageFaceHandling.faceEdit: fname :' + fname + ':');
+		//console.log('ImageFaceHandling.faceEdit Config.image :' + JSON.stringify(Config.image,null,'\t'));
 		var rect = target.getBoundingClientRect();
 		logger('ImageFaceHandling.faceEdit: fname :%s: target.id :%s: target.tag :%s:',fname,target.id,target.tagName);
 
 		let deltaWidth = Config.displayBoxWidth / Config.image.naturalWidth;
 		let deltaHeight = Config.displayBoxHeight / Config.image.naturalHeight;
-      	logger ('ImageFaceHandling.faceEdit: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
+      logger('ImageFaceHandling.faceEdit: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
 		logger('ImageFaceHandling.faceEdit: boundingbox %d,%d,%d,%d',rect.top, rect.right, rect.bottom, rect.left);
 
   		const pos = {
@@ -399,7 +396,9 @@ var ImageFaceHandling = (function () {
 		let face = isFaceClicked(fname,pos,rect,deltaWidth,deltaHeight);
 		logger('ImageFaceHandling.faceEdit: after isFaceClicked face %d',face);
 		if(face != -1) {
-			let faceData = Album_Data['images'][fname]['faces']['faceList']
+			//logger('ImageFaceHandling.faceEdit Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
+			logger('ImageFaceHandling.faceEdit fname:' + fname);
+			let faceData = Album_Data['images'][fname]['faces']['faceList'];
 			let fd = faceData[face];
 			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				faceData.splice(face,1);
