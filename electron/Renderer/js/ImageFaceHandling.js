@@ -15,6 +15,7 @@ var ImageFaceHandling = (function () {
 		const IFH_CanvasClass = 'IFH_CoveringCanvas';
 
 		let Config = {};
+		let CurrentFace = {};
 
 		var init = function( settings )
 		{
@@ -42,6 +43,8 @@ var ImageFaceHandling = (function () {
 	 var setup = function()
 	 {
 		Config.wrapperTag = document.getElementById('pictureDisplay');
+		document.getElementById('FaceInfoBlackout').addEventListener('click', (e) => { FaceInfoHide();})
+		document.getElementById('FaceInfoClose').addEventListener('click', (e) => { FaceInfoHide();})
 
 		setTimeout(function(){
 
@@ -52,8 +55,8 @@ var ImageFaceHandling = (function () {
       	logger ('ImageFaceHandling.setup: The Config.image.id is %s',Config.image.getAttribute('id'));
 
 			// the canvas and image must be in the same place and the same size
-			Config.wrapperTag.width(Config.displayBoxWidth);
-			Config.wrapperTag.height(Config.displayBoxHeight);
+			Config.wrapperTag.width = Config.displayBoxWidth;
+			Config.wrapperTag.height = Config.displayBoxHeight;
 
 			Config.canvas.width  = Config.displayBoxWidth;
 			Config.canvas.height = Config.displayBoxHeight;
@@ -63,93 +66,10 @@ var ImageFaceHandling = (function () {
 			Config.ctx.lineWidth   = Config.lineWidth;
 			Config.ctx.strokeStyle = Config.strokeStyle;
 
-			Config.canvas.addEventListener('click',(e) => { onImageClick();});
-			Config.canvas.addEventListener('dblclick', (e) => { onImageDoubleClick(e);});
+			Config.canvas.addEventListener('click',(e) => { onImageClick(e);});
+			document.getElementById('DeleteFaceBox').addEventListener('click',(e) => { deleteFaceBox(e);});
 		},100);
 	 } // setup
- 
-	/*
-	<!-- the pictureDisplay div and class is passed in by the user -->
-	<div id="pictureDisplay" class="pictureDisplay IFH_WrapperClass">
-		<div class="IHF_Buttons_Block">
-			<button id="IFH_UndoDelete" class="IFH_ButtonBaseClass IFH_UndoButtonClass">
-				⎌ Delete
-			</button>
-			<button id="IFH_UndoCreate" class="IFH_ButtonBaseClass IFH_UndoButtonClass">
-				⎌ Create
-			</button>
-			<button id="IFH_CreateFace" class="IFH_ButtonBaseClass IFH_CreateButtonClass">
-				Mark Face
-			</button>
-			<button id="IFH_DeleteFace" class="IFH_ButtonBaseClass IFH_DeleteButtonClass">
-				Delete Face
-			</button>
-		</div> <!-- IHF_Buttons_Block -->
-		<div class="IFH_ImageGroupClass">
-			<img id="IFH_ImageTag" src="TestAlbum/PD0005.jpg" alt="image to display" class="IFH_ImageTagClass" data-file="PD0005.jpg" />>>
-			<canvas id="IFH_CanvasTag" class="IFH_CoveringCanvas""></canvas>
-		</div> <!-- IFH_ImageGroupClass -->
-	</div> <!-- pictureDisplay -->
-	*/
-	function createDOM()
-	{
-		var pd = $('#'+Config.wrapperID);
-		pd.addClass('IFH_WrapperClass');
-		logger('ImageFaceHandling.createDOM: got pd');
-
-		let buttons = makeElement('div', {
-				'class' : IFH_BUTTONS_BLOCK
-					},'');
-				
-		buttons.append(makeElement('button',{
-				'id' : IFH_UndoDeleteID,
-				'class' : IFH_ButtonBaseClass +' ' + IFH_UndoButtonClass
-				},
-				'&#x238C; Delete'));
-		buttons.append(makeElement('button',{
-				'id' : IFH_UndoCreateID,
-				'class' : IFH_ButtonBaseClass +' ' + IFH_UndoButtonClass
-				},
-				'&#x238C; Create'));
-		buttons.append(makeElement('button',{
-				'id' : IFH_CreateFaceID,
-				'class' : IFH_ButtonBaseClass +' ' + IFH_CreateButtonClass
-				},
-				'Mark Face'));
-		buttons.append(makeElement('button',{
-				'id' : IFH_DeleteFaceID,
-				'class' : IFH_ButtonBaseClass +' ' + IFH_DeleteButtonClass
-				},
-				'Delete Face'));
-					
-		let images = makeElement('div', {
-				'class' : IFH_ImageGroupClass
-					},'');
-			
-		images.append(makeElement('img', {
-				'id': IFH_ImageElementID,
-				'src':'#',
-				'alt':'image to display',
-				'class': IFH_ImageElementClass,
-      		'width': Config.displayBoxWidth+'px',
-      		'height': Config.displayBoxHeight+'px',
-				'data-file':''
-					},''
-				) 
-			);
-				
-		images.append(makeElement('canvas',{
-				'id':IFH_CanvasElementID,
-				'class': IFH_CanvasClass,
-				'width' : Config.displayBoxWidth,
-				'height' : Config.displayBoxHeight
-				},'')
-			);
-				  
-		pd.append(buttons);
-		pd.append(images);
-		return pd;
-	 } // createDOM
 	 
 	 // called as part of the main page picture select onChange
 	var showPicture = function(fname)
@@ -218,91 +138,91 @@ var ImageFaceHandling = (function () {
 			logger('ImageFaceHandling.drawFaces: boxes drawn');
 	} // drawFaces
 
+	function getFileName()
+	{
+		let fnamePath = document.getElementById('IFH_ImageTag').getAttribute('filename');
+		console.log('ImageFaceHandling.getFileName: fnamePath :' + fnamePath + ':');
+    	let pathParts = pathLib.parse(fnamePath);
+    	let fname = pathParts.base;
+		console.log('ImageFaceHandling.getFileName: fname :' + fname + ':');
+		return fname;
+	} // getFileName
+
+	function deleteFaceBox(ev)
+	{
+		logger('ImageFaceHandling.deleteFaceBox: START');
+		let target = CurrentFace.currentTarget;
+    	let fname = getFileName();
+		logger('ImageFaceHandling.deleteFaceBox: fname=:'+fname+':');
+		let faceData = Album_Data['images'][fname]['faces']['faceList']
+		let face = isFaceClicked(CurrentFace);
+		if(face != -1) {
+			logger('ImageFaceHandling.deleteFaceBox: face=:'+face+':');
+			let fd = faceData[face];
+			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
+				logger('ImageFaceHandling.deleteFaceBox: Yes delete face box');
+				faceData.splice(face,1);  // delete face object from list
+				logger('ImageFaceHandling.deleteFaceBox: faceData after splice :' + JSON.stringify(faceData,null,'\t'));
+				logger('ImageFaceHandling.deleteFaceBox: face info :' + JSON.stringify(faceData[face],null,'\t'));
+				Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
+				drawFaces(fname);
+			}
+			else {
+				logger('ImageFaceHandling.deleteFaceBox: NO  do not delete face box');
+			}
+		}
+		else {
+				logger('ImageFaceHandling.deleteFaceBox: Not a face');
+		}
+	} // deleteFaceBox
+
 	// if a face box is single clicked, display the name information for editting
-	var onImageClick = function(e)
+	var onImageClick = function(ev)
 	{
 		logger('ImageFaceHandling.onImageClick : START');
+		CurrentFace.currentTarget = ev.currentTarget; // save for later use
+    	CurrentFace.clientX = ev.clientX;
+    	CurrentFace.clientY = ev.clientY;
 
-		let target = e.currentTarget;
-		//let fname = Config.image.getAttribute('data-file');
-		let fname = document.getElementById('pictureFileName').text();
-		let deltaWidth = Config.displayBoxWidth / Config.image.naturalWidth;
-		let deltaHeight = Config.displayBoxHeight / Config.image.naturalHeight;
-		var rect = target.getBoundingClientRect();
+		let target = ev.currentTarget;
+    	let fname = getFileName();
+		console.log('onImageClick.faceEdit: fname :' + fname + ':');
 
-		logger('ImageFaceHandling.onImageClick: fname :%s: target.id :%s: target.tag :%s:',fname,target.id,target.tagName);
-		logger('ImageFaceHandling.onImageClick: image.id :%s:',Config.image.id );
-		logger('ImageFaceHandling.onImageClick: boundingbox top %d,right %d,bottom %d,left %d',rect.top, rect.right, rect.bottom, rect.left);
-
-		logger('ImageFaceHandling.onImageClick: e.clientX %d e.clientY %d',e.clientX, e.clientY);
-  		const pos = {
-    			x: Math.floor(e.clientX  - rect.left)
-    			,y: Math.floor(e.clientY -  rect.top)
-  		};
-				logger('ImageFaceHandling.onImageClick pos = ' + JSON.stringify(pos,null,'\t'));
-		let face = isFaceClicked(fname,pos,rect,deltaWidth,deltaHeight);
-		if(face != -1) {
-			let first = Album_Data['images'][fname]['faces']['faceList'][face].firstName;
-			let last = Album_Data['images'][fname]['faces']['faceList'][face].lastName;
-			logger('ImageFaceHandling. onImageClick: first name = :%s: last name = :%s:',first,last);
+		let face = isFaceClicked(ev);
+		if(face != -1) {  // we have clicked on a face box
+			let faceData = Album_Data['images'][fname]['faces']['faceList'];
+			console.log('ImageFaceHandling. onImageClick: first name = :%s: last name = :%s:',faceData[face].firstName,faceData[face].lastName);
+			openFaceInfo(faceData[face]);
 		}
 		else 
 			logger('ImageFaceHandling.onImageClick: clicked NOT ON face %d', face);
 	} // onImageClick
 
-	// double click on a face box to delete it
-	// the chosen one gets removed fron the album data
-	// and the faces get redrawn
-	var onImageDoubleClick = function(ev)
-	{
-		logger('ImageFaceHandling.onImageDoubleClick : START');
-		ev.stopPropagation();
-		let target = ev.currentTarget;
-		let fname = Config.image.getAttribute('data-file');
-		var rect = target.getBoundingClientRect();
-		logger('onImageDoubleClick: fname %s target.id %s target.tag %s',fname,target.id,target.tagName);
-
-		let deltaWidth = Config.displayBoxWidth / Config.image.naturalWidth;
-		let deltaHeight = Config.displayBoxHeight / Config.image.naturalHeight;
-      logger ('ImageFaceHandling.onImageDoubleClick: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
-		logger('ImageFaceHandling.onImageDoubleClick: boundingbox %d,%d,%d,%d',rect.top, rect.right, rect.bottom, rect.left);
-
-  		const pos = {
-    			x: Math.floor(ev.clientX  - rect.left)
-    			,y: Math.floor(ev.clientY -  rect.top)
-  		};
-		logger('ImageFaceHandling.onImageDoubleClick pos :' + JSON.stringify(pos,null,'\t'));
-		let face = isFaceClicked(fname,pos,rect,deltaWidth,deltaHeight);
-		logger('ImageFaceHandling.onImageDoubleClick: after isFaceClicked face %d',face);
-		if(face != -1) {
-			let faceData = Album_Data['images'][fname]['faces']['faceList']
-			let fd = faceData[face];
-			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
-				faceData.splice(face,1);
-				logger('ImageFaceHandling.onImageDoubleClick faceData after splice :' + JSON.stringify(faceData,null,'\t'));
-				logger('ImageFaceHandling.onImageDoubleClick: Yes delete face box');
-				logger('ImageFaceHandling.onImageDoubleClick face :' + JSON.stringify(fd,null,'\t'));
-				Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
-				drawFaces(fname);
-			}
-			else {
-				logger('ImageFaceHandling.onImageDoubleClick: NO  do not delete face box');
-			}
-		}
-		else {
-			logger('ImageFaceHandling.onImageDoubleClick: Not a face');
-		}
-	} // onImageDoubleClick
-
 	// see if we clicked on one of the displayed face boxes
 	// rect is the boundingBox of the canvas
-	var isFaceClicked	= function (picFileName, pos,rect,deltaWidth,deltaHeight)
-		{
+	var isFaceClicked	= function (ev)
+	{
+			console.log('imageFaceHandling.isFaceClicked: START');
+			let fname = getFileName();
+			let target = ev.currentTarget;
+			console.log('ImageFaceHandling.onImageClick: fname :%s: target.id :%s: target.tag :%s:',fname,target.id,target.tagName);
+			let deltaWidth = Config.displayBoxWidth / Config.image.naturalWidth;
+			let deltaHeight = Config.displayBoxHeight / Config.image.naturalHeight;
+      	logger('ImageFaceHandling.isFaceClicked: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
+
+			var rect = target.getBoundingClientRect();
+			logger('ImageFaceHandling.onImageClick: boundingbox top %d,right %d,bottom %d,left %d',rect.top, rect.right, rect.bottom, rect.left);
+
+
+			logger('ImageFaceHandling.onImageClick: e.clientX %d e.clientY %d',ev.clientX, ev.clientY);
+  			const pos = {
+    			x: Math.floor(ev.clientX  - rect.left)
+    			,y: Math.floor(ev.clientY -  rect.top)
+  			};
 			logger('imageFaceHandling.isFaceClicked: x=%d y=%d',pos.x,pos.y);
-			console.log('imageFaceHandling.isFaceClicked: picFileName=:'+picFileName+':');
+
 			//logger('ImageFaceHandling.isFaceClicked Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
-			let faceData = Album_Data['images'][picFileName]['faces']['faceList'];
-			//let faceData = Album_Data['images'][picFileName]['faceList'];
+			let faceData = Album_Data['images'][fname]['faces']['faceList'];
 			let i = 0;
 			for(var fd of faceData) {
 				let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
@@ -315,7 +235,7 @@ var ImageFaceHandling = (function () {
 					 && (pos.y >= (newFaceBox.startY)) && (pos.y < faceBoxYMax)
 				  )
 				  {
-						 logger('imageFaceHandling.isFaceClicked: clicked in face %s',fd.firstName);
+						 console.log('imageFaceHandling.isFaceClicked: clicked in face %s',fd.firstName);
 						 return i;
 					 }
 					 else {
@@ -373,34 +293,19 @@ var ImageFaceHandling = (function () {
 		logger('ImageFaceHandling.faceEdit : START');
 		ev.stopPropagation();
 		let target = ev.currentTarget;
-		//let fname = Config.image.getAttribute('data-file');
-		let fnamePath = document.getElementById('IFH_ImageTag').getAttribute('filename');
-		console.log('ImageFaceHandling.faceEdit: fnamePath :' + fnamePath + ':');
-    	let pathParts = pathLib.parse(fnamePath);
-    	let fname = pathParts.base;
+		fname = getFileName();
 		console.log('ImageFaceHandling.faceEdit: fname :' + fname + ':');
-		//console.log('ImageFaceHandling.faceEdit Config.image :' + JSON.stringify(Config.image,null,'\t'));
-		var rect = target.getBoundingClientRect();
-		logger('ImageFaceHandling.faceEdit: fname :%s: target.id :%s: target.tag :%s:',fname,target.id,target.tagName);
-
-		let deltaWidth = Config.displayBoxWidth / Config.image.naturalWidth;
-		let deltaHeight = Config.displayBoxHeight / Config.image.naturalHeight;
-      logger('ImageFaceHandling.faceEdit: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
-		logger('ImageFaceHandling.faceEdit: boundingbox %d,%d,%d,%d',rect.top, rect.right, rect.bottom, rect.left);
-
-  		const pos = {
-    			x: Math.floor(ev.clientX  - rect.left)
-    			,y: Math.floor(ev.clientY -  rect.top)
-  		};
-		logger('ImageFaceHandling.faceEdit pos :' + JSON.stringify(pos,null,'\t'));
-		let face = isFaceClicked(fname,pos,rect,deltaWidth,deltaHeight);
+		let face = isFaceClicked(ev);
 		logger('ImageFaceHandling.faceEdit: after isFaceClicked face %d',face);
 		if(face != -1) {
 			//logger('ImageFaceHandling.faceEdit Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
 			logger('ImageFaceHandling.faceEdit fname:' + fname);
+			logger('ImageFaceHandling.faceEdit calling openFaceInfo');
+
 			let faceData = Album_Data['images'][fname]['faces']['faceList'];
 			let fd = faceData[face];
-			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
+			openFaceInfo(fd);
+			if (window.confirm('faceEdit: Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				faceData.splice(face,1);
 				logger('ImageFaceHandling.faceEdit faceData after splice :' + JSON.stringify(faceData,null,'\t'));
 				logger('ImageFaceHandling.faceEdit: Yes delete face box');
@@ -416,6 +321,23 @@ var ImageFaceHandling = (function () {
 			logger('ImageFaceHandling.faceEdit: Not a face');
 		}
 	} // faceEdit
+
+	function openFaceInfo(faceData)
+	{
+		logger('ImageFaceHandling.openFaceInfo: Start');
+		console.log('ImageFaceHandling. openFaceInfo: first name = :%s: last name = :%s:',faceData.firstName,faceData.lastName);
+		document.getElementById('FaceInfoFirstName').value = faceData.firstName;
+		document.getElementById('FaceInfoSecondName').value = faceData.lastName;
+		document.getElementById('FaceInfo').style.display='block';
+   	document.getElementById('FaceInfoBlackout').style.display='block';
+	}  // openFaceData
+
+
+	function FaceInfoHide()
+	{
+		document.getElementById('FaceInfo').style.display='none';
+		document.getElementById('FaceInfoBlackout').style.display='none';
+	} // FaceInfoHide
 
 	// construct a DOM element using the passed in parameters
 	function makeElement(kind,params,content) {
