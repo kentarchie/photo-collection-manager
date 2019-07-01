@@ -104,27 +104,28 @@ var ImageFaceHandling = (function () {
 	var drawFaces = function(fname)
 	{
 		logger('ImageFaceHandling.drawFaces fname %s',fname);
-		const faceData = Album_Data['images'][fname]['faces']['faceList'];
+		let faceData = Album_Data['images'][fname]['faces']['faceList'];
 
-			//logger('ImageFaceHandling.drawFaces fname %s faceData %s:',fname, JSON.stringify(faceData,null,'\t'));
+			logger('ImageFaceHandling.drawFaces faceData %s:',JSON.stringify(faceData,null,'\t'));
 			//logger ('ImageFaceHandling.drawFaces: The image id is :%s:',Config.inage.getAttribute('id'));
 			//logger('ImageFaceHandling.drawFaces: scrollX,scrollY %s,%s',window.scrollX, window.scrollY);
 			//logger('ImageFaceHandling.drawFaces: canvas width,height %s,%s',Config.canvas.width, Config.canvas.height);
-			//logger ('ImageFaceHandling.drawFaces: albumName is :%s:',Config.albumName);
+			console.log ('ImageFaceHandling.drawFaces: albumName is :%s:',Config.albumName);
 
 		let im = new Image();
-		im.src = Config.albumName + '/' + fname;
+		im.src = '../' + Config.albumName + '/' + fname;
+			console.log ('ImageFaceHandling.drawFaces: im.src is :%s:',im.src);
       	//logger ('ImageFaceHandling.drawFaces: The box sizes are %f * %f',Config.displayBoxHeight,Config.displayBoxWidth);
 			//logger ('ImageFaceHandling.drawFaces: The im natural sizes are %f(height) * %f(width)',im.naturalHeight,im.naturalWidth);
 			//logger ('ImageFaceHandling.drawFaces: The canvas left offset %f  top offset %f',Config.canvas.offset().left,Config.canvas.offset().top);
 
 		let deltaWidth = Config.displayBoxWidth / im.naturalWidth;
 		let deltaHeight = Config.displayBoxHeight / im.naturalHeight;
-      	logger ('ImageFaceHandling.drawFaces: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
+      	console.log ('ImageFaceHandling.drawFaces: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
 
 		//let colors = ['#FF0000','#00FF00'];  // used during debugging
 		faceData.forEach((fd, i) => {
-				//logger('ImageFaceHandling.drawFaces: fd ' + JSON.stringify(fd,null,'\t'));
+				logger('ImageFaceHandling.drawFaces: fd ' + JSON.stringify(fd,null,'\t'));
 			let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
 				logger('ImageFaceHandling.drawFaces newFaceBox = ' + JSON.stringify(newFaceBox,null,'\t'));
 			// draw rectangle
@@ -161,9 +162,9 @@ var ImageFaceHandling = (function () {
 			let fd = faceData[face];
 			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				logger('ImageFaceHandling.deleteFaceBox: Yes delete face box');
-				faceData.splice(face,1);  // delete face object from list
-				logger('ImageFaceHandling.deleteFaceBox: faceData after splice :' + JSON.stringify(faceData,null,'\t'));
-				logger('ImageFaceHandling.deleteFaceBox: face info :' + JSON.stringify(faceData[face],null,'\t'));
+				Album_Data['images'][fname]['faces']['faceList'].splice(face,1);  // delete face object from list
+				logger('ImageFaceHandling.deleteFaceBox: faceData after splice :' + JSON.stringify(Album_Data['images'][fname]['faces']['faceList'],null,'\t'));
+				logger('ImageFaceHandling.deleteFaceBox: face info :' + JSON.stringify(faceData[--face],null,'\t'));
 				Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 				drawFaces(fname);
 			}
