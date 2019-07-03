@@ -170,8 +170,11 @@ function setupEventHandlers()
     });
 
 	 // A face is selected, add or update the face information
-    document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) {
-        logger('setupEventHandlers: createFace(): evt.target.innerHTML:' + evt.target.innerHTML);
+    document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) 
+	 {
+      logger('setupEventHandlers: createFace(): evt.target.innerHTML:' + evt.target.innerHTML);
+		var newBox = ImageFaceHandling.drawBox();
+      logger('setupEventHandlers: newBox:' + JSON.stringify(newBox,null,'\t'));
     });
 } // setupEventHandlers
 

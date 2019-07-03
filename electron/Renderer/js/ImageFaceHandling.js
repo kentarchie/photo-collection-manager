@@ -250,10 +250,14 @@ var ImageFaceHandling = (function () {
 	// if a face is not detected by the preprocessing, we can draw a new face box
 	// basic drawing code from
 	// https://jsfiddle.net/richardcwc/ukqhf54k/
-	function drawBox()
+	var drawBox = function()
 	{
+		logger('imageFaceHandling.drawBox: START');
 		var canvasx = $(Config.canvas).offset().left;
 		var canvasy = $(Config.canvas).offset().top;
+		console.log('imageFaceHandling.drawBox: canvasx %d',canvasx);
+		console.log('imageFaceHandling.drawBox: canvasy %d',canvasy);
+
 		var last_mousex = last_mousey = 0;
 		var mousex = mousey = 0;
 		var mousedown = false;
@@ -275,7 +279,7 @@ var ImageFaceHandling = (function () {
     		mousex = parseInt(e.clientX-canvasx);
 			mousey = parseInt(e.clientY-canvasy);
     		if(mousedown) {
-        		Config.ctx.clearRect(0,0,Config.canvas.width,canvas.height); //clear canvas
+        		Config.ctx.clearRect(0,0,Config.canvas.width,Config.canvas.height); //clear canvas
         		Config.ctx.beginPath();
         		var width = mousex-last_mousex;
         		var height = mousey-last_mousey;
@@ -285,7 +289,15 @@ var ImageFaceHandling = (function () {
         		Config.ctx.stroke();
     		}
     		//Output
-    		$('#output').html('current: '+mousex+', '+mousey+'<br/>last: '+last_mousex+', '+last_mousey+'<br/>mousedown: '+mousedown);
+			var result = {
+				'mousex' : mousex
+				,'mousey' : mousey
+				,'last_mousex' : last_mousex
+				,'last_mousey' : last_mousey
+			};
+			console.log('imageFaceHandling.drawBox: result %s',JSON.stringify(result,null,'\t'));
+			return result;
+    		//$('#output').html('current: '+mousex+', '+mousey+'<br/>last: '+last_mousex+', '+last_mousey+'<br/>mousedown: '+mousedown);
 		});
 	} // drawBox
 
@@ -357,5 +369,6 @@ var ImageFaceHandling = (function () {
 	 ,drawFaces : drawFaces
 	 ,showPicture : showPicture
 	 ,faceEdit : faceEdit
+	 ,drawBox : drawBox
   };
 })();

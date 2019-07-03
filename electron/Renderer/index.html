@@ -50,9 +50,9 @@
                 </div> <!-- pictureButtons -->
                 <div id='pictureDisplay' class='pictureDisplay IFH_WrapperClass' style='width: 450px; height: 450px;'>
                     <div class='IHF_Buttons_Block'>
-                        <button type='button' id='IFH_CreateFace' name='IFH_UndoDelete' 
+                        <button type='button' id='IFH_CreateFace' name='IFH_CreateFace' 
                                 class='IFH_ButtonBaseClass IFH_CreateButtonClass'
-                                title='Identify Face'>
+                                title='Draw a box around a Face'>
                                 Add A Face
                         </button>
                     </div>
@@ -66,19 +66,15 @@
            </div>  <!--pictureView -->
 
 			  <!--get/edit face info, delete face, add face box -->
-			  <div id='FaceInfo' class='FaceInfo'>
+			  <div id='FaceInfo' class='FaceInfo' title='Click the X or outside the window to close it'>
+					<span title='Close Window' id='FaceInfoClose' class='FaceInfoClose' title='Close this window, click anywhere outside will close it as well'>X</span>
 			  		<div class='AddEditInfo'>
-						<input type='text' id='FaceInfoFirstName' name='FaceInfoFirstName' />
-						<input type='text' id='FaceInfoSecondName' name='FaceInfoSecondName' />
+						<input type='text' id='FaceInfoFirstName' name='FaceInfoFirstName' placeholder='First Name' title='First Name'/>
+						<input type='text' id='FaceInfoSecondName' name='FaceInfoSecondName' placeholder='Second Name' title='Second Name'/>
 						<button type='button' id='FaceInfoSave' name='FaceInfoSave'>Save Changes</button>
 			  		</div>
-					<button type='button' id='DeleteFaceBox' name='DeleteFaceBox'>Delete This Face Box</button>
-					<button type='button' id='AddFaceBox' name='AddFaceBox'>Add A New Face Box</button>
-					<div class='FaceInfoInstructions'>
-								You may click the X in the lower right corner to close this window or 
-								you may click outside of this window to close it as well.
-					</div>
-					<span title='Close Window' id='FaceInfoClose' class='FaceInfoClose'>X</span>
+					<button type='button' id='DeleteFaceBox' name='DeleteFaceBox' title='Delete the selected Face Box'>Delete This <br />Face Box</button>
+					<button type='button' id='AddFaceBox' name='AddFaceBox' title='Add a box around a face '>Add A New <br />Face Box</button>
 			  </div> <!-- FaceInfo -->
 			  <div id='FaceInfoBlackout'></div>
 
