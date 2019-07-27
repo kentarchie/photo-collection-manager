@@ -297,6 +297,7 @@ var ImageFaceHandling = (function () {
             ,"startX": faceBox['start_x']
       };
 		Album_Data['images'][fname]['faces']['faceList'].push(newFace);
+		Config.albumFile.save();
       logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( Album_Data['images'][fname]['faces']['faceList'] ,null,'\t'));
 	} //addFaceBox
 

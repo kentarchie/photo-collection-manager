@@ -43,7 +43,9 @@ class MakeReadAlbumData
   save()
   {
     try {
+        console.log('MakeReadAlbumData.save START');
         fs.writeFileSync(this.fullPath, JSON.stringify(this.data,null,'\t'));
+        console.log('MakeReadAlbumData.save after save');
         this.saved = true;
         return this.saved;
     } catch(error) {

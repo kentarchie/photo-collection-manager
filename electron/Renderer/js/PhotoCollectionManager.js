@@ -15,6 +15,8 @@ let Album_Data = null; // contents of the JSON file describing the album
 let ImageHandlingSettings = {};
 let ImageDisplay = null;
 let DrawBoxControls = null;
+let AlbumFile = null;
+
 Settings['imageDirectoryFilter'] = [
     'thumbnails'
     ,'webpage'
@@ -91,8 +93,8 @@ function processAlbum(albumPath)
     ImageDisplay.init(AlbumPath);
     let pathParts = pathLib.parse(AlbumPath);
     AlbumName = pathParts.base;
-    let albumData = new MakeReadAlbumData(AlbumPath);
-    Album_Data = albumData.get();
+    AlbumFile = new MakeReadAlbumData(AlbumPath);
+    Album_Data = AlbumFile.get();
     logger('processAlbum: AlbumPath:' + AlbumPath + ': AlbumName:' + AlbumName+':');
     logger('processAlbum loaded album data');
     //logger('processAlbum: Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
@@ -185,6 +187,7 @@ function setupEventHandlers()
 			   ,strokeStyle : config.strokeStyle
 			   ,canvas : config.canvas
 			   ,ctx : config.ctx
+			   ,albumFile : AlbumFile
          });
          DrawBox.startDrawing();
       }
@@ -229,6 +232,7 @@ $(document).ready(function()
         ,albumName: 'TestAlbum'
 	    ,lineWidth : 1
 	    ,strokeStyle : '#FF0000'
+		 ,albumFile : AlbumFile
     };
 	ImageFaceHandling.init(ImageHandlingSettings);
 	ImageFaceHandling.showConfig();
