@@ -1,4 +1,3 @@
-
 const {remote} = require('electron');
 const { ipcRenderer } = require('electron')
 const fsLib = require('fs');
@@ -15,6 +14,7 @@ let AlbumName = ''; // name of the directory containing the album
 let Album_Data = null; // contents of the JSON file describing the album
 let ImageHandlingSettings = {};
 let ImageDisplay = null;
+let DrawBoxControls = null;
 Settings['imageDirectoryFilter'] = [
     'thumbnails'
     ,'webpage'
@@ -58,7 +58,7 @@ function collectImageFiles (dir, base,fileList,postAction) {
   return fileList;
 } // collectImageFiles
 
-// not currently used. If we do this here, remove thumnail production from the AlbumPreProcess code
+// not currently used. If we do this here, remove thumbnail production from the AlbumPreProcess code
 function makeThumbNails()
 {
     //logger('makeThumbNails: START:');
@@ -157,24 +157,58 @@ function setupEventHandlers()
     document.getElementById('fileList').addEventListener('click',function (evt) {
         logger('setupEventHandlers: fileList: evt.target.innerHTML:' + evt.target.innerHTML);
         let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
-        logger('setupEventHandlers: fileList: item selected:' + imageName + ':')
         let fullPath = AlbumPath + '/' + imageName;
+        logger('setupEventHandlers: fileList: full path :' + fullPath + ':')
+        logger('setupEventHandlers: fileList: imageName :' + imageName + ':')
+
         if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
             logger('setupEventHandlers: fileList: clicked on directory fullpath = :'+fullPath+':');
             return;
         }
 
-        logger('setupEventHandlers: fileList: full path :' + fullPath + ':')
-        logger('setupEventHandlers: fileList: imageName :' + imageName + ':')
-        ImageDisplay.pictureSelected(imageName);
+        ImageDisplay.pictureSelected(imageName,fullPath);
     });
 
-	 // A face is selected, add or update the face information
+	 // add a new face box
     document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) 
 	 {
       logger('setupEventHandlers: createFace(): evt.target.innerHTML:' + evt.target.innerHTML);
-		var newBox = ImageFaceHandling.drawBox();
-      logger('setupEventHandlers: newBox:' + JSON.stringify(newBox,null,'\t'));
+	   let config = ImageFaceHandling.getConfig();
+		config.canvas.removeEventListener('click',ImageFaceHandling.onImageClick);
+
+      if (evt.target.innerHTML.search('Add') != -1) {
+         logger('setupEventHandlers: createFace(): Starting to draw face box:');
+         evt.target.innerHTML = 'Save New Face Box';
+         document.getElementById('IFH_CancelCreateFace').style.display='block';
+         DrawBox.init({
+			   lineWidth : config.lineWidth
+			   ,strokeStyle : config.strokeStyle
+			   ,canvas : config.canvas
+			   ,ctx : config.ctx
+         });
+         DrawBox.startDrawing();
+      }
+      else {
+         logger('setupEventHandlers: createFace(): done drawing face box:');
+         evt.target.innerHTML = 'Add A Face';
+         DrawBox.stopDrawing();
+		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
+         let newFace = DrawBox.getNewBoxInfo();
+         ImageFaceHandling.addFaceBox(newFace);
+         logger('setupEventHandlers: newface:' + JSON.stringify(newFace,null,'\t'));
+      }
+    });
+
+    document.getElementById('IFH_CancelCreateFace').addEventListener('click',function (evt) 
+	 {
+         logger('setupEventHandlers: cancel create face: START:');
+         document.getElementById('IFH_CreateFace').innerHTML = 'Add A Face';
+         DrawBox.stopDrawing();
+         DrawBox.clearBox();
+
+	      let config = ImageFaceHandling.getConfig();
+		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
+         document.getElementById('IFH_CancelCreateFace').style.display='none';
     });
 } // setupEventHandlers
 

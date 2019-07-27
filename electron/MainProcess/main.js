@@ -71,10 +71,12 @@ function createWindow (app)
   let winHeight = DEFAULT_HEIGHT;
   let winWidth = DEFAULT_WIDTH;
 
+  /*
   if(CliData.debug) {
     winHeight = DEBUG_HEIGHT;
     winWidth = DEBUG_WIDTH;
   }
+  */
 
   // Create the main window
   MainWindow = new BrowserWindow({
@@ -92,7 +94,7 @@ function createWindow (app)
   MainWindow.loadURL(urlToLoad);
 
   MainWindow.CliData = CliData;  // make CLI data available to  the renderer
-  if(CliData.debug) MainWindow.webContents.openDevTools(); // Open the DevTools.
+  if(CliData.debug) MainWindow.webContents.openDevTools({'mode' : 'undocked'}); // Open the DevTools as separate window
 
   // Remove window once app is closed
   MainWindow.on('closed', () => { MainWindow = null; });
@@ -100,7 +102,6 @@ function createWindow (app)
   // Show window when page is ready
   MainWindow.once('ready-to-show', () => { 
     MainWindow.show();
-    if(CliData.album != '') MainWindow.webContents.send('open-album', 'click!'); 
   });
 
   //  require(`${__dirname}/mainMenu.js`);

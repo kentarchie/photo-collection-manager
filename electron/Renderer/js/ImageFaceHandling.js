@@ -66,7 +66,8 @@ var ImageFaceHandling = (function () {
 			Config.ctx.lineWidth   = Config.lineWidth;
 			Config.ctx.strokeStyle = Config.strokeStyle;
 
-			Config.canvas.addEventListener('click',(e) => { onImageClick(e);});
+			//Config.canvas.addEventListener('click',(e) => { onImageClick(e);});
+			Config.canvas.addEventListener('click',onImageClick);
 			document.getElementById('DeleteFaceBox').addEventListener('click',(e) => { deleteFaceBox(e);});
 		},100);
 	 } // setup
@@ -98,6 +99,7 @@ var ImageFaceHandling = (function () {
 	} // adjustFaceBox
 
 	var showConfig = () => { logger('ImageFaceHandling.showConfig :' + JSON.stringify(Config,null,'\t')); }
+	var getConfig = () => { return Config; }
 
 	// go through the album data for the displayed image
 	// and draw the boxes arond all the faces
@@ -177,7 +179,7 @@ var ImageFaceHandling = (function () {
 		}
 	} // deleteFaceBox
 
-	// if a face box is single clicked, display the name information for editting
+	// if a face box is single clicked, display the name information for editing
 	var onImageClick = function(ev)
 	{
 		logger('ImageFaceHandling.onImageClick : START');
@@ -247,60 +249,6 @@ var ImageFaceHandling = (function () {
 			return -1;
 		} // isFaceClicked
 
-	// if a face is not detected by the preprocessing, we can draw a new face box
-	// basic drawing code from
-	// https://jsfiddle.net/richardcwc/ukqhf54k/
-	var drawBox = function()
-	{
-		logger('imageFaceHandling.drawBox: START');
-		var canvasx = $(Config.canvas).offset().left;
-		var canvasy = $(Config.canvas).offset().top;
-		console.log('imageFaceHandling.drawBox: canvasx %d',canvasx);
-		console.log('imageFaceHandling.drawBox: canvasy %d',canvasy);
-
-		var last_mousex = last_mousey = 0;
-		var mousex = mousey = 0;
-		var mousedown = false;
-
-		//Mousedown
-		$(Config.canvas).on('mousedown', function(e) {
-    		last_mousex = parseInt(e.clientX-canvasx);
-			last_mousey = parseInt(e.clientY-canvasy);
-    		mousedown = true;
-		});
-
-		//Mouseup
-		$(Config.canvas).on('mouseup', function(e) {
-    		mousedown = false;
-		});
-
-		//Mousemove
-		$(Config.canvas).on('mousemove', function(e) {
-    		mousex = parseInt(e.clientX-canvasx);
-			mousey = parseInt(e.clientY-canvasy);
-    		if(mousedown) {
-        		Config.ctx.clearRect(0,0,Config.canvas.width,Config.canvas.height); //clear canvas
-        		Config.ctx.beginPath();
-        		var width = mousex-last_mousex;
-        		var height = mousey-last_mousey;
-        		Config.ctx.rect(last_mousex,last_mousey,width,height);
-        		Config.ctx.strokeStyle = 'black';
-        		Config.ctx.lineWidth = 10;
-        		Config.ctx.stroke();
-    		}
-    		//Output
-			var result = {
-				'mousex' : mousex
-				,'mousey' : mousey
-				,'last_mousex' : last_mousex
-				,'last_mousey' : last_mousey
-			};
-			console.log('imageFaceHandling.drawBox: result %s',JSON.stringify(result,null,'\t'));
-			return result;
-    		//$('#output').html('current: '+mousex+', '+mousey+'<br/>last: '+last_mousex+', '+last_mousey+'<br/>mousedown: '+mousedown);
-		});
-	} // drawBox
-
 	var faceEdit = function(ev)
 	{
 		logger('ImageFaceHandling.faceEdit : START');
@@ -335,6 +283,23 @@ var ImageFaceHandling = (function () {
 		}
 	} // faceEdit
 
+	var addFaceBox = function(faceBox)
+	{
+		let fname = getFileName();
+      logger('ImageFaceHandling.addFaceBox new FaceBox :' + JSON.stringify(faceBox,null,'\t'));
+		logger('ImageFaceHandling.faceEdit: fname :' + fname + ':');
+      let newFace = {
+            "lastName": ""
+            ,"firstName": ""
+            ,"height": Math.abs(faceBox['start_y'] - faceBox['end_y'])
+            ,"width": Math.abs(faceBox['start_x'] - faceBox['end_x'])
+            ,"startY": faceBox['start_y']
+            ,"startX": faceBox['start_x']
+      };
+		Album_Data['images'][fname]['faces']['faceList'].push(newFace);
+      logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( Album_Data['images'][fname]['faces']['faceList'] ,null,'\t'));
+	} //addFaceBox
+
 	function openFaceInfo(faceData)
 	{
 		logger('ImageFaceHandling.openFaceInfo: Start');
@@ -366,9 +331,10 @@ var ImageFaceHandling = (function () {
 	 init: init
 	 ,setup: setup
 	 ,showConfig: showConfig
+	 ,getConfig: getConfig
 	 ,drawFaces : drawFaces
 	 ,showPicture : showPicture
 	 ,faceEdit : faceEdit
-	 ,drawBox : drawBox
+    ,addFaceBox : addFaceBox
   };
 })();

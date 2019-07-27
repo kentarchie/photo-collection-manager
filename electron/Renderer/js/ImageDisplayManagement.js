@@ -105,7 +105,7 @@ class ImageDisplayManagement
 		console.log('ImageDisplayManagement.drawImage: boxes drawn');
 	} // drawImage
 
-    pictureSelected(imageName)
+   pictureSelected(imageName,fullPath)
 	{
 		console.log('ImageDisplayManagement.pictureSelected: START imageName = :%s: ',imageName);
       console.log('ImageDisplayManagement.pictureSelected this.FileList length (%d)',this.FileList.length);
@@ -119,8 +119,8 @@ class ImageDisplayManagement
 			that.drawImage(imageName,this);
 		}); // onload
 
-      imageTag.attr('filename', filename);
-      imageTag.attr('src',filename);
+      imageTag.attr('filename', fullPath);
+      imageTag.attr('src',fullPath);
 	} // pictureSelected
 
 	findPicture(picture)

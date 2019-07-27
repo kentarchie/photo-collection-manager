@@ -55,6 +55,11 @@
                                 title='Draw a box around a Face'>
                                 Add A Face
                         </button>
+                        <button type='button' id='IFH_CancelCreateFace' name='IFH_CancelCreateFace' 
+                                class='IFH_ButtonBaseClass IFH_CancelButtonClass'
+                                title='Cancel drawing a box around a Face'>
+                                Cancel Adding A Face
+                        </button>
                     </div>
                     <div class='IFH_ImageGroupClass'>
                         <img id='IFH_ImageTag' src='#' alt='image to display' 
@@ -74,7 +79,6 @@
 						<button type='button' id='FaceInfoSave' name='FaceInfoSave'>Save Changes</button>
 			  		</div>
 					<button type='button' id='DeleteFaceBox' name='DeleteFaceBox' title='Delete the selected Face Box'>Delete This <br />Face Box</button>
-					<button type='button' id='AddFaceBox' name='AddFaceBox' title='Add a box around a face '>Add A New <br />Face Box</button>
 			  </div> <!-- FaceInfo -->
 			  <div id='FaceInfoBlackout'></div>
 
@@ -104,6 +108,7 @@
    <script type='text/javascript' src='js/ThirdParty/jquery-3.3.1.js'></script>
 
    <script type='text/javascript' src='js/ImageFaceHandling.js'></script>
+   <script type='text/javascript' src='js/DrawBox.js'></script>
    <script type='text/javascript' src='js/PhotoCollectionManager.js'></script>
 
    <!-- Insert this line after script imports -->
