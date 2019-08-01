@@ -118,7 +118,7 @@ var ImageFaceHandling = (function () {
 		im.src = '../' + Config.albumName + '/' + fname;
 			console.log ('ImageFaceHandling.drawFaces: im.src is :%s:',im.src);
       	//logger ('ImageFaceHandling.drawFaces: The box sizes are %f * %f',Config.displayBoxHeight,Config.displayBoxWidth);
-			//logger ('ImageFaceHandling.drawFaces: The im natural sizes are %f(height) * %f(width)',im.naturalHeight,im.naturalWidth);
+			console.log ('RENDERER: ImageFaceHandling.drawFaces: The im natural sizes are %f(height) * %f(width)',im.naturalHeight,im.naturalWidth);
 			//logger ('ImageFaceHandling.drawFaces: The canvas left offset %f  top offset %f',Config.canvas.offset().left,Config.canvas.offset().top);
 
 		let deltaWidth = Config.displayBoxWidth / im.naturalWidth;
@@ -289,19 +289,21 @@ var ImageFaceHandling = (function () {
       logger('ImageFaceHandling.addFaceBox new FaceBox :' + JSON.stringify(faceBox,null,'\t'));
 		logger('ImageFaceHandling.faceEdit: fname :' + fname + ':');
       let newFace = {
-            "lastName": ""
-            ,"firstName": ""
-            ,"height": Math.abs(faceBox['start_y'] - faceBox['end_y'])
-            ,"width": Math.abs(faceBox['start_x'] - faceBox['end_x'])
-            ,"startY": faceBox['start_y']
-            ,"startX": faceBox['start_x']
+            'lastName' : faceBox['lastName'] ? faceBox['lastName'] : ''
+            ,'firstName': faceBox['firstName'] ? faceBox['firstName'] : ''
+            ,'height': Math.abs(faceBox['start_y'] - faceBox['end_y'])
+            ,'width': Math.abs(faceBox['start_x'] - faceBox['end_x'])
+            ,'startY': faceBox['start_y']
+            ,'startX': faceBox['start_x']
       };
+		openFaceInfo(newFace);
 		Album_Data['images'][fname]['faces']['faceList'].push(newFace);
+		Album_Data['images'][fname]['faces']['numberFaces'] = parseInt(Album_Data['images'][fname]['faces']['numberFaces']) + 1;
 		Config.albumFile.save();
-      logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( Album_Data['images'][fname]['faces']['faceList'] ,null,'\t'));
+      //logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( Album_Data['images'][fname]['faces']['faceList'] ,null,'\t'));
 	} //addFaceBox
 
-	function openFaceInfo(faceData)
+	var openFaceInfo = function(faceData)
 	{
 		logger('ImageFaceHandling.openFaceInfo: Start');
 		console.log('ImageFaceHandling. openFaceInfo: first name = :%s: last name = :%s:',faceData.firstName,faceData.lastName);
@@ -309,7 +311,7 @@ var ImageFaceHandling = (function () {
 		document.getElementById('FaceInfoSecondName').value = faceData.lastName;
 		document.getElementById('FaceInfo').style.display='block';
    	document.getElementById('FaceInfoBlackout').style.display='block';
-	}  // openFaceData
+	}  // openFaceInfo
 
 
 	function FaceInfoHide()
@@ -337,5 +339,6 @@ var ImageFaceHandling = (function () {
 	 ,showPicture : showPicture
 	 ,faceEdit : faceEdit
     ,addFaceBox : addFaceBox
+    ,openFaceInfo : openFaceInfo
   };
 })();

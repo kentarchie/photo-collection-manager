@@ -41,7 +41,7 @@ function isImage(fname)
 // List all files in a directory in Node.js recursively in a synchronous fashion
 // base code from from https://gist.github.com/kethinov/6658166
 // modified to build a data structure for the electron-tree-view
-// TODO: not recursive, should thisprocess sub directories of images? 
+// TODO: not recursive, should this process sub directories of images? 
 function collectImageFiles (dir, base,fileList,postAction) {
   var getFiles = fsLib.readdirSync(dir);
   getFiles.forEach((file) => {
@@ -182,6 +182,8 @@ function setupEventHandlers()
          logger('setupEventHandlers: createFace(): Starting to draw face box:');
          evt.target.innerHTML = 'Save New Face Box';
          document.getElementById('IFH_CancelCreateFace').style.display='block';
+         DrawBox.init(Album_Data,config,AlbumFile,ImageFaceHandling);
+			/*
          DrawBox.init({
 			   lineWidth : config.lineWidth
 			   ,strokeStyle : config.strokeStyle
@@ -189,6 +191,7 @@ function setupEventHandlers()
 			   ,ctx : config.ctx
 			   ,albumFile : AlbumFile
          });
+			*/
          DrawBox.startDrawing();
       }
       else {
@@ -197,6 +200,7 @@ function setupEventHandlers()
          DrawBox.stopDrawing();
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
          let newFace = DrawBox.getNewBoxInfo();
+         ImageFaceHandling.openFaceInfo(newFace);
          ImageFaceHandling.addFaceBox(newFace);
          logger('setupEventHandlers: newface:' + JSON.stringify(newFace,null,'\t'));
       }
