@@ -200,7 +200,7 @@ function setupEventHandlers()
          DrawBox.stopDrawing();
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
          let newFace = DrawBox.getNewBoxInfo();
-         ImageFaceHandling.openFaceInfo(newFace);
+         //ImageFaceHandling.openFaceInfo(newFace);
          ImageFaceHandling.addFaceBox(newFace);
          logger('setupEventHandlers: newface:' + JSON.stringify(newFace,null,'\t'));
       }

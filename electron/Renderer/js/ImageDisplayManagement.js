@@ -22,7 +22,7 @@ class ImageDisplayManagement
 		imageTag.height(this.DISPLAY_BOX_HEIGHT+'px');
 		canvasTag.width(this.DISPLAY_BOX_WIDTH+'px');
 		canvasTag.height(this.DISPLAY_BOX_HEIGHT+'px');
-		// put the convas on top of the image
+		// put the canvas on top of the image
 		canvasTag.position({ 
   			my: "left top",
   			at: "left top",

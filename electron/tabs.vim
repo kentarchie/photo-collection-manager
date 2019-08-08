@@ -8,3 +8,4 @@ tabe Renderer/js/MakeReadAlbumData.js
 tabe Renderer/js/ImageDisplayManagement.js
 tabe Renderer/js/ImageFaceHandling.js
 tabe Renderer/js/DrawBox.js
+tabe Renderer/js/FaceInfo.js

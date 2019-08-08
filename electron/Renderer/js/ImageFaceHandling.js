@@ -43,8 +43,6 @@ var ImageFaceHandling = (function () {
 	 var setup = function()
 	 {
 		Config.wrapperTag = document.getElementById('pictureDisplay');
-		document.getElementById('FaceInfoBlackout').addEventListener('click', (e) => { FaceInfoHide();})
-		document.getElementById('FaceInfoClose').addEventListener('click', (e) => { FaceInfoHide();})
 
 		setTimeout(function(){
 
@@ -68,7 +66,6 @@ var ImageFaceHandling = (function () {
 
 			//Config.canvas.addEventListener('click',(e) => { onImageClick(e);});
 			Config.canvas.addEventListener('click',onImageClick);
-			document.getElementById('DeleteFaceBox').addEventListener('click',(e) => { deleteFaceBox(e);});
 		},100);
 	 } // setup
 	 
@@ -289,36 +286,24 @@ var ImageFaceHandling = (function () {
       logger('ImageFaceHandling.addFaceBox new FaceBox :' + JSON.stringify(faceBox,null,'\t'));
 		logger('ImageFaceHandling.faceEdit: fname :' + fname + ':');
       let newFace = {
-            'lastName' : faceBox['lastName'] ? faceBox['lastName'] : ''
-            ,'firstName': faceBox['firstName'] ? faceBox['firstName'] : ''
+            'lastName'   : (faceBox['lastName'] != "") ? faceBox['lastName'] : ''
+            ,'firstName' : (faceBox['firstName'] != "") ? faceBox['firstName'] : ''
             ,'height': Math.abs(faceBox['start_y'] - faceBox['end_y'])
             ,'width': Math.abs(faceBox['start_x'] - faceBox['end_x'])
             ,'startY': faceBox['start_y']
             ,'startX': faceBox['start_x']
       };
-		openFaceInfo(newFace);
+      //let newFaceInfo = new FaceInfo();
 		Album_Data['images'][fname]['faces']['faceList'].push(newFace);
 		Album_Data['images'][fname]['faces']['numberFaces'] = parseInt(Album_Data['images'][fname]['faces']['numberFaces']) + 1;
 		Config.albumFile.save();
+
+		let numFaces = parseInt(Album_Data['images'][fname]['faces']['faceList'].length)
+      FaceInfo.init(Album_Data['images'][fname]['faces']['faceList'][numFaces-1]);
+      FaceInfo.openFaceInfo();
       //logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( Album_Data['images'][fname]['faces']['faceList'] ,null,'\t'));
 	} //addFaceBox
 
-	var openFaceInfo = function(faceData)
-	{
-		logger('ImageFaceHandling.openFaceInfo: Start');
-		console.log('ImageFaceHandling. openFaceInfo: first name = :%s: last name = :%s:',faceData.firstName,faceData.lastName);
-		document.getElementById('FaceInfoFirstName').value = faceData.firstName;
-		document.getElementById('FaceInfoSecondName').value = faceData.lastName;
-		document.getElementById('FaceInfo').style.display='block';
-   	document.getElementById('FaceInfoBlackout').style.display='block';
-	}  // openFaceInfo
-
-
-	function FaceInfoHide()
-	{
-		document.getElementById('FaceInfo').style.display='none';
-		document.getElementById('FaceInfoBlackout').style.display='none';
-	} // FaceInfoHide
 
 	// construct a DOM element using the passed in parameters
 	function makeElement(kind,params,content) {
@@ -339,6 +324,5 @@ var ImageFaceHandling = (function () {
 	 ,showPicture : showPicture
 	 ,faceEdit : faceEdit
     ,addFaceBox : addFaceBox
-    ,openFaceInfo : openFaceInfo
   };
 })();
