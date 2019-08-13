@@ -5,6 +5,7 @@ const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
 const MakeReadAlbumData = require(`${__dirname}/js/MakeReadAlbumData.js`);
 const ImageDisplayManagement = require(`${__dirname}/js/ImageDisplayManagement.js`);
+const AlbumDataHandler = require(`${__dirname}/js/AlbumData.js`);
 
 let Settings = {};
 let FileList = [];
@@ -24,10 +25,6 @@ Settings['imageDirectoryFilter'] = [
     ,'pages'
 ];
 
-// extensions of allowed image files
-let ImageExtensions = [ 'tif' ,'tiff' ,'gif' ,'jpeg' ,'jpg' ,'jif'
-                        ,'jfif' ,'jp2' ,'jpx' ,'j2k' ,'j2c' ,'png'
-];
 let CliData = remote.getCurrentWindow().CliData; // parameters from the command line
 
 // check the filename extension against the list of image file extensions
@@ -115,31 +112,6 @@ function processAlbum(albumPath)
 
 } // processAlbum
 
-  //TODO: this is written assuming we are on Linux, how should we deal with
-  // file path designation oon multiple OS's
-function makeImageFileTree(evt)
-{
-    logger('makeImageFileTree: START');
-    remote.dialog.showOpenDialog({
-        'title':"Select a folder"
-        ,'defaultPath': 'C:'
-        ,'properties': ["openDirectory"]
-    }, (folderPaths) => {
-        // folderPaths is an array that contains all the selected paths
-        if(folderPaths === undefined) {
-            logger("showOpenDialog: No destination folder selected");
-            return;
-        }
-        else {
-            //we only use the first selected path
-            // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
-            // example Album  :TestData
-
-            logger('makeImageFileTree: before processAlbum');
-            processAlbum(folderPaths[0]);
-        }
-    }); // showOpenDialog
-} // makeImageFileTree
 
 function setupEventHandlers()
 {
@@ -222,13 +194,16 @@ function setupEventHandlers()
 $(document).ready(function()
 {
     logger('ready: START ');
+    AlbumData = new AlbumDataHandler();
 
     ImageDisplay = new ImageDisplayManagement('');
     logger('ready: CliData.album :' + CliData.album + ':');
     if(CliData.album) {
         logger('ready: Clidata.album set')
         ImageDisplay.init(CliData.album);
-        processAlbum(CliData.album);
+        //processAlbum(CliData.album);
+        AlbumData.setAlbumPath(CliData.album);
+        console.log('ready: album path is :%s:',AlbumData.AlbumPath);
     }
 
     ImageHandlingSettings = {
@@ -243,11 +218,7 @@ $(document).ready(function()
    ImageFaceHandling.setup();
 	setupEventHandlers();
 
-   ipcRenderer.on('open-album', (event, arg) => {
-        logger('ready: open-album received');
-        makeImageFileTree();
-        logger('ready: album select setup');
-    });
+   ipcRenderer.on('open-album', AlbumData.findAlbum);
 
    var copyRightYear = new Date().getFullYear();
    logger('ready:  copyRightYear=:'+copyRightYear+':');
