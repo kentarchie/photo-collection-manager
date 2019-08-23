@@ -5,7 +5,6 @@ const pathLib = require('path');
 const thumb = require('node-thumbnail').thumb;
 const MakeReadAlbumData = require(`${__dirname}/js/MakeReadAlbumData.js`);
 const ImageDisplayManagement = require(`${__dirname}/js/ImageDisplayManagement.js`);
-const AlbumDataHandler = require(`${__dirname}/js/AlbumData.js`);
 
 let Settings = {};
 let FileList = [];
@@ -102,6 +101,7 @@ function processAlbum(albumPath)
     });  // build data structure of file folder
     logger('processAlbum: FileList length after collectImageFiles = %d',FileList.length);
     // makeThumbNails();
+    let iList = AlbumData.getImagesList();
     let imgList = [];
     for(img in FileList) {
         logger('processAlbum: adding (%s)',FileList[img])
@@ -131,16 +131,17 @@ function setupEventHandlers()
     document.getElementById('fileList').addEventListener('click',function (evt) {
         logger('setupEventHandlers: fileList: evt.target.innerHTML:' + evt.target.innerHTML);
         let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
-        let fullPath = AlbumPath + '/' + imageName;
-        logger('setupEventHandlers: fileList: full path :' + fullPath + ':')
+        let filePath = evt.target.dataset.path;
+        //let fullPath = AlbumPath + '/' + imageName;
+        logger('setupEventHandlers: fileList: full path :' + filePath + ':')
         logger('setupEventHandlers: fileList: imageName :' + imageName + ':')
 
-        if (fsLib.statSync(fullPath).isDirectory()) { // skip directories
+        if (fsLib.statSync(filePath).isDirectory()) { // skip directories
             logger('setupEventHandlers: fileList: clicked on directory fullpath = :'+fullPath+':');
             return;
         }
 
-        ImageDisplay.pictureSelected(imageName,fullPath);
+        ImageDisplay.pictureSelected(imageName,filePath);
     });
 
 	 // add a new face box
@@ -194,30 +195,47 @@ function setupEventHandlers()
 $(document).ready(function()
 {
     logger('ready: START ');
-    AlbumData = new AlbumDataHandler();
+    console.log('ready: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
 
     ImageDisplay = new ImageDisplayManagement('');
-    logger('ready: CliData.album :' + CliData.album + ':');
+    console.log('ready: CliData.album :%s:',CliData.album);
+
+    document.getElementById('albumName').addEventListener('data-loaded', () => {
+         console.log('ready: data-loaded: event caught');
+         let iList = AlbumData.getImageList();
+         console.log('ready: data-loaded: number of images is :%d:',iList.length);
+         let imgList = [];
+         for(img in iList) {
+            logger('ready data-loaded: adding (%s)',iList[img])
+            imgList.push('<li data-path="'+iList[img].link+'">' + iList[img].name + '</>');
+         }
+         $('#fileList').html(imgList.join(''));
+    });
+
     if(CliData.album) {
         logger('ready: Clidata.album set')
         ImageDisplay.init(CliData.album);
         //processAlbum(CliData.album);
         AlbumData.setAlbumPath(CliData.album);
-        console.log('ready: album path is :%s:',AlbumData.AlbumPath);
+        console.log('ready: album path is :%s:',AlbumData.getAlbumPath());
+    }
+    else {
+        console.log('ready: Clidata.album NOT set AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
     }
 
     ImageHandlingSettings = {
-        wrapperID: 'pictureDisplay'
-        ,albumName: 'TestAlbum'
-	    ,lineWidth : 1
+       wrapperID    : 'pictureDisplay'
+       ,albumName   : 'NO_REAL_ALBUM'
+	    ,lineWidth   : 1
 	    ,strokeStyle : '#FF0000'
-		 ,albumFile : AlbumFile
+		 ,albumFile   : AlbumFile
     };
 	ImageFaceHandling.init(ImageHandlingSettings);
 	ImageFaceHandling.showConfig();
    ImageFaceHandling.setup();
 	setupEventHandlers();
 
+   console.log('ready: before open-album: AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
    ipcRenderer.on('open-album', AlbumData.findAlbum);
 
    var copyRightYear = new Date().getFullYear();

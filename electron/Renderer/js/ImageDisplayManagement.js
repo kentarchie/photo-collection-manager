@@ -111,7 +111,7 @@ class ImageDisplayManagement
       console.log('ImageDisplayManagement.pictureSelected this.FileList length (%d)',this.FileList.length);
       $('#pictureFileName').html(imageName);
 		let that=this;
-      let filename = Album_Data['images'][imageName].filename;
+      let filename = AlbumData.getImageData(imageName).filename;
 		let imageTag = $('#IFH_ImageTag'); // where to display the image
 
       imageTag.on('load', function() {

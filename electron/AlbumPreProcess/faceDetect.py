@@ -94,7 +94,7 @@ def main():
 	initializeAlbumData()
 	#print("START: {0}".format(json.dumps(ALBUM_DATA)))
 
-	# get the list of image files in the crrent directory
+	# get the list of image files in the current directory
 	imageList = [fn for fn in os.listdir(FULL_ALBUM_PATH)
 						if any(fn.endswith(ext) for ext in INCLUDED_EXTENSIONS)]
 
