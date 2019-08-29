@@ -1,7 +1,7 @@
 class ImageDisplayManagement 
 {
-    constructor()
-    {
+   constructor()
+   {
 		console.log('ImageDisplayManagement.constructor START ');
 		this.DISPLAY_BOX_WIDTH = 450;
     	this.DISPLAY_BOX_HEIGHT = 450;
@@ -9,10 +9,10 @@ class ImageDisplayManagement
 		this.STROKE_STYLE = '#FF0000';
     	this.AlbumPath = '';
     	this.FileList = []
-	} // constructor
+   } // constructor
 
-    init(albumPath)
-    {
+   init(albumPath)
+   {
       this.AlbumPath = albumPath;
       console.log('ImageDisplayManagement.init albumPath (%s)',albumPath);
 		// the canvas and image must be in the same place and the same size
@@ -30,97 +30,54 @@ class ImageDisplayManagement
 		});
       console.log('ImageDisplayManagement.init canvas.top (%s) canvas.left (%s)',canvasTag.css('top'),canvasTag.css('left'));
       console.log('ImageDisplayManagement.init image.top (%s) image.left (%s)',imageTag.css('top'),imageTag.css('left'));
-	} // init
+   } // init
 	
-	setFileList(fileList)
+   imgStatus(img)
 	{
-      console.log('ImageDisplayManagement.setFileList fileList length (%d)',fileList.length);
-		this.FileList = fileList;
-      console.log('ImageDisplayManagement.setFileList this.FileList length (%d)',this.FileList.length);
-	}
+      let status = '';
+      console.log('ImageDisplayManagement.imgStatus: Where (%s)',img.whereTaken);
+      if(img.whereTaken == '') status += 'L';
+      if(img.whenTaken == '') status += 'T';
+      if(img.notes == '') status += 'N';
+      return(status);
+   } // imgStatus
 
-	// from https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
-	getClickPosition(evt,canvasElement)
+   createImageList(listElement)
 	{
-		let clickX,clickY;
-		if (evt.pageX || evt.pageY) { 
-			clickX = evt.pageX;
-			clickY = evt.pageY;
-			console.log('ImageDisplayManagement.getClickedPosition: using pageX,Y');
-		}
-		else { 
-			clickX = evt.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
-			clickY = evt.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
-			console.log('ImageDisplayManagement.getClickedPosition: using clientX,Y');
-		} 
-		clickX -= canvasElement.offsetLeft;
-		clickY -= canvasElement.offsetTop;
-		console.log('ImageDisplayManagement.getClickedPosition: canvasElement.offsetLeft= %d canvasElement.offsetTop=%d',canvasElement.offsetLeft,  canvasElement.offsetTop);
-		let newPos =  {
-			x : clickX
-			,y : clickY
-		};
-		console.log('ImageDisplayManagement.getClickedPosition: ' + JSON.stringify(newPos,null,'\t'));
-		return newPos;
-	} // getClickPosition
+      let iList = AlbumData.getImageList();
+      console.log('ImageDisplayManagement.createImageList: number of images is :%d:',iList.length);
+      let imgList = [];
+      for(var img in iList) {
+         logger('ImageDisplayManagement.createImageList adding (%s)',iList[img])
+         imgList.push('<li data-filename="'+iList[img].name+'" data-path="'+iList[img].link+'">' + iList[img].name + ' (<span class="imgStatus">'+this.imgStatus(iList[img])+'</span>)</>');
+      }
+      document.getElementById(listElement).innerHTML = imgList.join('');
+   } // createImageList
 
-	adjustFaceBox(boxSpec,deltaWidth,deltaHeight)
+   pictureSelected(evt)
 	{
-		let result = {};
-		result['startX'] = Math.floor(deltaWidth  * boxSpec.startX);
-		result['startY'] = Math.floor(deltaHeight * boxSpec.startY);
-		result['width']  = Math.floor(deltaWidth  * boxSpec.width);
-		result['height'] = Math.floor(deltaHeight * boxSpec.height);
-		return result;
-	} // adjustFaceBox
+      logger('ImageDisplayManagment.pictureSelected: evt.target.innerHTML:' + evt.target.innerHTML);
+      //let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
+      let imageName = evt.target.dataset.filename;
+      let filePath = evt.target.dataset.path;
+      logger('ImageDisplayManagment.pictureSelected: filePath :' + filePath + ':')
+      logger('ImageDisplayManagment.pictureSelected: imageName :' + imageName + ':')
 
-	drawImage(picFileName,chosenImage)
-	{
-		const canvas = $('#IFH_CanvasTag').get(0);
-		const ctx = canvas.getContext('2d');
-		console.log('ImageDisplayManagement.drawImage: picFileName= %s', picFileName);
-      console.log('ImageDisplayManagement.drawImage this.FileList length (%d)',this.FileList.length);
+      if (fsLib.statSync(filePath).isDirectory()) { // skip directories
+         logger('ImageDisplayManagment.pictureSelected: : clicked on directory filePath = :'+filePath+':');
+         return;
+      }
+      document.getElementById('pictureFileName').innerHTML = imageName;  // display the filename
+		let imageTag = document.getElementById('IFH_ImageTag'); // where to display the image
 
-		const faceData = Album_Data['images'][picFileName]['faces']['faceList']
-
-		let height = chosenImage.naturalHeight;
-		let width = chosenImage.naturalWidth;
-		console.log ('ImageDisplayManagement.drawImage: The image natural size is %d(width) * %d(height)',width,height);
-		let deltaWidth = this.DISPLAY_BOX_WIDTH / width;
-		let deltaHeight = this.DISPLAY_BOX_HEIGHT / height;
-		console.log ('ImageDisplayManagement.onload: The delta size is %f * %f',deltaWidth,deltaHeight);
-
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		faceData.forEach((fd, i) => {
-			console.log('ImageDisplayManagement.drawImage ' + JSON.stringify(fd,null,'\t'));
-			let newFaceBox = this.adjustFaceBox(fd,deltaWidth,deltaHeight);
-			console.log('ImageDisplayManagement.newFaceBox = ' + JSON.stringify(newFaceBox,null,'\t'));
-			// draw rectangle
-			ctx.lineWidth = this.LINE_WIDTH;
-			ctx.strokeStyle = this.STROKE_STYLE;
-			ctx.beginPath();
-			ctx.strokeRect(newFaceBox.startX, newFaceBox.startY, newFaceBox.width, newFaceBox.height);
-			ctx.closePath();
-		});
-		console.log('ImageDisplayManagement.drawImage: boxes drawn');
-	} // drawImage
-
-   pictureSelected(imageName,fullPath)
-	{
-		console.log('ImageDisplayManagement.pictureSelected: START imageName = :%s: ',imageName);
-      console.log('ImageDisplayManagement.pictureSelected this.FileList length (%d)',this.FileList.length);
-      $('#pictureFileName').html(imageName);
-		let that=this;
-      let filename = AlbumData.getImageData(imageName).filename;
-		let imageTag = $('#IFH_ImageTag'); // where to display the image
-
-      imageTag.on('load', function() {
+      imageTag.addEventListener('load', function() {
          console.log('ImageDisplayManagement.pictureSelected: image object loaded this.src = :%s:', this.src);
-			that.drawImage(imageName,this);
-		}); // onload
+         ImageFaceHandling.drawFaces(imageName);
+		}); // load event
 
-      imageTag.attr('filename', fullPath);
-      imageTag.attr('src',fullPath);
+      imageTag.setAttribute('data-path', filePath);
+      imageTag.setAttribute('data-filename', imageName);
+      imageTag.setAttribute('src',filePath);
 	} // pictureSelected
 
 	findPicture(picture)
@@ -144,7 +101,6 @@ class ImageDisplayManagement
     	console.log('ImageDisplayManagement.nextPrevPicture: path= %s' , path);
     	CurrentPicture = this.FileList[index];
 		this.pictureSelected(CurrentPicture);
-    	this.drawImage(CurrentPicture,$('#IFH_ImageTag'));
 	} // nextPrevPicture
 
 } // ImageDisplayManagement

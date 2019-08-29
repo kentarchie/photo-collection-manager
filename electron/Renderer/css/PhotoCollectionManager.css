@@ -109,6 +109,12 @@ header span.left {
 	display:none;
 }
 
+.imgStatus {
+    color:green;
+    text-transform: uppercase;
+    font-weight:bold;
+}
+
 .AddEditInfo {
 	padding-bottom: 30px;
 }

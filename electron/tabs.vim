@@ -4,7 +4,6 @@ tabe Renderer/css/PhotoCollectionManager.css
 tabe Renderer/css/PictureDisplay.css
 tabe Renderer/about.html
 tabe Renderer/js/PhotoCollectionManager.js
-tabe Renderer/js/MakeReadAlbumData.js
 tabe Renderer/js/ImageDisplayManagement.js
 tabe Renderer/js/ImageFaceHandling.js
 tabe Renderer/js/DrawBox.js

@@ -201,6 +201,9 @@ var getImageList = function()
         let imageListData = {};
         imageListData['name'] = image;
         imageListData['link'] = AlbumPath + '/' + AlbumContents['images'][image]['fileName'];
+        imageListData['whereTaken']  = AlbumContents['images'][image]['whereTaken'];
+        imageListData['whenTaken']  = AlbumContents['images'][image]['whenTaken'];
+        imageListData['notes']  = AlbumContents['images'][image]['notes'];
         imageList.push(imageListData);
         console.log('AlbumData.getImageList: image list is (:%s:,:%s:)',imageListData['name'],imageListData['link']);
     });
@@ -212,6 +215,14 @@ var getImageData = function(imageName)
 {
    return AlbumContents['images'][imageName];
 } // getImageData
+
+var getFaceList = function(imageName)
+{
+   console.log('AlbumData.getFaceList: START image(%s)',imageName);
+   let faces =  AlbumContents['images'][imageName]['faces']['faceList'];
+   console.log('AlbumData.getFaceList: image(%s) faces length %d',imageName,faces.length);
+   return faces;
+} // getFaceList
 
 var setAlbumPath = function(album)
 {
@@ -237,6 +248,34 @@ var getAllAlbumData = function()
       return AlbumContents;
 } // getAllAlbumData
 
+// not currently used. If we do this here, remove thumbnail production from the AlbumPreProcess code
+function makeThumbNails()
+{
+    //logger('makeThumbNails: START:');
+    //for(var index=0,len=FileList.length; index<len; ++index) {
+     for(var index=0,len=2; index<len; ++index) {
+        let sourcePath = AlbumPath + '\\' + FileList[index];
+        let destPath = AlbumPath + '\\thumbnails\\' + FileList[index];
+        //logger('makeThumbNails: working on source :' + sourcePath + ':');
+        //logger('makeThumbNails: working on dest :' + destPath + ':');
+        thumb({
+            source: sourcePath
+            ,destination: destPath
+            ,width: 300
+            ,quiet: false
+            ,overwrite: true
+            ,concurrency: 4
+        }).then(function() {
+                logger('Success');
+                }).catch(function(e) {
+                    logger('Error', e);
+                });
+
+    //logger('makeThumbNails: working on :' + sourcePath + ': done');
+    } // for FileList
+} // makeThumbNails
+
+
 // expose the class
   return {
 	 setAlbumPath      : setAlbumPath
@@ -247,5 +286,6 @@ var getAllAlbumData = function()
 	 ,save             : save
 	 ,getImageList     : getImageList
 	 ,getImageData     : getImageData
+	 ,getFaceList      : getFaceList
   };
 })();

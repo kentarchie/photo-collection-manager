@@ -15,7 +15,7 @@ var FaceInfo = (function () {
       faceData = fd;
    } // setFaceBox
 
-	var openFaceInfo = function()
+	var openFaceInfo = function(faceData)
 	{
 		logger('FaceInfo.openFaceInfo: Start');
 		console.log('FaceInfo. openFaceInfo: first name = :%s: last name = :%s:',faceData.firstName,faceData.lastName);

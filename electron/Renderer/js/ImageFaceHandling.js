@@ -102,31 +102,30 @@ var ImageFaceHandling = (function () {
 	// and draw the boxes arond all the faces
 	var drawFaces = function(fname)
 	{
-		logger('ImageFaceHandling.drawFaces fname %s',fname);
-		let faceData = Album_Data['images'][fname]['faces']['faceList'];
+		console.log('ImageFaceHandling.drawFaces fname %s',fname);
+		//let faceData = Album_Data['images'][fname]['faces']['faceList'];
+		let faceData = AlbumData.getFaceList(fname);
 
-			logger('ImageFaceHandling.drawFaces faceData %s:',JSON.stringify(faceData,null,'\t'));
+			console.log('ImageFaceHandling.drawFaces faceData %s:',JSON.stringify(faceData,null,'\t'));
 			//logger ('ImageFaceHandling.drawFaces: The image id is :%s:',Config.inage.getAttribute('id'));
 			//logger('ImageFaceHandling.drawFaces: scrollX,scrollY %s,%s',window.scrollX, window.scrollY);
 			//logger('ImageFaceHandling.drawFaces: canvas width,height %s,%s',Config.canvas.width, Config.canvas.height);
 			console.log ('ImageFaceHandling.drawFaces: albumName is :%s:',Config.albumName);
 
-		let im = new Image();
-		im.src = '../' + Config.albumName + '/' + fname;
-			console.log ('ImageFaceHandling.drawFaces: im.src is :%s:',im.src);
-      	//logger ('ImageFaceHandling.drawFaces: The box sizes are %f * %f',Config.displayBoxHeight,Config.displayBoxWidth);
-			console.log ('RENDERER: ImageFaceHandling.drawFaces: The im natural sizes are %f(height) * %f(width)',im.naturalHeight,im.naturalWidth);
-			//logger ('ImageFaceHandling.drawFaces: The canvas left offset %f  top offset %f',Config.canvas.offset().left,Config.canvas.offset().top);
+		let imageTag = document.getElementById('IFH_ImageTag');
+		console.log ('ImageFaceHandling.drawFaces: imageTag.width,height is :%d,%d:',imageTag.width,imageTag.height);
+		console.log ('ImageFaceHandling.drawFaces: imageTag.src is :%s:',imageTag.src);
+		console.log ('RENDERER: ImageFaceHandling.drawFaces: The imageTag natural sizes are %f(height) * %f(width)',imageTag.naturalHeight,imageTag.naturalWidth);
 
-		let deltaWidth = Config.displayBoxWidth / im.naturalWidth;
-		let deltaHeight = Config.displayBoxHeight / im.naturalHeight;
+		let deltaHeight = Config.displayBoxHeight / imageTag.naturalHeight;
+		let deltaWidth = Config.displayBoxWidth / imageTag.naturalWidth;
       	console.log ('ImageFaceHandling.drawFaces: The delta size is (width) %f  (height) %f',deltaWidth,deltaHeight);
 
 		//let colors = ['#FF0000','#00FF00'];  // used during debugging
 		faceData.forEach((fd, i) => {
-				logger('ImageFaceHandling.drawFaces: fd ' + JSON.stringify(fd,null,'\t'));
+				console.log('ImageFaceHandling.drawFaces: fd ' + JSON.stringify(fd,null,'\t'));
 			let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
-				logger('ImageFaceHandling.drawFaces newFaceBox = ' + JSON.stringify(newFaceBox,null,'\t'));
+				console.log('ImageFaceHandling.drawFaces newFaceBox = ' + JSON.stringify(newFaceBox,null,'\t'));
 			// draw rectangle
 			Config.ctx.lineWidth = Config.lineWidth;
 			Config.ctx.strokeStyle = Config.strokeStyle;
@@ -140,12 +139,13 @@ var ImageFaceHandling = (function () {
 
 	function getFileName()
 	{
-		let fnamePath = document.getElementById('IFH_ImageTag').getAttribute('filename');
+		let fnamePath = document.getElementById('IFH_ImageTag').dataset.filename;
 		console.log('ImageFaceHandling.getFileName: fnamePath :' + fnamePath + ':');
-    	let pathParts = pathLib.parse(fnamePath);
-    	let fname = pathParts.base;
-		console.log('ImageFaceHandling.getFileName: fname :' + fname + ':');
-		return fname;
+    	//let pathParts = pathLib.parse(fnamePath);
+    	//let fname = pathParts.base;
+		//console.log('ImageFaceHandling.getFileName: fname :' + fname + ':');
+		//return fname;
+		return fnamePath;
 	} // getFileName
 
 	function deleteFaceBox(ev)
@@ -190,9 +190,9 @@ var ImageFaceHandling = (function () {
 
 		let face = isFaceClicked(ev);
 		if(face != -1) {  // we have clicked on a face box
-			let faceData = Album_Data['images'][fname]['faces']['faceList'];
+			let faceData = AlbumData.getFaceList(fname);
 			console.log('ImageFaceHandling. onImageClick: first name = :%s: last name = :%s:',faceData[face].firstName,faceData[face].lastName);
-			openFaceInfo(faceData[face]);
+			FaceInfo.openFaceInfo(faceData[face]);
 		}
 		else 
 			logger('ImageFaceHandling.onImageClick: clicked NOT ON face %d', face);
@@ -219,10 +219,12 @@ var ImageFaceHandling = (function () {
     			x: Math.floor(ev.clientX  - rect.left)
     			,y: Math.floor(ev.clientY -  rect.top)
   			};
-			logger('imageFaceHandling.isFaceClicked: x=%d y=%d',pos.x,pos.y);
+			console.log('imageFaceHandling.isFaceClicked: x=%d y=%d',pos.x,pos.y);
 
 			//logger('ImageFaceHandling.isFaceClicked Album_Data:' + JSON.stringify(Album_Data,null,'\t'));
-			let faceData = Album_Data['images'][fname]['faces']['faceList'];
+         console.log('imageFaceHandling.isFaceClicked: image fname :%s:',fname);
+			//let faceData = AlbumData['images'][fname]['faces']['faceList'];
+			let faceData = AlbumData.getFaceList(fname);
 			let i = 0;
 			for(var fd of faceData) {
 				let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
@@ -262,7 +264,7 @@ var ImageFaceHandling = (function () {
 
 			let faceData = Album_Data['images'][fname]['faces']['faceList'];
 			let fd = faceData[face];
-			openFaceInfo(fd);
+			FaceInfo.openFaceInfo(fd);
 			if (window.confirm('faceEdit: Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				faceData.splice(face,1);
 				logger('ImageFaceHandling.faceEdit faceData after splice :' + JSON.stringify(faceData,null,'\t'));
