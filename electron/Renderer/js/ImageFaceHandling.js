@@ -1,18 +1,6 @@
 var ImageFaceHandling = (function () {
-		const IFH_DeleteFaceID = 'IFH_DeleteFace';
-		const IFH_CreateFaceID = 'IFH_CreateFace'
-		const IFH_UndoCreateID = 'IFH_UndoCreate';
-		const IFH_UndoDeleteID = 'IFH_UndoDelete';
-		const IFH_BUTTONS_BLOCK = 'IHF_Buttons_Block';
-		const IFH_ButtonBaseClass = 'IFH_ButtonBaseClass';
-		const IFH_UndoButtonClass = 'IFH_UndoButtonClass';
-		const IFH_CreateButtonClass = 'IFH_CreateButtonClass';
-		const IFH_DeleteButtonClass = 'IFH_DeleteButtonClass';
     	const IFH_ImageElementID  = 'IFH_ImageTag';
-    	const IFH_ImageElementClass = 'IFH_ImageTagClass';
-    	const IFH_ImageGroupClass = 'IFH_ImageGroupClass';
     	const IFH_CanvasElementID = 'IFH_CanvasTag';
-		const IFH_CanvasClass = 'IFH_CoveringCanvas';
 
 		let Config = {};
 		let CurrentFace = {};
@@ -99,7 +87,7 @@ var ImageFaceHandling = (function () {
 	var getConfig = () => { return Config; }
 
 	// go through the album data for the displayed image
-	// and draw the boxes arond all the faces
+	// and draw the boxes around all the faces
 	var drawFaces = function(fname)
 	{
 		console.log('ImageFaceHandling.drawFaces fname %s',fname);

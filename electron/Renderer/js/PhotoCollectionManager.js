@@ -33,7 +33,7 @@ function setupEventHandlers()
     logger('setupEventHandlers: after next/prev setup');
 
     // what to do when an image is selected from the file tree
-    document.getElementById('fileList').addEventListener('click',ImageDisplay.pictureSelected);
+    document.getElementById('fileList').addEventListener('click',(evt) => {ImageDisplay.pictureSelected(evt);});
 
 	 // add a new face box
     document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) 
@@ -47,15 +47,6 @@ function setupEventHandlers()
          evt.target.innerHTML = 'Save New Face Box';
          document.getElementById('IFH_CancelCreateFace').style.display='block';
          DrawBox.init(Album_Data,config,AlbumFile,ImageFaceHandling);
-			/*
-         DrawBox.init({
-			   lineWidth : config.lineWidth
-			   ,strokeStyle : config.strokeStyle
-			   ,canvas : config.canvas
-			   ,ctx : config.ctx
-			   ,albumFile : AlbumFile
-         });
-			*/
          DrawBox.startDrawing();
       }
       else {
@@ -81,6 +72,7 @@ function setupEventHandlers()
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
          document.getElementById('IFH_CancelCreateFace').style.display='none';
     });
+    FaceInfo.init();
 } // setupEventHandlers
 
 $(document).ready(function()
@@ -93,21 +85,13 @@ $(document).ready(function()
 
     document.getElementById('albumName').addEventListener('data-loaded', () => {
          console.log('ready: data-loaded: event caught');
-         //let iList = AlbumData.getImageList();
-         //console.log('ready: data-loaded: number of images is :%d:',iList.length);
-         //let imgList = [];
-         //for(img in iList) {
-            //logger('ready data-loaded: adding (%s)',iList[img])
-            //imgList.push('<li data-path="'+iList[img].link+'">' + iList[img].name + '</>');
-         //}
-         //$('#fileList').html(imgList.join(''));
          ImageDisplay.createImageList('fileList');
     });
 
     if(CliData.album) {
         logger('ready: Clidata.album set')
-        ImageDisplay.init(CliData.album);
         AlbumData.setAlbumPath(CliData.album);
+        ImageDisplay.init(CliData.album);
         console.log('ready: album path is :%s:',AlbumData.getAlbumPath());
     }
     else {

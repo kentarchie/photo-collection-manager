@@ -1,12 +1,30 @@
 var FaceInfo = (function () {
 
    var faceData = {};
+
+	var closeNoChange = function(evt)
+	{
+		document.getElementById('FaceInfo').style.display='none';
+		document.getElementById('FaceInfoBlackout').style.display='none';
+	} // closeNoChange
+
+	var closeSave = function(evt)
+	{
+      faceData.firstName = document.getElementById('FaceInfoFirstName').value;
+      faceData.lastName = document.getElementById('FaceInfoSecondName').value;
+      closeNoChange();
+	} // closeSave
+
+	var deleteFaceBox = function(evt)
+	{
+	} // deleteFaceBox
+
 	var init = function(fd)
 	{
       logger('FaceInfo.init: START');
-		document.getElementById('FaceInfoBlackout').addEventListener('click', (e) => { closeNoSave();})
-		document.getElementById('FaceInfoClose').addEventListener('click', (e) => { closeNoSave();})
-		document.getElementById('DeleteFaceBox').addEventListener('click',(e) => { deleteFaceBox(e);});
+		document.getElementById('FaceInfoBlackout').addEventListener('click', closeNoChange);
+		document.getElementById('FaceInfoClose').addEventListener('click', closeNoChange);
+		document.getElementById('DeleteFaceBox').addEventListener('click',deleteFaceBox);
    } // init
 
 	var setFaceBox = function(fd)
@@ -25,24 +43,10 @@ var FaceInfo = (function () {
    	document.getElementById('FaceInfoBlackout').style.display='block';
 	}  // openFaceInfo
 
-
-	var closeNoChange = function()
-	{
-		document.getElementById('FaceInfo').style.display='none';
-		document.getElementById('FaceInfoBlackout').style.display='none';
-	} // closeNoChange
-
-	var closeSave = function()
-	{
-      faceData.firstName = document.getElementById('FaceInfoFirstName').value;
-      faceData.lastName = document.getElementById('FaceInfoSecondName').value;
-      closeNoChange();
-	} // closeSave
-
    return {
 	 init: init
 	 ,openFaceInfo  : openFaceInfo
 	 ,closeNoChange : closeNoChange
-	 ,closeSave : closeSave
+	 ,closeSave     : closeSave
   };
 })();

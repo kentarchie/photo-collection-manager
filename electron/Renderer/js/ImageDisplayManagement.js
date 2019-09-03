@@ -9,11 +9,13 @@ class ImageDisplayManagement
 		this.STROKE_STYLE = '#FF0000';
     	this.AlbumPath = '';
     	this.FileList = []
+      this.CurrentPicture = '';
    } // constructor
 
    init(albumPath)
    {
       this.AlbumPath = albumPath;
+      this.FileList = AlbumData.getImageList();
       console.log('ImageDisplayManagement.init albumPath (%s)',albumPath);
 		// the canvas and image must be in the same place and the same size
 		let imageTag  = $('#IFH_ImageTag');
@@ -48,25 +50,23 @@ class ImageDisplayManagement
       console.log('ImageDisplayManagement.createImageList: number of images is :%d:',iList.length);
       let imgList = [];
       for(var img in iList) {
-         logger('ImageDisplayManagement.createImageList adding (%s)',iList[img])
+         console.log('ImageDisplayManagement.createImageList adding (%s)',iList[img])
          imgList.push('<li data-filename="'+iList[img].name+'" data-path="'+iList[img].link+'">' + iList[img].name + ' (<span class="imgStatus">'+this.imgStatus(iList[img])+'</span>)</>');
       }
       document.getElementById(listElement).innerHTML = imgList.join('');
    } // createImageList
 
-   pictureSelected(evt)
+   switchPicture(chosenElement)
 	{
-      logger('ImageDisplayManagment.pictureSelected: evt.target.innerHTML:' + evt.target.innerHTML);
+      console.log('ImageDisplayManagment.pictureSelected: chosenElement.innerHTML= :%s:',chosenElement.innerHTML);
       //let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
-      let imageName = evt.target.dataset.filename;
-      let filePath = evt.target.dataset.path;
-      logger('ImageDisplayManagment.pictureSelected: filePath :' + filePath + ':')
-      logger('ImageDisplayManagment.pictureSelected: imageName :' + imageName + ':')
+      if (chosenElement.tagName.toLowerCase() != 'li') return;
+      let imageName = chosenElement.dataset.filename;
+      let filePath = chosenElement.dataset.path;
+      this.CurrentPicture = imageName;
+      console.log('ImageDisplayManagment.pictureSelected: filePath :%s:',filePath)
+      console.log('ImageDisplayManagment.pictureSelected: imageName :%s:',imageName)
 
-      if (fsLib.statSync(filePath).isDirectory()) { // skip directories
-         logger('ImageDisplayManagment.pictureSelected: : clicked on directory filePath = :'+filePath+':');
-         return;
-      }
       document.getElementById('pictureFileName').innerHTML = imageName;  // display the filename
 		let imageTag = document.getElementById('IFH_ImageTag'); // where to display the image
 
@@ -78,11 +78,24 @@ class ImageDisplayManagement
       imageTag.setAttribute('data-path', filePath);
       imageTag.setAttribute('data-filename', imageName);
       imageTag.setAttribute('src',filePath);
+
+      let imageData = AlbumData.getImageData(imageName);
+      document.getElementById('whenTaken').value = imageData['whenTaken'];
+      document.getElementById('whereTaken').value = imageData['whereTaken'];
+      document.getElementById('notes').innerHTML = imageData['notes'];
+	} // switchPicture
+
+   pictureSelected(evt)
+	{
+      console.log('ImageDisplayManagment.pictureSelected: evt.target.innerHTML = :%s:',evt.target.innerHTML);
+      console.log('ImageDisplayManagment.pictureSelected: this.tagName = :%s:',this.tagName);
+      this.switchPicture(evt.target);
 	} // pictureSelected
+
 
 	findPicture(picture)
 	{
-    	console.log('ImageDisplayManagement.findPicture: START ');
+    	console.log('ImageDisplayManagement.findPicture: picture = :%s:',picture);
     	return(this.FileList.indexOf(picture));
 	} // findPicture
 
@@ -90,7 +103,8 @@ class ImageDisplayManagement
 	{
 		let id = evt.target.id;
     	console.log('ImageDisplayManagement.nextPrevPicture: START button id = %s' , id);
-    	let index = this.findPicture(CurrentPicture);
+    	if(this.CurrentPicture == '') this.CurrentPicture = this.FileList[0];
+    	let index = this.findPicture(this.CurrentPicture);
     	console.log('ImageDisplayManagement.nextPrevPicture: initial index= %d' , index);
     	index = (id.startsWith('prev')) ? index -1 : index +1;
     	if(index <= 0) index = this.FileList.length-1;
@@ -99,8 +113,8 @@ class ImageDisplayManagement
 
     	let path = AlbumPath + '/' + this.FileList[index];
     	console.log('ImageDisplayManagement.nextPrevPicture: path= %s' , path);
-    	CurrentPicture = this.FileList[index];
-		this.pictureSelected(CurrentPicture);
+    	this.CurrentPicture = this.FileList[index];
+		this.switchPicture(this.CurrentPicture);
 	} // nextPrevPicture
 
 } // ImageDisplayManagement
