@@ -17,6 +17,7 @@ var FaceInfo = (function () {
 
 	var deleteFaceBox = function(evt)
 	{
+       ImageFaceHandling.deleteFaceBox(evt);
 	} // deleteFaceBox
 
 	var init = function(fd)

@@ -21,16 +21,16 @@ let CliData = remote.getCurrentWindow().CliData; // parameters from the command 
 function setupEventHandlers()
 {
 	 document.getElementById('IFH_CanvasTag').addEventListener('contextmenu', (e) => {
-        logger('setupEventHandlers: contextmenu : detected');
+        console.log('setupEventHandlers: contextmenu : detected');
         ImageFaceHandling.faceEdit(e);
 	 });
-	 logger('setupEventHandlers: contextmenu: after faceEdit setup');
+	 console.log('setupEventHandlers: contextmenu: after faceEdit setup');
 
     var prevImage = document.getElementById('prevImage');
-	 logger('setupEventHandlers: prevImage:' + prevImage);
+	 console.log('setupEventHandlers: prevImage:' + prevImage);
     document.getElementById('prevImage').addEventListener('click',function (evt) { ImageDisplay.nextPrevPicture(evt); });
     document.getElementById('nextImage').addEventListener('click',function (evt) { ImageDisplay.nextPrevPicture(evt); });
-    logger('setupEventHandlers: after next/prev setup');
+    console.log('setupEventHandlers: after next/prev setup');
 
     // what to do when an image is selected from the file tree
     document.getElementById('fileList').addEventListener('click',(evt) => {ImageDisplay.pictureSelected(evt);});
@@ -38,32 +38,32 @@ function setupEventHandlers()
 	 // add a new face box
     document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) 
 	 {
-      logger('setupEventHandlers: createFace(): evt.target.innerHTML:' + evt.target.innerHTML);
+      console.log('setupEventHandlers: createFace(): evt.target.innerHTML:' + evt.target.innerHTML);
 	   let config = ImageFaceHandling.getConfig();
 		config.canvas.removeEventListener('click',ImageFaceHandling.onImageClick);
 
       if (evt.target.innerHTML.search('Add') != -1) {
-         logger('setupEventHandlers: createFace(): Starting to draw face box:');
+         console.log('setupEventHandlers: createFace(): Starting to draw face box:');
          evt.target.innerHTML = 'Save New Face Box';
          document.getElementById('IFH_CancelCreateFace').style.display='block';
          DrawBox.init(Album_Data,config,AlbumFile,ImageFaceHandling);
          DrawBox.startDrawing();
       }
       else {
-         logger('setupEventHandlers: createFace(): done drawing face box:');
+         console.log('setupEventHandlers: createFace(): done drawing face box:');
          evt.target.innerHTML = 'Add A Face';
          DrawBox.stopDrawing();
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
          let newFace = DrawBox.getNewBoxInfo();
          //ImageFaceHandling.openFaceInfo(newFace);
          ImageFaceHandling.addFaceBox(newFace);
-         logger('setupEventHandlers: newface:' + JSON.stringify(newFace,null,'\t'));
+         console.log('setupEventHandlers: newface:' + JSON.stringify(newFace,null,'\t'));
       }
     });
 
     document.getElementById('IFH_CancelCreateFace').addEventListener('click',function (evt) 
 	 {
-         logger('setupEventHandlers: cancel create face: START:');
+         console.log('setupEventHandlers: cancel create face: START:');
          document.getElementById('IFH_CreateFace').innerHTML = 'Add A Face';
          DrawBox.stopDrawing();
          DrawBox.clearBox();
@@ -77,7 +77,7 @@ function setupEventHandlers()
 
 $(document).ready(function()
 {
-    logger('ready: START ');
+    console.log('ready: START ');
     console.log('ready: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
 
     ImageDisplay = new ImageDisplayManagement('');
@@ -89,7 +89,7 @@ $(document).ready(function()
     });
 
     if(CliData.album) {
-        logger('ready: Clidata.album set')
+        console.log('ready: Clidata.album set')
         AlbumData.setAlbumPath(CliData.album);
         ImageDisplay.init(CliData.album);
         console.log('ready: album path is :%s:',AlbumData.getAlbumPath());
@@ -114,7 +114,7 @@ $(document).ready(function()
    ipcRenderer.on('open-album', AlbumData.findAlbum);
 
    var copyRightYear = new Date().getFullYear();
-   logger('ready:  copyRightYear=:'+copyRightYear+':');
+   console.log('ready:  copyRightYear=:'+copyRightYear+':');
    $('.copyright span').html(copyRightYear);
 }); // ready function
 

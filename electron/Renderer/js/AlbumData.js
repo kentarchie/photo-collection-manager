@@ -248,6 +248,17 @@ var getAllAlbumData = function()
       return AlbumContents;
 } // getAllAlbumData
 
+var deleteFaceData = function(imageName,face)
+{
+   AlbumContents['images'][imageName]['faces']['faceList'].splice(face,1);  // delete face object from list
+   save();
+} // deleteFaceData
+
+var addFaceData = function(imageName,faceBox)
+{
+   AlbumContents['images'][imageName]['faces']['faceList'].push(faceBox);
+} // addFaceData
+
 // not currently used. If we do this here, remove thumbnail production from the AlbumPreProcess code
 function makeThumbNails()
 {
@@ -275,7 +286,6 @@ function makeThumbNails()
     } // for FileList
 } // makeThumbNails
 
-
 // expose the class
   return {
 	 setAlbumPath      : setAlbumPath
@@ -287,5 +297,7 @@ function makeThumbNails()
 	 ,getImageList     : getImageList
 	 ,getImageData     : getImageData
 	 ,getFaceList      : getFaceList
+	 ,deleteFaceData   : deleteFaceData
+	 ,addFaceData      : addFaceData
   };
 })();

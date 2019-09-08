@@ -142,15 +142,18 @@ var ImageFaceHandling = (function () {
 		let target = CurrentFace.currentTarget;
     	let fname = getFileName();
 		logger('ImageFaceHandling.deleteFaceBox: fname=:'+fname+':');
-		let faceData = Album_Data['images'][fname]['faces']['faceList']
+		//let faceData = Album_Data['images'][fname]['faces']['faceList']
+		let faceData = AlbumData.getFaceList(fname);
 		let face = isFaceClicked(CurrentFace);
 		if(face != -1) {
 			logger('ImageFaceHandling.deleteFaceBox: face=:'+face+':');
 			let fd = faceData[face];
 			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				logger('ImageFaceHandling.deleteFaceBox: Yes delete face box');
-				Album_Data['images'][fname]['faces']['faceList'].splice(face,1);  // delete face object from list
-				logger('ImageFaceHandling.deleteFaceBox: faceData after splice :' + JSON.stringify(Album_Data['images'][fname]['faces']['faceList'],null,'\t'));
+				//Album_Data['images'][fname]['faces']['faceList'].splice(face,1);  // delete face object from list
+            AlbumData.deleteFaceData(fname,face);
+		      faceData = AlbumData.getFaceList(fname);
+				logger('ImageFaceHandling.deleteFaceBox: faceData after splice :' + JSON.stringify(faceData,null,'\t'));
 				logger('ImageFaceHandling.deleteFaceBox: face info :' + JSON.stringify(faceData[--face],null,'\t'));
 				Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 				drawFaces(fname);
@@ -283,17 +286,16 @@ var ImageFaceHandling = (function () {
             ,'startY': faceBox['start_y']
             ,'startX': faceBox['start_x']
       };
-      //let newFaceInfo = new FaceInfo();
-		Album_Data['images'][fname]['faces']['faceList'].push(newFace);
-		Album_Data['images'][fname]['faces']['numberFaces'] = parseInt(Album_Data['images'][fname]['faces']['numberFaces']) + 1;
-		Config.albumFile.save();
 
-		let numFaces = parseInt(Album_Data['images'][fname]['faces']['faceList'].length)
-      FaceInfo.init(Album_Data['images'][fname]['faces']['faceList'][numFaces-1]);
-      FaceInfo.openFaceInfo();
-      //logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( Album_Data['images'][fname]['faces']['faceList'] ,null,'\t'));
+		let faceData = AlbumData.getFaceList(fname);
+      AlbumData.addFaceData(fname,newFace);
+		AlbumData.save();
+
+		faceData = AlbumData.getFaceList(fname);
+      FaceInfo.init(faceData);
+      FaceInfo.openFaceInfo(newFace);
+      logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( faceData ,null,'\t'));
 	} //addFaceBox
-
 
 	// construct a DOM element using the passed in parameters
 	function makeElement(kind,params,content) {
@@ -306,13 +308,14 @@ var ImageFaceHandling = (function () {
 	} // makeElement
 
   return {
-	 init: init
-	 ,setup: setup
-	 ,showConfig: showConfig
-	 ,getConfig: getConfig
-	 ,drawFaces : drawFaces
-	 ,showPicture : showPicture
-	 ,faceEdit : faceEdit
-    ,addFaceBox : addFaceBox
+	 init           : init
+	 ,setup         : setup
+	 ,showConfig    : showConfig
+	 ,getConfig     : getConfig
+	 ,drawFaces     : drawFaces
+	 ,showPicture   : showPicture
+	 ,faceEdit      : faceEdit
+    ,addFaceBox    : addFaceBox
+	 ,deleteFaceBox : deleteFaceBox
   };
 })();

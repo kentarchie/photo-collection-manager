@@ -61,7 +61,7 @@ function processArgs(app)
   CliData['debug'] = argv.debug;
   CliData['AppPath'] = app.getAppPath();
   CliData['album'] = argv.album;
-  logger('processArgs: CliData %s', JSON.stringify(CliData,null,'\t'));
+  console.log('processArgs: CliData %s', JSON.stringify(CliData,null,'\t'));
 } //processArgs
 
 function createWindow (app)
@@ -89,8 +89,8 @@ function createWindow (app)
 
   // Load a URL in the window to the local index.html path
   let urlToLoad = 'file://' + __dirname + '/../Renderer/index.html';
-  logger('createWindow: loading url ->%s', urlToLoad);
-  logger('TEST x= %d, y= %d',1,2);
+  console.log('createWindow: loading url ->%s', urlToLoad);
+  console.log('TEST x= %d, y= %d',1,2);
   MainWindow.loadURL(urlToLoad);
 
   MainWindow.CliData = CliData;  // make CLI data available to  the renderer
@@ -106,9 +106,9 @@ function createWindow (app)
 
   //  require(`${__dirname}/mainMenu.js`);
   let menu = createMainMenu();
-  logger('createWindow: got menu template');
+  console.log('createWindow: got menu template');
   Menu.setApplicationMenu(menu); 
-  logger('createWindow: menu set');
+  console.log('createWindow: menu set');
 } // createWindow
 
 function createMainMenu()
@@ -164,7 +164,7 @@ function createMainMenu()
 
 function openAboutWindow()
 {
-  logger('openAboutWindow: START');
+  console.log('openAboutWindow: START');
   if(AboutWindow) {
     AboutWindow.focus();
     return;
@@ -181,23 +181,8 @@ function openAboutWindow()
   AboutWindow.setMenu(null);
 
   let urlToLoad = 'file://' + __dirname + '/app/about.html';
-  logger('openAboutWindow: loading url ->%s', urlToLoad);
+  console.log('openAboutWindow: loading url ->%s', urlToLoad);
   AboutWindow.loadURL(urlToLoad);
 
   AboutWindow.on('closed', () => { AboutWindow = null; });
 } // openAboutWindow
-
-// ideas from https://gist.github.com/robatron/5681424
-function logger()
-{
-  if(CliData.debug) {
-    let args = Array.prototype.slice.call(arguments);
-    //args.unshift('MAIN: ');
-    let template = 'MAIN: ' + args[0];
-    //console.log('template = :%s:',template);
-    args.splice(0,1);
-    console.log(args);
-    //console.log.apply(console, args);
-    console.log(template, args);
-  }
-} // logger
