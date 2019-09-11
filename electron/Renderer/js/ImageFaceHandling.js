@@ -297,6 +297,11 @@ var ImageFaceHandling = (function () {
       logger('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( faceData ,null,'\t'));
 	} //addFaceBox
 
+	var saveFaceInfo = function(faceBox)
+	{
+
+	} //saveFaceInfo
+
 	// construct a DOM element using the passed in parameters
 	function makeElement(kind,params,content) {
 			let el = document.createElement(kind);
