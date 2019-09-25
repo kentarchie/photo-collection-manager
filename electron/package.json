@@ -13,7 +13,7 @@
   "author": "Kent Archie",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^4.2.9",
+    "electron": "^4.2.10",
     "electron-debug": "^1.5.0",
     "electron-devtools-installer": "^2.2.4",
     "electron-packager": "^13.1.1",
@@ -39,7 +39,7 @@
     "node-thumbnail": "^0.15.0",
     "remote": "^0.2.6",
     "send": "^0.16.2",
-    "webpack": "^4.39.2",
+    "webpack": "^4.40.2",
     "yargs": "^12.0.5"
   }
 }

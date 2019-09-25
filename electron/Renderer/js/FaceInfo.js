@@ -4,12 +4,14 @@ var FaceInfo = (function () {
 
 	var closeNoChange = function(evt)
 	{
+		console.log('FaceInfo.closeNoChange: START');
 		document.getElementById('FaceInfo').style.display='none';
 		document.getElementById('FaceInfoBlackout').style.display='none';
 	} // closeNoChange
 
 	var closeSave = function(evt)
 	{
+      console.log('FaceInfo.closeSave: START');
       faceData.firstName = document.getElementById('FaceInfoFirstName').value;
       faceData.lastName = document.getElementById('FaceInfoSecondName').value;
       closeNoChange();
@@ -22,7 +24,7 @@ var FaceInfo = (function () {
 
 	var init = function()
 	{
-      logger('FaceInfo.init: START');
+		console.log('FaceInfo.init: START');
 		document.getElementById('FaceInfoBlackout').addEventListener('click', closeNoChange);
 		document.getElementById('FaceInfoClose').addEventListener('click', closeNoChange);
 		document.getElementById('DeleteFaceBox').addEventListener('click',deleteFaceBox);
@@ -31,10 +33,13 @@ var FaceInfo = (function () {
 
 	var faceInfoSave = function(evt)
 	{
-       let face = getFaceInfo();
-       let fName = document.getElementById('pictureFileName').innerHTML;
-       AlbumData.addFaceData(fName,face);
-       AlbumData.save();
+		console.log('FaceInfo.faceInfoSave: START');
+    	let face = getFaceInfo();
+		let fName = document.getElementById('pictureFileName').innerHTML;
+		let faceNumber = document.getElementById('FaceInfo').dataset.faceNumber;
+    	AlbumData.updateFaceData(fName,faceNumber,face['firstName'],face['lastName']);
+    	AlbumData.save();
+		closeNoChange();
 	}  // faceInfoSave
 
 	var getFaceInfo = function()
@@ -44,15 +49,16 @@ var FaceInfo = (function () {
        return faceData;
 	}  // getFaceInfo
 
-	var openFaceInfo = function(fd)
+	var openFaceInfo = function(fd,faceNumber)
 	{
-		logger('FaceInfo.openFaceInfo: Start');
-      faceData = fd;
-		console.log('FaceInfo. openFaceInfo: first name = :%s: last name = :%s:',faceData.firstName,faceData.lastName);
+		console.log('FaceInfo.openFaceInfo: Start');
+      	faceData = fd;
+		console.log('FaceInfo.openFaceInfo: first name = :%s: last name = :%s:',faceData.firstName,faceData.lastName);
 		document.getElementById('FaceInfoFirstName').value = faceData.firstName;
 		document.getElementById('FaceInfoSecondName').value = faceData.lastName;
 		document.getElementById('FaceInfo').style.display='block';
-   	document.getElementById('FaceInfoBlackout').style.display='block';
+   		document.getElementById('FaceInfoBlackout').style.display='block';
+		document.getElementById('FaceInfo').dataset.faceNumber = faceNumber;
 	}  // openFaceInfo
 
    return {

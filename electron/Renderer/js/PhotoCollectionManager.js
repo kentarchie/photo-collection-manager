@@ -28,9 +28,8 @@ function setupEventHandlers()
 
     var prevImage = document.getElementById('prevImage');
 	 console.log('setupEventHandlers: prevImage:' + prevImage);
-    document.getElementById('prevImage').addEventListener('click',function (evt) { ImageDisplay.nextPrevPicture(evt); });
-    document.getElementById('nextImage').addEventListener('click',function (evt) { ImageDisplay.nextPrevPicture(evt); });
-    console.log('setupEventHandlers: after next/prev setup');
+    document.getElementById('prevImage').addEventListener('click',(evt) => { ImageDisplay.nextPrevPicture(evt); });
+    document.getElementById('nextImage').addEventListener('click',(evt) => { ImageDisplay.nextPrevPicture(evt); });
 
     // what to do when an image is selected from the file tree
     document.getElementById('fileList').addEventListener('click',(evt) => {ImageDisplay.pictureSelected(evt);});
@@ -38,11 +37,12 @@ function setupEventHandlers()
 	 // add a new face box
     document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) 
 	 {
-      console.log('setupEventHandlers: createFace(): evt.target.innerHTML:' + evt.target.innerHTML);
+      let addSaveButton = evt.target.innerHTML;
+      console.log('setupEventHandlers: createFace(): evt.target.innerHTML :%s:',addSaveButton);
 	   let config = ImageFaceHandling.getConfig();
 		config.canvas.removeEventListener('click',ImageFaceHandling.onImageClick);
 
-      if (evt.target.innerHTML.search('Add') != -1) {
+      if (addSaveButton.search('Add') != -1) {
          console.log('setupEventHandlers: createFace(): Starting to draw face box:');
          evt.target.innerHTML = 'Save New Face Box';
          document.getElementById('IFH_CancelCreateFace').style.display='block';
@@ -51,13 +51,12 @@ function setupEventHandlers()
       }
       else {
          console.log('setupEventHandlers: createFace(): done drawing face box:');
-         evt.target.innerHTML = 'Add A Face';
          DrawBox.stopDrawing();
-		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
+         evt.target.innerHTML = 'Add A Face';
+		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick); // go back to waiting for click
          let newFace = DrawBox.getNewBoxInfo();
-         //ImageFaceHandling.openFaceInfo(newFace);
          ImageFaceHandling.addFaceBox(newFace);
-         console.log('setupEventHandlers: newface:' + JSON.stringify(newFace,null,'\t'));
+         console.log('setupEventHandlers: newface :%s',JSON.stringify(newFace,null,'\t'));
       }
     });
 

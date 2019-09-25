@@ -219,7 +219,7 @@ var getImageData = function(imageName)
 var getFaceList = function(imageName)
 {
    console.log('AlbumData.getFaceList: START image(%s)',imageName);
-   let faces =  AlbumContents['images'][imageName]['faces']['faceList'];
+   let faces =  AlbumContents['images'][imageName]['faces']
    console.log('AlbumData.getFaceList: image(%s) faces length %d',imageName,faces.length);
    return faces;
 } // getFaceList
@@ -245,19 +245,25 @@ var getAlbumFileName = function()
 
 var getAllAlbumData = function()
 {
-      return AlbumContents;
+    return AlbumContents;
 } // getAllAlbumData
 
 var deleteFaceData = function(imageName,face)
 {
-   AlbumContents['images'][imageName]['faces']['faceList'].splice(face,1);  // delete face object from list
+   AlbumContents['images'][imageName]['faces'].splice(face,1);  // delete face object from list
    save();
 } // deleteFaceData
 
-var addFaceData = function(imageName,faceBox)
+var addNewFaceData = function(imageName,faceBox)
 {
-   AlbumContents['images'][imageName]['faces']['faceList'].push(faceBox);
-} // addFaceData
+   AlbumContents['images'][imageName]['faces'].push(faceBox);
+} // addNewFaceData
+
+var updateFaceData = function(imageName,faceNumber,firstName,secondName)
+{
+   AlbumContents['images'][imageName]['faces'][faceNumber]['firstName'] = firstName;
+   AlbumContents['images'][imageName]['faces'][faceNumber]['lastName'] = secondName;
+} // updateFaceData
 
 // not currently used. If we do this here, remove thumbnail production from the AlbumPreProcess code
 function makeThumbNails()
@@ -268,7 +274,7 @@ function makeThumbNails()
         let sourcePath = AlbumPath + '\\' + FileList[index];
         let destPath = AlbumPath + '\\thumbnails\\' + FileList[index];
         //logger('makeThumbNails: working on source :' + sourcePath + ':');
-        //logger('makeThumbNails: working on dest :' + destPath + ':');
+        //logger('makeThunmbNails: working on dest :' + destPath + ':');
         thumb({
             source: sourcePath
             ,destination: destPath
@@ -298,6 +304,7 @@ function makeThumbNails()
 	 ,getImageData     : getImageData
 	 ,getFaceList      : getFaceList
 	 ,deleteFaceData   : deleteFaceData
-	 ,addFaceData      : addFaceData
+	 ,addNewFaceData   : addNewFaceData
+	 ,updateFaceData   : updateFaceData
   };
 })();

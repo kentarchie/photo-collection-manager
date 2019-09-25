@@ -58,25 +58,23 @@ class ImageDisplayManagement
 
    switchPicture(chosenElement)
 	{
-      console.log('ImageDisplayManagment.pictureSelected: chosenElement.innerHTML= :%s:',chosenElement.innerHTML);
-      //let imageName = evt.target.innerHTML.replace('/',''); // hack, remove this later
+      console.log('ImageDisplayManagment.switchPicture: chosenElement.innerHTML= :%s:',chosenElement.innerHTML);
       if (chosenElement.tagName.toLowerCase() != 'li') return;
-      let imageName = chosenElement.dataset.filename;
+      let fileName = chosenElement.dataset.filename;
       let filePath = chosenElement.dataset.path;
-      this.CurrentPicture = imageName;
-      console.log('ImageDisplayManagment.pictureSelected: filePath :%s:',filePath)
-      console.log('ImageDisplayManagment.pictureSelected: imageName :%s:',imageName)
+      console.log('ImageDisplayManagment.switchPicture: fileName :%s:',fileName)
+      console.log('ImageDisplayManagment.switchPicture: filePath :%s:',filePath)
 
-      document.getElementById('pictureFileName').innerHTML = imageName;  // display the filename
+      document.getElementById('pictureFileName').innerHTML = fileName;  // display the filename
 		let imageTag = document.getElementById('IFH_ImageTag'); // where to display the image
 
-      imageTag.addEventListener('load', function() {
-         console.log('ImageDisplayManagement.pictureSelected: image object loaded this.src = :%s:', this.src);
-         ImageFaceHandling.drawFaces(imageName);
+      imageTag.addEventListener('load', () => {
+         console.log('ImageDisplayManagement.switchPicture: image object loaded this.src = :%s:', this.src);
+         ImageFaceHandling.drawFaces(fileName);
 		}); // load event
 
       imageTag.setAttribute('data-path', filePath);
-      imageTag.setAttribute('data-filename', imageName);
+      imageTag.setAttribute('data-filename', fileName);
       imageTag.setAttribute('src',filePath);
 
       let imageData = AlbumData.getImageData(imageName);
@@ -88,7 +86,7 @@ class ImageDisplayManagement
    pictureSelected(evt)
 	{
       console.log('ImageDisplayManagment.pictureSelected: evt.target.innerHTML = :%s:',evt.target.innerHTML);
-      console.log('ImageDisplayManagment.pictureSelected: this.tagName = :%s:',this.tagName);
+      console.log('ImageDisplayManagment.pictureSelected: evt.target.tagName = :%s:',evt.target.tagName);
       this.switchPicture(evt.target);
 	} // pictureSelected
 
