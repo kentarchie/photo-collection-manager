@@ -257,12 +257,16 @@ var deleteFaceData = function(imageName,face)
 var addNewFaceData = function(imageName,faceBox)
 {
    AlbumContents['images'][imageName]['faces'].push(faceBox);
+   return AlbumContents['images'][imageName]['faces'].length - 1;
 } // addNewFaceData
 
 var updateFaceData = function(imageName,faceNumber,firstName,secondName)
 {
-   AlbumContents['images'][imageName]['faces'][faceNumber]['firstName'] = firstName;
-   AlbumContents['images'][imageName]['faces'][faceNumber]['lastName'] = secondName;
+   let fNum = parseInt(faceNumber);
+   console.log('AlbumData.updateFaceData faceNumber string(%s) fNum int(%d)',faceNumber,fNum);
+   console.log('AlbumData.updateFaceData imageName (%s)',imageName);
+   AlbumContents['images'][imageName]['faces'][fNum]['firstName'] = firstName;
+   AlbumContents['images'][imageName]['faces'][fNum]['lastName'] = secondName;
 } // updateFaceData
 
 // not currently used. If we do this here, remove thumbnail production from the AlbumPreProcess code

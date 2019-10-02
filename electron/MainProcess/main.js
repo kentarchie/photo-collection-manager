@@ -85,6 +85,9 @@ function createWindow (app)
     ,icon : pathLib.join(__dirname , 'images/TaskBar.png')
     ,backgroundColor: "#D6D8DC" // background color of the page, this prevents any white flickering
     ,show: false // Don't show the window until it's ready, this prevents any white flickering
+    ,webPreferences : {
+      nodeIntegration: true
+    }
   });
 
   // Load a URL in the window to the local index.html path

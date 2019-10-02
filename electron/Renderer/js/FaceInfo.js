@@ -34,9 +34,12 @@ var FaceInfo = (function () {
 	var faceInfoSave = function(evt)
 	{
 		console.log('FaceInfo.faceInfoSave: START');
-    	let face = getFaceInfo();
+		let face = getFaceInfo();
+		console.log('FaceInfo.faceInfoSave: face = :%s:',JSON.stringify(face,null,'\t'));
 		let fName = document.getElementById('pictureFileName').innerHTML;
-		let faceNumber = document.getElementById('FaceInfo').dataset.faceNumber;
+		console.log('FaceInfo.faceInfoSave: fName = :%s:',fName);
+		let faceNumber = parseInt(document.getElementById('FaceInfo').dataset.faceNumber);
+		console.log('FaceInfo.faceInfoSave: faceNumber = int(%d) string(%s)',faceNumber,faceNumber);
     	AlbumData.updateFaceData(fName,faceNumber,face['firstName'],face['lastName']);
     	AlbumData.save();
 		closeNoChange();
@@ -51,9 +54,8 @@ var FaceInfo = (function () {
 
 	var openFaceInfo = function(fd,faceNumber)
 	{
-		console.log('FaceInfo.openFaceInfo: Start');
+		console.log('FaceInfo.openFaceInfo: START: first name = :%s: last name = :%s: faceNumber = :%d:',fd.firstName,fd.lastName,faceNumber);
       	faceData = fd;
-		console.log('FaceInfo.openFaceInfo: first name = :%s: last name = :%s:',faceData.firstName,faceData.lastName);
 		document.getElementById('FaceInfoFirstName').value = faceData.firstName;
 		document.getElementById('FaceInfoSecondName').value = faceData.lastName;
 		document.getElementById('FaceInfo').style.display='block';

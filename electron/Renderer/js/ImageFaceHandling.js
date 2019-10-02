@@ -104,6 +104,7 @@ var ImageFaceHandling = (function () {
 		let deltaHeight = Config.displayBoxHeight / imageTag.naturalHeight;
 		let deltaWidth = Config.displayBoxWidth / imageTag.naturalWidth;
       	console.log('ImageFaceHandling.drawFaces: The delta size is (width) %.4f  (height) %.4f',deltaWidth,deltaHeight);
+		Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 
 		//let colors = ['#FF0000','#00FF00'];  // used during debugging
 		faceData.forEach((fd, i) => {
@@ -143,12 +144,13 @@ var ImageFaceHandling = (function () {
 			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				console.log('ImageFaceHandling.deleteFaceBox: Yes delete face box');
 				//Album_Data['images'][fname]['faces']['faceList'].splice(face,1);  // delete face object from list
-            AlbumData.deleteFaceData(fname,face);
-		      faceData = AlbumData.getFaceList(fname);
+            	AlbumData.deleteFaceData(fname,face);
+		      	faceData = AlbumData.getFaceList(fname);
 				console.log('ImageFaceHandling.deleteFaceBox: faceData after splice :' + JSON.stringify(faceData,null,'\t'));
 				console.log('ImageFaceHandling.deleteFaceBox: face info :' + JSON.stringify(faceData[--face],null,'\t'));
 				Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 				drawFaces(fname);
+				FaceInfo.closeNoChange();
 			}
 			else {
 				console.log('ImageFaceHandling.deleteFaceBox: NO  do not delete face box');
@@ -163,18 +165,22 @@ var ImageFaceHandling = (function () {
 	var onImageClick = function(ev)
 	{
 		console.log('ImageFaceHandling.onImageClick : START');
+		console.log('onImageClick.onImageClick: DrawBox.boxDrawn() :%s:',DrawBox.boxDrawn());
+		if(DrawBox.boxDrawn()) return;
 		CurrentFace.currentTarget = ev.currentTarget; // save for later use
     	CurrentFace.clientX = ev.clientX;
     	CurrentFace.clientY = ev.clientY;
 
 		let target = ev.currentTarget;
     	let fname = getFileName();
-		console.log('onImageClick.onImageClick: fname :' + fname + ':');
+		console.log('onImageClick.onImageClick: fname :%s:',fname);
 
 		let face = isFaceClicked(ev);
 		if(face != -1) {  // we have clicked on a face box
 			let faceData = AlbumData.getFaceList(fname);
+			console.log('ImageFaceHandling. onImageClick: face = :%d:',face);
 			console.log('ImageFaceHandling. onImageClick: first name = :%s: last name = :%s:',faceData[face].firstName,faceData[face].lastName);
+			console.log('ImageFaceHandling. onImageClick (181): Calling FaceInfo.openFaceInfo face = %d',face);
 			FaceInfo.openFaceInfo(faceData[face],face);
 		}
 		else 
@@ -245,6 +251,7 @@ var ImageFaceHandling = (function () {
 
 			let faceData = AlbumData.getFaceList();
 			let fd = faceData[face];
+			console.log('ImageFaceHandling.faceEdit (253): Calling FaceInfo.openFaceInfo face = %d',face);
 			FaceInfo.openFaceInfo(fd,face);
 			if (window.confirm('faceEdit: Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				faceData.splice(face,1);
@@ -278,11 +285,12 @@ var ImageFaceHandling = (function () {
       	};
 
 		let faceData = AlbumData.getFaceList(fname);
-      	//AlbumData.addNewFaceData(fname,newFace);
+      	let newFaceNum = AlbumData.addNewFaceData(fname,newFace);
 		AlbumData.save();
 
       	FaceInfo.init(faceData);
-      	FaceInfo.openFaceInfo(newFace,-1);
+		console.log('ImageFaceHandling.addFaceBoc (292): Calling FaceInfo.openFaceInfo face = -1');
+      	FaceInfo.openFaceInfo(newFace,newFaceNum);
       	console.log('ImageFaceHandling.addFaceBox new face list :' + JSON.stringify( faceData ,null,'\t'));
 	} //addFaceBox
 

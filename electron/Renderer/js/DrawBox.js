@@ -9,7 +9,9 @@ var DrawBox = (function () {
    	var start_mousex = start_mousey = 0;
    	var canvasx = canvasy = 0;
    	var current_mousex = current_mousey = 0;
-   	var mousedown = false;
+	var mousedown = false;
+	let DrewBox = false;
+
    	var result = {
 				'firstName' : ''
 				,'lastName' : ''
@@ -22,6 +24,8 @@ var DrawBox = (function () {
 	var init = function(Album_Data,config,filename,faceHandling)
 	{
       	console.log('DrawBox.init: START');
+		DrewBox = false;
+      	console.log ('DrawBox.init: DrawBox.DrewBox (%s)',DrewBox);
 		Config = config;
 		AlbumFile = filename
 		ImageFaceHandling = faceHandling;
@@ -61,9 +65,11 @@ var DrawBox = (function () {
 		function mouseUp(e)
 		{
         	console.log('DrawBox.mouseUp START:');
-      		//console.log ('DrawBox.mouseUp: The current mouse position is (x) %f  (y) %f',current_mousex,current_mousey);
         	e.stopPropagation();
+      		//console.log ('DrawBox.mouseUp: The current mouse position is (x) %f  (y) %f',current_mousex,current_mousey);
+			DrewBox = true;
     		mousedown = false;
+         	console.log('DrawBox.mouseUp : DrewBox :%s:',DrewBox);
       		console.log ('DrawBox.mouseUp: CurrentImageName (%s)',CurrentImageName);
 			let faceData = AlbumData.getImageData(CurrentImageName);
          	console.log('DrawBox.mouseUp : faceData: %s',JSON.stringify(faceData,null,'\t'));
@@ -91,6 +97,10 @@ var DrawBox = (function () {
     		}
 		} // mouseMove
 
+   var boxDrawn = () => { 
+	   console.log('DrawBox.boxDrawn : DrewBox = %s' ,DrewBox ); 
+	   return DrewBox;
+	}
    var showConfig = () => { console.log('DrawBox.showConfig : %s' , JSON.stringify(Config,null,'\t')); }
    var getNewBoxInfo = () => { 
        console.log('DrawBox.getNewBoxInfo : %s' , JSON.stringify(result,null,'\t'));
@@ -102,7 +112,8 @@ var DrawBox = (function () {
 		Config.canvas.addEventListener('mousedown', mouseDown);
 		Config.canvas.addEventListener('mouseup', mouseUp);
 		Config.canvas.addEventListener('mousemove', mouseMove);
-    	console.log('DrawBox.startDrawing: DONE');
+		DrewBox = false;
+    	console.log('DrawBox.startDrawing: DONE DrewBox= %s',DrewBox);
    }; // startDrawing
 
    var clearBox = function() {
@@ -115,7 +126,8 @@ var DrawBox = (function () {
 		Config.canvas.removeEventListener('mousedown', mouseDown);
 		Config.canvas.removeEventListener('mouseup', mouseUp);
 		Config.canvas.removeEventListener('mousemove', mouseMove);
-    	console.log('DrawBox.stopDrawing: DONE');
+		DrewBox = false;
+		console.log('DrawBox.stopDrawing: DONE');
    }; // stopDrawing
 
    return {
@@ -125,5 +137,6 @@ var DrawBox = (function () {
 	 ,getNewBoxInfo : getNewBoxInfo
 	 ,showConfig    : showConfig
 	 ,clearBox      : clearBox
+	 ,boxDrawn      : boxDrawn
   };
 })();
