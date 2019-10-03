@@ -61,7 +61,7 @@ function processArgs(app)
   CliData['debug'] = argv.debug;
   CliData['AppPath'] = app.getAppPath();
   CliData['album'] = argv.album;
-  console.log('processArgs: CliData %s', JSON.stringify(CliData,null,'\t'));
+  console.log('MAIN: processArgs: CliData %s', JSON.stringify(CliData,null,'\t'));
 } //processArgs
 
 function createWindow (app)
@@ -92,8 +92,7 @@ function createWindow (app)
 
   // Load a URL in the window to the local index.html path
   let urlToLoad = 'file://' + __dirname + '/../Renderer/index.html';
-  console.log('createWindow: loading url ->%s', urlToLoad);
-  console.log('TEST x= %d, y= %d',1,2);
+  console.log('MAIN: createWindow: loading url ->%s', urlToLoad);
   MainWindow.loadURL(urlToLoad);
 
   MainWindow.CliData = CliData;  // make CLI data available to  the renderer
@@ -109,9 +108,9 @@ function createWindow (app)
 
   //  require(`${__dirname}/mainMenu.js`);
   let menu = createMainMenu();
-  console.log('createWindow: got menu template');
+  console.log('MAIN: createWindow: got menu template');
   Menu.setApplicationMenu(menu); 
-  console.log('createWindow: menu set');
+  console.log('MAIN: createWindow: menu set');
 } // createWindow
 
 function createMainMenu()
@@ -167,7 +166,7 @@ function createMainMenu()
 
 function openAboutWindow()
 {
-  console.log('openAboutWindow: START');
+  console.log('MAIN: openAboutWindow: START');
   if(AboutWindow) {
     AboutWindow.focus();
     return;
@@ -184,7 +183,7 @@ function openAboutWindow()
   AboutWindow.setMenu(null);
 
   let urlToLoad = 'file://' + __dirname + '/app/about.html';
-  console.log('openAboutWindow: loading url ->%s', urlToLoad);
+  console.log('MAIN: openAboutWindow: loading url ->%s', urlToLoad);
   AboutWindow.loadURL(urlToLoad);
 
   AboutWindow.on('closed', () => { AboutWindow = null; });

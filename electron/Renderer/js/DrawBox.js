@@ -23,19 +23,19 @@ var DrawBox = (function () {
 
 	var init = function(Album_Data,config,filename,faceHandling)
 	{
-      	console.log('DrawBox.init: START');
+      	console.log('RENDERER: DrawBox.init: START');
 		DrewBox = false;
-      	console.log ('DrawBox.init: DrawBox.DrewBox (%s)',DrewBox);
+      	console.log ('RENDERER: DrawBox.init: DrawBox.DrewBox (%s)',DrewBox);
 		Config = config;
 		AlbumFile = filename
 		ImageFaceHandling = faceHandling;
 		CurrentImageName = document.getElementById('pictureFileName').innerHTML.trim();
-      	console.log ('DrawBox.init: CurrentImageName (%s)',CurrentImageName);
-      	console.log('DrawBox.init: DrawBoxConfig.canvas is %s' , (Config.canvas == null) ? 'null' : 'not null');
+      	console.log ('RENDERER: DrawBox.init: CurrentImageName (%s)',CurrentImageName);
+      	console.log('RENDERER: DrawBox.init: DrawBoxConfig.canvas is %s' , (Config.canvas == null) ? 'null' : 'not null');
 
     	canvasx = Config.canvas.getBoundingClientRect().left;
     	canvasy = Config.canvas.getBoundingClientRect().top;
-    	console.log('DrawBox.init: DrawBox: canvasx,y (%d,%d)',canvasx,canvasy);
+    	console.log('RENDERER: DrawBox.init: DrawBox: canvasx,y (%d,%d)',canvasx,canvasy);
 	}; // init
 
 		function makeDelta(imageTag,faceData)
@@ -44,41 +44,41 @@ var DrawBox = (function () {
 			let image = document.getElementById(imageTag);
 			let imageWidth =  parseInt(image.getAttribute('width'));
 			let imageHeight = parseInt(image.getAttribute('height'));
-      		//console.log ('DrawBox.makeDelta: The image  (width) %f  (height) %f',imageWidth,imageHeight);
+      		//console.log ('RENDERER: DrawBox.makeDelta: The image  (width) %f  (height) %f',imageWidth,imageHeight);
 			deltas['width'] =  imageWidth / parseInt(faceData['originalWidth']);
 			deltas['height'] = imageHeight / parseInt(faceData['originalHeight']);
-        	//console.log('DrawBox.makeDelta : deltas: %s',JSON.stringify(deltas,null,'\t'));
+        	//console.log('RENDERER: DrawBox.makeDelta : deltas: %s',JSON.stringify(deltas,null,'\t'));
 			return deltas;
 		} // makeDelta
 
 		function mouseDown(e) {
-         	console.log('DrawBox.mouseDown: START');
+         	console.log('RENDERER: DrawBox.mouseDown: START');
          	e.stopPropagation();
     		start_mousex = parseInt(e.clientX - canvasx);
 			start_mousey = parseInt(e.clientY - canvasy);
     		mousedown = true;
         	Config.ctx.strokeStyle = Config.strokeStyle;
         	Config.ctx.lineWidth = Config.lineWidth;
-         	console.log('DrawBox.mouseDown: DONE: x,y (%d,%d)',start_mousex,start_mousey);
+         	console.log('RENDERER: DrawBox.mouseDown: DONE: x,y (%d,%d)',start_mousex,start_mousey);
 		} //mouseDown
 
 		function mouseUp(e)
 		{
-        	console.log('DrawBox.mouseUp START:');
+        	console.log('RENDERER: DrawBox.mouseUp START:');
         	e.stopPropagation();
-      		//console.log ('DrawBox.mouseUp: The current mouse position is (x) %f  (y) %f',current_mousex,current_mousey);
+      		//console.log ('RENDERER: DrawBox.mouseUp: The current mouse position is (x) %f  (y) %f',current_mousex,current_mousey);
 			DrewBox = true;
     		mousedown = false;
-         	console.log('DrawBox.mouseUp : DrewBox :%s:',DrewBox);
-      		console.log ('DrawBox.mouseUp: CurrentImageName (%s)',CurrentImageName);
+         	console.log('RENDERER: DrawBox.mouseUp : DrewBox :%s:',DrewBox);
+      		console.log ('RENDERER: DrawBox.mouseUp: CurrentImageName (%s)',CurrentImageName);
 			let faceData = AlbumData.getImageData(CurrentImageName);
-         	console.log('DrawBox.mouseUp : faceData: %s',JSON.stringify(faceData,null,'\t'));
+         	console.log('RENDERER: DrawBox.mouseUp : faceData: %s',JSON.stringify(faceData,null,'\t'));
 			let delta = makeDelta('IFH_ImageTag',faceData);
 			result['end_x']   = Math.floor(current_mousex / delta.width);
 			result['end_y']   = Math.floor(current_mousey / delta.height);
 			result['start_x'] = Math.floor(start_mousex / delta.width);
 			result['start_y'] = Math.floor(start_mousey / delta.height);
-         	console.log('DrawBox.mouseUp : %s' , JSON.stringify(result,null,'\t'));
+         	console.log('RENDERER: DrawBox.mouseUp : %s' , JSON.stringify(result,null,'\t'));
 		} // mouseUp
 
 		function mouseMove(e)
@@ -86,7 +86,7 @@ var DrawBox = (function () {
         	e.stopPropagation();
     		current_mousex = parseInt(e.clientX - canvasx);
 			current_mousey = parseInt(e.clientY - canvasy);
-         	//console.log('DrawBox.mouseMove: x,y (%d,%d)',current_mousex,current_mousey);
+         	//console.log('RENDERER: DrawBox.mouseMove: x,y (%d,%d)',current_mousex,current_mousey);
     		if(mousedown) {
         		var width = current_mousex - start_mousex;
         		var height = current_mousey - start_mousey;
@@ -98,36 +98,31 @@ var DrawBox = (function () {
 		} // mouseMove
 
    var boxDrawn = () => { 
-	   console.log('DrawBox.boxDrawn : DrewBox = %s' ,DrewBox ); 
+	   console.log('RENDERER: DrawBox.boxDrawn : DrewBox = %s' ,DrewBox ); 
 	   return DrewBox;
 	}
-   var showConfig = () => { console.log('DrawBox.showConfig : %s' , JSON.stringify(Config,null,'\t')); }
+   var showConfig = () => { console.log('RENDERER: DrawBox.showConfig : %s' , JSON.stringify(Config,null,'\t')); }
    var getNewBoxInfo = () => { 
-       console.log('DrawBox.getNewBoxInfo : %s' , JSON.stringify(result,null,'\t'));
+       console.log('RENDERER: DrawBox.getNewBoxInfo : %s' , JSON.stringify(result,null,'\t'));
        return result;
    }
 
    var startDrawing = function() {
-    	console.log('DrawBox.startDrawing: START');
+    	console.log('RENDERER: DrawBox.startDrawing: START');
 		Config.canvas.addEventListener('mousedown', mouseDown);
 		Config.canvas.addEventListener('mouseup', mouseUp);
 		Config.canvas.addEventListener('mousemove', mouseMove);
 		DrewBox = false;
-    	console.log('DrawBox.startDrawing: DONE DrewBox= %s',DrewBox);
+    	console.log('RENDERER: DrawBox.startDrawing: DONE DrewBox= %s',DrewBox);
    }; // startDrawing
 
-   var clearBox = function() {
-      console.log('DrawBox.clearBox: START');
-      console.log('DrawBox.clearBox: DONE');
-   }; // clearBox
-
    var stopDrawing = function() {
-    	console.log('DrawBox.stopDrawing: START');
+    	console.log('RENDERER: DrawBox.stopDrawing: START');
 		Config.canvas.removeEventListener('mousedown', mouseDown);
 		Config.canvas.removeEventListener('mouseup', mouseUp);
 		Config.canvas.removeEventListener('mousemove', mouseMove);
 		DrewBox = false;
-		console.log('DrawBox.stopDrawing: DONE');
+		console.log('RENDERER: DrawBox.stopDrawing: DONE');
    }; // stopDrawing
 
    return {
@@ -136,7 +131,6 @@ var DrawBox = (function () {
 	 ,stopDrawing   : stopDrawing
 	 ,getNewBoxInfo : getNewBoxInfo
 	 ,showConfig    : showConfig
-	 ,clearBox      : clearBox
 	 ,boxDrawn      : boxDrawn
   };
 })();

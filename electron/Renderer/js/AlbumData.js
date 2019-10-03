@@ -20,23 +20,23 @@ let AlbumSaved = true;;
 
 function dataFileExists()
 {
-   console.log('AlbumData.dataFileExists filePath (%s) exists',FullAlbumPath);
+   console.log('RENDERER: AlbumData.dataFileExists filePath (%s) exists',FullAlbumPath);
    let fileContents = null;
    try {
          fileContents = fsLib.readFileSync(FullAlbumPath);
-         console.log('AlbumData.dataFileExists: fileContents (%s)',fileContents);
-         console.log('AlbumData.dataFileExists: fileContents length (%d)',fileContents.length);
+         console.log('RENDERER: AlbumData.dataFileExists: fileContents (%s)',fileContents);
+         console.log('RENDERER: AlbumData.dataFileExists: fileContents length (%d)',fileContents.length);
    } catch(error) {
-         console.error('AlbumData.dataFileExists data file (%s) read failed error is (%s)',FullAlbumPath, error);
+         console.error('RENDERER: AlbumData.dataFileExists data file (%s) read failed error is (%s)',FullAlbumPath, error);
          AlbumContents = {};
    }
 
    try {
          AlbumContents =  JSON.parse(fileContents);
-         console.log('AlbumData.dataFileExists AlbumContents %s',JSON.stringify(AlbumContents,null,'\t'));
+         console.log('RENDERER: AlbumData.dataFileExists AlbumContents %s',JSON.stringify(AlbumContents,null,'\t'));
          document.getElementById('albumName').dispatchEvent(new Event('data-loaded'));
    } catch(error) {
-         console.error('AlbumData.dataFileExists data file (%s) parse failed error is (%s)',FullAlbumPath, error);
+         console.error('RENDERER: AlbumData.dataFileExists data file (%s) parse failed error is (%s)',FullAlbumPath, error);
          AlbumContents = {};
    }
 } // dataFileExists
@@ -72,7 +72,7 @@ function dataFileExists()
 function isImage(fname)
 {
     let ext = pathLib.extname(fname).toLowerCase().replace('.','');
-    console.log('looking for :%s:',ext);
+    console.log('RENDERER: AlbumData.isImage: looking for :%s:',ext);
     return(ImageExtensions.indexOf(ext) > 0);
 } // isImage
 
@@ -84,7 +84,7 @@ function collectImageFiles (albumPath)
 {
   var getFiles = fsLib.readdirSync(albumPath);
   getFiles.forEach((file) => {
-      console.log('AlbumData.collectImageFiles: PROCESSING file :%s:',file);
+      console.log('RENDERER: AlbumData.collectImageFiles: PROCESSING file :%s:',file);
       if (fsLib.statSync(albumPath + '/' + file).isDirectory()) {
           if(ImageDirectoryFilter.indexOf(file) >= 0) return;  // skip folders I made
           collectImageFiles(albumPath + '/' + file + '/');
@@ -97,7 +97,7 @@ function collectImageFiles (albumPath)
           AlbumContents['images'][imageName]['faces'] = [];
           AlbumContents['images'][imageName]['fileName'] = file;
           Image.load(albumPath + '/' + file).then(function (image) {
-            console.log('AlbumData.collectImageFiles: image file is :%s:',file);
+            console.log('RENDERER: AlbumData.collectImageFiles: image file is :%s:',file);
             AlbumContents['images'][imageName]['originalWidth'] = image.width;
             AlbumContents['images'][imageName]['originalHeight'] = image.height;
           });
@@ -108,18 +108,18 @@ function collectImageFiles (albumPath)
           AlbumContents['images'][imageName]['notes'] = '';
       }
   });
-  logger('AlbumData.collectImageFiles: FileList length = %d',FileList.length);
+  console.log('RENDERER: AlbumData.collectImageFiles: FileList length = %d',FileList.length);
 } // collectImageFiles
 
    function makeDataFile()
    {
-      console.log('AlbumData.makeDataFile: START');
+      console.log('RENDERER: AlbumData.makeDataFile: START');
       AlbumContents = {};
       AlbumContents['images'] = {};
       AlbumContents['album'] = AlbumName;
       collectImageFiles(AlbumPath); 
 		setTimeout(function(){
-         console.log('AlbumData.makeDataFile AlbumContents %s',JSON.stringify(AlbumContents,null,'\t'));
+         console.log('RENDERER: AlbumData.makeDataFile AlbumContents %s',JSON.stringify(AlbumContents,null,'\t'));
          save();
          document.getElementById('albumName').dispatchEvent(new Event('data-loaded'));
 		},5000);
@@ -127,20 +127,20 @@ function collectImageFiles (albumPath)
 
   function setupAlbumData() 
   {
-      console.log('AlbumData.setupAlbumData: START');
+      console.log('RENDERER: AlbumData.setupAlbumData: START');
       let pathParts = pathLib.parse(AlbumPath);
       AlbumName = pathParts.base;
       AlbumFileName = AlbumName + '.json';
       FullAlbumPath = pathLib.join(AlbumPath, AlbumFileName);
       $('#albumName').val(AlbumName);
-      console.log('AlbumData.setupAlbumData: album filename is :%s:',AlbumFileName);
+      console.log('RENDERER: AlbumData.setupAlbumData: album filename is :%s:',AlbumFileName);
 
       if (fsLib.existsSync(FullAlbumPath)) { //file exists
-         console.log('AlbumData.setupAlbumData filePath (%s) exists',FullAlbumPath);
+         console.log('RENDERER: AlbumData.setupAlbumData filePath (%s) exists',FullAlbumPath);
          dataFileExists();
       }
       else {
-         console.log('AlbumData.setupAlbumData no album file, making one');
+         console.log('RENDERER: AlbumData.setupAlbumData no album file, making one');
          makeDataFile();
       }
   } // setupAlbumData
@@ -150,8 +150,8 @@ function collectImageFiles (albumPath)
 var findAlbum = function(event, arg)
 {
     var that=this;
-    console.log('AlbumData.findAlbum: findAlbum message received');
-    console.log('AlbumData.findAlbum: AlbumPath:%s:',AlbumPath);
+    console.log('RENDERER: AlbumData.findAlbum: findAlbum message received');
+    console.log('RENDERER: AlbumData.findAlbum: AlbumPath:%s:',AlbumPath);
     //that.setupAlbumData();
     remote.dialog.showOpenDialog({
         'title':"Select a folder"
@@ -160,7 +160,7 @@ var findAlbum = function(event, arg)
     }, (folderPaths) => {
         // folderPaths is an array that contains all the selected paths
         if(folderPaths === undefined) {
-            logger("AlbumData.findAlbum.showOpenDialog: No destination folder selected");
+            console.log("RENDERER: AlbumData.findAlbum.showOpenDialog: No destination folder selected");
             AlbumPath = 'NONE_SELECTED';
             return;
         }
@@ -169,24 +169,24 @@ var findAlbum = function(event, arg)
             // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
             // example Album  :TestData
 
-            console.log('AlbumData.findAlbum: before processAlbum');
+            console.log('RENDERER: AlbumData.findAlbum: before processAlbum');
             AlbumPath = folderPaths[0];
             setupAlbumData();
         }
     }); // showOpenDialog
-    console.log('AlbumData.findAlbum: DONE');
+    console.log('RENDERER: AlbumData.findAlbum: DONE');
 } // findAlbum
 
 var save = function()
 {
     try {
-        console.log('AlbumData.save START');
+        console.log('RENDERER: AlbumData.save START');
         fsLib.writeFileSync(FullAlbumPath, JSON.stringify(AlbumContents,null,'\t'));
-        console.log('AlbumData.save after save');
+        console.log('RENDERER: AlbumData.save after save');
         AlbumSaved = true;
         return AlbumSaved;
     } catch(error) {
-        console.error('AlbumData.save: album file (%s) failed, error is (%s)',FullAlbumPath, error);
+        console.error('RENDERER: AlbumData.save: album file (%s) failed, error is (%s)',FullAlbumPath, error);
         AlbumSaved = false;
         return AlbumSaved;
     }
@@ -195,7 +195,7 @@ var save = function()
 var getImageList = function()
 {
     var imageList = [];
-    console.log('AlbumData.getImageList: AlbumContents[images] %s',AlbumContents['images']);
+    console.log('RENDERER: AlbumData.getImageList: AlbumContents[images] %s',AlbumContents['images']);
     var list = Object.keys(AlbumContents['images']);
     list.forEach((image) => {
         let imageListData = {};
@@ -205,9 +205,9 @@ var getImageList = function()
         imageListData['whenTaken']  = AlbumContents['images'][image]['whenTaken'];
         imageListData['notes']  = AlbumContents['images'][image]['notes'];
         imageList.push(imageListData);
-        console.log('AlbumData.getImageList: image list is (:%s:,:%s:)',imageListData['name'],imageListData['link']);
+        console.log('RENDERER: AlbumData.getImageList: image list is (:%s:,:%s:)',imageListData['name'],imageListData['link']);
     });
-    console.log('AlbumData.getImageList: image list length %d',imageList.length);
+    console.log('RENDERER: AlbumData.getImageList: image list length %d',imageList.length);
     return imageList;
 } // getImageList
 
@@ -218,28 +218,28 @@ var getImageData = function(imageName)
 
 var getFaceList = function(imageName)
 {
-   console.log('AlbumData.getFaceList: START image(%s)',imageName);
+   console.log('RENDERER: AlbumData.getFaceList: START image(%s)',imageName);
    let faces =  AlbumContents['images'][imageName]['faces']
-   console.log('AlbumData.getFaceList: image(%s) faces length %d',imageName,faces.length);
+   console.log('RENDERER: AlbumData.getFaceList: image(%s) faces length %d',imageName,faces.length);
    return faces;
 } // getFaceList
 
 var setAlbumPath = function(album)
 {
-      console.log('AlbumData.setAlbum: album is :%s:',album);
+      console.log('RENDERER: AlbumData.setAlbum: album is :%s:',album);
       AlbumPath = album;
       setupAlbumData();
 } // setAlbumPath
 
 var getAlbumPath = function()
 {
-      console.log('AlbumData.getAlbumPath: AlbumPath is :%s:',AlbumPath);
+      console.log('RENDERER: AlbumData.getAlbumPath: AlbumPath is :%s:',AlbumPath);
       return AlbumPath;
 } // getAlbumPath
 
 var getAlbumFileName = function()
 {
-      console.log('AlbumData.getAlbumFileName: AlbumFileName is :%s:',AlbumFileName);
+      console.log('RENDERER: AlbumData.getAlbumFileName: AlbumFileName is :%s:',AlbumFileName);
       return AlbumFileName;
 } // getAlbumFileName
 
@@ -263,8 +263,8 @@ var addNewFaceData = function(imageName,faceBox)
 var updateFaceData = function(imageName,faceNumber,firstName,secondName)
 {
    let fNum = parseInt(faceNumber);
-   console.log('AlbumData.updateFaceData faceNumber string(%s) fNum int(%d)',faceNumber,fNum);
-   console.log('AlbumData.updateFaceData imageName (%s)',imageName);
+   console.log('RENDERER: AlbumData.updateFaceData faceNumber string(%s) fNum int(%d)',faceNumber,fNum);
+   console.log('RENDERER: AlbumData.updateFaceData imageName (%s)',imageName);
    AlbumContents['images'][imageName]['faces'][fNum]['firstName'] = firstName;
    AlbumContents['images'][imageName]['faces'][fNum]['lastName'] = secondName;
 } // updateFaceData
@@ -272,13 +272,13 @@ var updateFaceData = function(imageName,faceNumber,firstName,secondName)
 // not currently used. If we do this here, remove thumbnail production from the AlbumPreProcess code
 function makeThumbNails()
 {
-    //logger('makeThumbNails: START:');
+    //console.log('RENDERER: AlbumData.makeThumbNails: START:');
     //for(var index=0,len=FileList.length; index<len; ++index) {
      for(var index=0,len=2; index<len; ++index) {
         let sourcePath = AlbumPath + '\\' + FileList[index];
         let destPath = AlbumPath + '\\thumbnails\\' + FileList[index];
-        //logger('makeThumbNails: working on source :' + sourcePath + ':');
-        //logger('makeThunmbNails: working on dest :' + destPath + ':');
+        //console.log('RENDERER: AlbumData.makeThumbNails: working on source :' + sourcePath + ':');
+        //console.log('RENDERER: AlbumData.makeThunmbNails: working on dest :' + destPath + ':');
         thumb({
             source: sourcePath
             ,destination: destPath
@@ -287,12 +287,12 @@ function makeThumbNails()
             ,overwrite: true
             ,concurrency: 4
         }).then(function() {
-                logger('Success');
+                console.log('RENDERER: AlbumData.thumb: Success');
                 }).catch(function(e) {
-                    logger('Error', e);
+                    console.log('RENDERER: AlbumData.thumb: Error', e);
                 });
 
-    //logger('makeThumbNails: working on :' + sourcePath + ': done');
+    //console.log('RENDERER: AlbumData.makeThumbNails: working on :' + sourcePath + ': done');
     } // for FileList
 } // makeThumbNails
 

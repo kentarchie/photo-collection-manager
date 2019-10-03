@@ -21,13 +21,13 @@ let CliData = remote.getCurrentWindow().CliData; // parameters from the command 
 function setupEventHandlers()
 {
 	 document.getElementById('IFH_CanvasTag').addEventListener('contextmenu', (e) => {
-        console.log('setupEventHandlers: contextmenu : detected');
+        console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: contextmenu : detected');
         ImageFaceHandling.faceEdit(e);
 	 });
-	 console.log('setupEventHandlers: contextmenu: after faceEdit setup');
+	 console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: contextmenu: after faceEdit setup');
 
     var prevImage = document.getElementById('prevImage');
-	 console.log('setupEventHandlers: prevImage:' + prevImage);
+	 console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: prevImage :%s:',prevImage);
     document.getElementById('prevImage').addEventListener('click',(evt) => { ImageDisplay.nextPrevPicture(evt); });
     document.getElementById('nextImage').addEventListener('click',(evt) => { ImageDisplay.nextPrevPicture(evt); });
 
@@ -38,34 +38,33 @@ function setupEventHandlers()
     document.getElementById('IFH_CreateFace').addEventListener('click',function (evt) 
 	 {
       let addSaveButton = evt.target.innerHTML;
-      console.log('setupEventHandlers: createFace(): evt.target.innerHTML :%s:',addSaveButton);
+      console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: createFace(): evt.target.innerHTML :%s:',addSaveButton);
 	   let config = ImageFaceHandling.getConfig();
 		config.canvas.removeEventListener('click',ImageFaceHandling.onImageClick);
 
       if (addSaveButton.search('Add') != -1) {
-         console.log('setupEventHandlers: createFace(): Starting to draw face box:');
+         console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: createFace(): Starting to draw face box:');
          evt.target.innerHTML = 'Save New Face Box';
          document.getElementById('IFH_CancelCreateFace').style.display='block';
          DrawBox.init(Album_Data,config,AlbumFile,ImageFaceHandling);
          DrawBox.startDrawing();
       }
       else {
-         console.log('setupEventHandlers: createFace(): done drawing face box:');
+         console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: createFace(): done drawing face box:');
          DrawBox.stopDrawing();
          evt.target.innerHTML = 'Add A Face';
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick); // go back to waiting for click
          let newFace = DrawBox.getNewBoxInfo();
          ImageFaceHandling.addFaceBox(newFace);
-         console.log('setupEventHandlers: newface :%s',JSON.stringify(newFace,null,'\t'));
+         console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: newface :%s',JSON.stringify(newFace,null,'\t'));
       }
     });
 
     document.getElementById('IFH_CancelCreateFace').addEventListener('click',function (evt) 
 	 {
-         console.log('setupEventHandlers: cancel create face: START:');
+         console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: cancel create face: START:');
          document.getElementById('IFH_CreateFace').innerHTML = 'Add A Face';
          DrawBox.stopDrawing();
-         DrawBox.clearBox();
 
 	      let config = ImageFaceHandling.getConfig();
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
@@ -76,25 +75,25 @@ function setupEventHandlers()
 
 $(document).ready(function()
 {
-    console.log('ready: START ');
-    console.log('ready: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
+    console.log('RENDERER: PhotoCollectionManager.ready: START ');
+    console.log('RENDERER: PhotoCollectionManager.ready: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
 
     ImageDisplay = new ImageDisplayManagement('');
-    console.log('ready: CliData.album :%s:',CliData.album);
+    console.log('RENDERER: PhotoCollectionManager.ready: CliData.album :%s:',CliData.album);
 
     document.getElementById('albumName').addEventListener('data-loaded', () => {
-         console.log('ready: data-loaded: event caught');
+         console.log('RENDERER: PhotoCollectionManager.ready: data-loaded: event caught');
          ImageDisplay.createImageList('fileList');
     });
 
     if(CliData.album) {
-        console.log('ready: Clidata.album set')
+        console.log('RENDERER: PhotoCollectionManager.ready: Clidata.album set')
         AlbumData.setAlbumPath(CliData.album);
         ImageDisplay.init(CliData.album);
-        console.log('ready: album path is :%s:',AlbumData.getAlbumPath());
+        console.log('RENDERER: PhotoCollectionManager.ready: album path is :%s:',AlbumData.getAlbumPath());
     }
     else {
-        console.log('ready: Clidata.album NOT set AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
+        console.log('RENDERER: PhotoCollectionManager.ready: Clidata.album NOT set AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
     }
 
     ImageHandlingSettings = {
@@ -109,21 +108,10 @@ $(document).ready(function()
    ImageFaceHandling.setup();
 	setupEventHandlers();
 
-   console.log('ready: before open-album: AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
+   console.log('RENDERER: PhotoCollectionManager.ready: before open-album: AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
    ipcRenderer.on('open-album', AlbumData.findAlbum);
 
    var copyRightYear = new Date().getFullYear();
-   console.log('ready:  copyRightYear=:'+copyRightYear+':');
+   console.log('RENDERER: PhotoCollectionManager.ready:  copyRightYear=:%d:',copyRightYear);
    $('.copyright span').html(copyRightYear);
 }); // ready function
-
-// ideas from https://gist.github.com/robatron/5681424
-function logger()
-{
-  //console.log('PhotoCollectionManager.logger start');
-  if(CliData.debug) {
-    let args = Array.prototype.slice.call(arguments);
-    args.unshift('RENDER: ');
-    console.log.apply(console, args);
-  }
-} // logger

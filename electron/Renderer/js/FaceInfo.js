@@ -4,14 +4,14 @@ var FaceInfo = (function () {
 
 	var closeNoChange = function(evt)
 	{
-		console.log('FaceInfo.closeNoChange: START');
+		console.log('RENDERER: FaceInfo.closeNoChange: START');
 		document.getElementById('FaceInfo').style.display='none';
 		document.getElementById('FaceInfoBlackout').style.display='none';
 	} // closeNoChange
 
 	var closeSave = function(evt)
 	{
-      console.log('FaceInfo.closeSave: START');
+      console.log('RENDERER: FaceInfo.closeSave: START');
       faceData.firstName = document.getElementById('FaceInfoFirstName').value;
       faceData.lastName = document.getElementById('FaceInfoSecondName').value;
       closeNoChange();
@@ -24,7 +24,7 @@ var FaceInfo = (function () {
 
 	var init = function()
 	{
-		console.log('FaceInfo.init: START');
+		console.log('RENDERER: FaceInfo.init: START');
 		document.getElementById('FaceInfoBlackout').addEventListener('click', closeNoChange);
 		document.getElementById('FaceInfoClose').addEventListener('click', closeNoChange);
 		document.getElementById('DeleteFaceBox').addEventListener('click',deleteFaceBox);
@@ -33,13 +33,13 @@ var FaceInfo = (function () {
 
 	var faceInfoSave = function(evt)
 	{
-		console.log('FaceInfo.faceInfoSave: START');
+		console.log('RENDERER: FaceInfo.faceInfoSave: START');
 		let face = getFaceInfo();
 		console.log('FaceInfo.faceInfoSave: face = :%s:',JSON.stringify(face,null,'\t'));
 		let fName = document.getElementById('pictureFileName').innerHTML;
-		console.log('FaceInfo.faceInfoSave: fName = :%s:',fName);
+		console.log('RENDERER: FaceInfo.faceInfoSave: fName = :%s:',fName);
 		let faceNumber = parseInt(document.getElementById('FaceInfo').dataset.faceNumber);
-		console.log('FaceInfo.faceInfoSave: faceNumber = int(%d) string(%s)',faceNumber,faceNumber);
+		console.log('RENDERER: FaceInfo.faceInfoSave: faceNumber = int(%d) string(%s)',faceNumber,faceNumber);
     	AlbumData.updateFaceData(fName,faceNumber,face['firstName'],face['lastName']);
     	AlbumData.save();
 		closeNoChange();
@@ -54,7 +54,7 @@ var FaceInfo = (function () {
 
 	var openFaceInfo = function(fd,faceNumber)
 	{
-		console.log('FaceInfo.openFaceInfo: START: first name = :%s: last name = :%s: faceNumber = :%d:',fd.firstName,fd.lastName,faceNumber);
+		console.log('RENDERER: FaceInfo.openFaceInfo: START: first name = :%s: last name = :%s: faceNumber = :%d:',fd.firstName,fd.lastName,faceNumber);
       	faceData = fd;
 		document.getElementById('FaceInfoFirstName').value = faceData.firstName;
 		document.getElementById('FaceInfoSecondName').value = faceData.lastName;
