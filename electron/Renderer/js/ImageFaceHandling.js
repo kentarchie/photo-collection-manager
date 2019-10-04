@@ -107,6 +107,7 @@ var ImageFaceHandling = (function () {
 		Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 
 		//let colors = ['#FF0000','#00FF00'];  // used during debugging
+		FaceInfo.clearWhoList();
 		faceData.forEach((fd, i) => {
 			console.log('RENDERER: ImageFaceHandling.drawFaces: fd %s',JSON.stringify(fd,null,'\t'));
 			let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
@@ -118,6 +119,8 @@ var ImageFaceHandling = (function () {
 			Config.ctx.beginPath();
 			Config.ctx.strokeRect(newFaceBox.startX, newFaceBox.startY, newFaceBox.width, newFaceBox.height);
 			Config.ctx.closePath();
+
+			FaceInfo.displayFace(i, fd.firstName, fd.lastName);
 		});
 			console.log('RENDERER: ImageFaceHandling.drawFaces: boxes drawn');
 	} // drawFaces

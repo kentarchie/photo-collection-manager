@@ -63,10 +63,38 @@ var FaceInfo = (function () {
 		document.getElementById('FaceInfo').dataset.faceNumber = faceNumber;
 	}  // openFaceInfo
 
+	var clearWhoList = function()
+	{
+		const myNode = document.getElementById("whoList");
+		while (myNode.firstChild) {
+	  		myNode.removeChild(myNode.firstChild);
+		}
+	} // clearWhoList
+
+	var displayFace = function(faceNumber, firstName, secondName)
+	{
+		let el = document.createElement('li');  // wrapper
+		el.dataset.faceNumber = faceNumber;
+
+		let first = document.createElement('span'); // first name
+		first.dataset.faceNumber = faceNumber;
+		first.innerText = firstName;
+
+		let second = document.createElement('span'); // second name
+		second.dataset.faceNumber = faceNumber;
+		second.innerText = secondName;
+
+		el.appendChild(first);
+		el.appendChild(second);
+		document.getElementById('whoList').append(el);
+	} // displayFace
+
    return {
 	 init: init
 	 ,openFaceInfo  : openFaceInfo
 	 ,closeNoChange : closeNoChange
 	 ,closeSave     : closeSave
+	 ,displayFace   : displayFace
+	 ,clearWhoList  : clearWhoList
   };
 })();
