@@ -1,6 +1,10 @@
 var ImageFaceHandling = (function () {
     	const IFH_ImageElementID  = 'IFH_ImageTag';
-    	const IFH_CanvasElementID = 'IFH_CanvasTag';
+		const IFH_CanvasElementID = 'IFH_CanvasTag';
+		const FaceBoxBaseColor = '#0000FF';
+		const FaceBoxHighLightColor = '#FF0000';
+		const FaceBoxBaseWidth = 2;
+		const FaceBoxHighLightWidth = 4;
 
 		let Config = {};
 		let CurrentFace = {};
@@ -12,8 +16,8 @@ var ImageFaceHandling = (function () {
          	wrapperID: 'IFH_pictureDisplay'
         		,wrapperClass: 'IFH_WrapperClass'
         		,albumName: 'testAlbum'
-				,lineWidth : 2
-				,strokeStyle : '#FF0000'
+				,lineWidth : FaceBoxBaseWidth
+				,strokeStyle : FaceBoxBaseWidth
 				,displayBoxWidth : 450
 				,displayBoxHeight : 450
 				,wrapperTag : null
@@ -46,8 +50,8 @@ var ImageFaceHandling = (function () {
 			Config.canvas.width  = Config.displayBoxWidth;
 			Config.canvas.height = Config.displayBoxHeight;
 
-			Config.ctx.lineWidth   = Config.lineWidth;
-			Config.ctx.strokeStyle = Config.strokeStyle;
+			Config.ctx.lineWidth   = FaceBoxBaseWidth;
+			Config.ctx.strokeStyle = FaceBoxBaseColor;
 
 			Config.canvas.addEventListener('click',onImageClick);
 		},100);
@@ -67,8 +71,9 @@ var ImageFaceHandling = (function () {
 	// based on the original image size and has to be 
 	// adjusted to the size of the display
 
-	function adjustFaceBox(boxSpec,deltaWidth,deltaHeight)
+	function adjustFaceBox(boxSpec)
 	{
+		let [deltaWidth, deltaHeight] = getDeltas();
 		console.log('RENDERER: ImageFaceHandling.adjustFaceBox: The delta size is (width) %.4f (height) %.4f',deltaWidth,deltaHeight);
 		let result = {
 				 'startX' : Math.floor(deltaWidth  * boxSpec.startX)
@@ -82,12 +87,21 @@ var ImageFaceHandling = (function () {
 	var showConfig = () => { console.log('RENDERER: ImageFaceHandling.showConfig :%s:',JSON.stringify(Config,null,'\t')); }
 	var getConfig = () => { return Config; }
 
+	var getDeltas = function()
+	{
+		let imageTag = document.getElementById('IFH_ImageTag');
+		let [displayBoxWidth , displayBoxHeight] = [450,450];
+		let deltaWidth = displayBoxWidth / imageTag.naturalWidth;
+		let deltaHeight = displayBoxHeight / imageTag.naturalHeight;
+		console.log('RENDERER: ImageFaceHandling.getDeltas: The delta size is (width) %.4f  (height) %.4f',deltaWidth,deltaHeight);
+		return [ deltaWidth ,deltaHeight ];
+	} // getDeltas
+
 	// go through the album data for the displayed image
 	// and draw the boxes around all the faces
 	var drawFaces = function(fname)
 	{
 		console.log('RENDERER: ImageFaceHandling.drawFaces fname %s',fname);
-		//let faceData = Album_Data['images'][fname]['faces']['faceList'];
 		let faceData = AlbumData.getFaceList(fname);
 
 			console.log('RENDERER: ImageFaceHandling.drawFaces faceData %s:',JSON.stringify(faceData,null,'\t'));
@@ -101,26 +115,19 @@ var ImageFaceHandling = (function () {
 		console.log ('RENDERER: ImageFaceHandling.drawFaces: imageTag.src is :%s:',imageTag.src);
 		console.log ('RENDERER: ImageFaceHandling.drawFaces: The imageTag natural sizes are %f(height) * %f(width)',imageTag.naturalHeight,imageTag.naturalWidth);
 
-		let deltaHeight = Config.displayBoxHeight / imageTag.naturalHeight;
-		let deltaWidth = Config.displayBoxWidth / imageTag.naturalWidth;
+		let [deltaWidth, deltaHeight] = getDeltas();
       	console.log('RENDERER: ImageFaceHandling.drawFaces: The delta size is (width) %.4f  (height) %.4f',deltaWidth,deltaHeight);
 		Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 
-		//let colors = ['#FF0000','#00FF00'];  // used during debugging
 		FaceInfo.clearWhoList();
 		faceData.forEach((fd, i) => {
 			console.log('RENDERER: ImageFaceHandling.drawFaces: fd %s',JSON.stringify(fd,null,'\t'));
-			let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
+			let newFaceBox = adjustFaceBox(fd);
 			console.log('RENDERER: ImageFaceHandling.drawFaces newFaceBox = :%s ',JSON.stringify(newFaceBox,null,'\t'));
 			// draw rectangle
-			Config.ctx.lineWidth = Config.lineWidth;
-			Config.ctx.strokeStyle = Config.strokeStyle;
+			drawFaceBox(FaceBoxBaseColor,FaceBoxBaseWidth,newFaceBox);
 
-			Config.ctx.beginPath();
-			Config.ctx.strokeRect(newFaceBox.startX, newFaceBox.startY, newFaceBox.width, newFaceBox.height);
-			Config.ctx.closePath();
-
-			FaceInfo.displayFace(i, fd.firstName, fd.lastName);
+			FaceInfo.displayFaceData(i, fd.firstName, fd.lastName);
 		});
 			console.log('RENDERER: ImageFaceHandling.drawFaces: boxes drawn');
 	} // drawFaces
@@ -146,11 +153,12 @@ var ImageFaceHandling = (function () {
 			let fd = faceData[face];
 			if (window.confirm('Do you want to delete this face information (' + fd.firstName + ' ' + fd.lastName + ')?')) { 
 				console.log('RENDERER: ImageFaceHandling.deleteFaceBox: Yes delete face box');
-				//Album_Data['images'][fname]['faces']['faceList'].splice(face,1);  // delete face object from list
             	AlbumData.deleteFaceData(fname,face);
-		      	faceData = AlbumData.getFaceList(fname);
-				console.log('RENDERER: ImageFaceHandling.deleteFaceBox: faceData after splice : %s',JSON.stringify(faceData,null,'\t'));
-				console.log('RENDERER: ImageFaceHandling.deleteFaceBox: face info : %s',JSON.stringify(faceData[--face],null,'\t'));
+		      	faceData = AlbumData.getFaceList(fname); // get the revised face list
+				console.log('RENDERER: ImageFaceHandling.deleteFaceBox: faceData after delete : %s',JSON.stringify(faceData,null,'\t'));
+				console.log('RENDERER: ImageFaceHandling.deleteFaceBox: face info : %s',JSON.stringify(faceData[face],null,'\t'));
+
+				// clear the face box canvas and readraw after delete
 				Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 				drawFaces(fname);
 				FaceInfo.closeNoChange();
@@ -167,24 +175,30 @@ var ImageFaceHandling = (function () {
 	// if a face box is single clicked, display the name information for editing
 	var onImageClick = function(ev)
 	{
-		console.log('RENDERER: ImageFaceHandling.onImageClick : START');
-		console.log('RENDERER: ImageFaceHandling.onImageClick.onImageClick: DrawBox.boxDrawn() :%s:',DrawBox.boxDrawn());
+		console.log('RENDERER: ImageFaceHandling.onImageClick.onImageClick: START DrawBox.boxDrawn() :%s:',DrawBox.boxDrawn());
 		if(DrawBox.boxDrawn()) return;
 		CurrentFace.currentTarget = ev.currentTarget; // save for later use
     	CurrentFace.clientX = ev.clientX;
     	CurrentFace.clientY = ev.clientY;
+		// let [deltaWidth, deltaHeight] = getDeltas();
 
-		let target = ev.currentTarget;
+		// let target = ev.currentTarget;
     	let fname = getFileName();
 		console.log('RENDERER: ImageFaceHandling.onImageClick.onImageClick: fname :%s:',fname);
 
 		let face = isFaceClicked(ev);
 		if(face != -1) {  // we have clicked on a face box
 			let faceData = AlbumData.getFaceList(fname);
-			console.log('RENDERER: ImageFaceHandling.onImageClick: face = :%d:',face);
-			console.log('RENDERER: ImageFaceHandling.onImageClick: first name = :%s: last name = :%s:',faceData[face].firstName,faceData[face].lastName);
+			let fd = faceData[face];
+			let newFaceBox = adjustFaceBox(fd);
+			console.log('RENDERER: ImageFaceHandling.onImageClick: face = :%d: first name = :%s: last name = :%s:'
+				,face,fd.firstName,fd.lastName);
 			console.log('RENDERER: ImageFaceHandling.onImageClick (181): Calling FaceInfo.openFaceInfo face = %d',face);
-			FaceInfo.openFaceInfo(faceData[face],face);
+			drawFaceBox( FaceBoxHighLightColor
+				,FaceBoxBaseWidth
+				,newFaceBox);
+			//FaceInfo.openFaceInfo (fd,face);
+			FaceInfo.faceSelected (fd,face);
 		}
 		else 
 			console.log('RENDERER: ImageFaceHandling.onImageClick: clicked NOT ON face %d', face);
@@ -194,12 +208,11 @@ var ImageFaceHandling = (function () {
 	// rect is the boundingBox of the canvas
 	var isFaceClicked = function (ev)
 	{
-			console.log('RENDERER: ImageFaceHandling.isFaceClicked: START');
+			console.log('RENDERER: ImageFaceHandling.isFaceClicked: START'); 
 			let fname = getFileName();
 			let target = ev.currentTarget;
 			console.log('RENDERER: ImageFaceHandling.onImageClick: fname :%s: target.id :%s: target.tag :%s:',fname,target.id,target.tagName);
-			let deltaWidth = Config.displayBoxWidth / Config.image.naturalWidth;
-			let deltaHeight = Config.displayBoxHeight / Config.image.naturalHeight;
+			let [deltaWidth, deltaHeight] = getDeltas();
       		console.log('RENDERER: ImageFaceHandling.isFaceClicked: The delta size is (width) %.4f  (height) %.4f',deltaWidth,deltaHeight);
 
 			var rect = target.getBoundingClientRect();
@@ -219,10 +232,10 @@ var ImageFaceHandling = (function () {
 			let faceData = AlbumData.getFaceList(fname);
 			let i = 0;
 			for(var fd of faceData) {
-				let newFaceBox = adjustFaceBox(fd,deltaWidth,deltaHeight);
+				let newFaceBox = adjustFaceBox(fd);
 				console.log('RENDERER: ImageFaceHandling.isFaceClicked: newFaceBox %s',JSON.stringify(newFaceBox,null,'\t'));
-				let faceBoxXMax =  (newFaceBox.startX)+newFaceBox.width+(2*Config.lineWidth);
-				let faceBoxYMax =  (newFaceBox.startY)+newFaceBox.height+(2*Config.lineWidth);
+				let faceBoxXMax =  (newFaceBox.startX)+newFaceBox.width+(2 * FaceBoxBaseWidth);
+				let faceBoxYMax =  (newFaceBox.startY)+newFaceBox.height+(2 * FaceBoxBaseWidth);
 				console.log('RENDERER: ImageFaceHandling.isFaceClicked: faceBoxXMax= %d faceBoxYMax=%d',faceBoxXMax, faceBoxYMax);
 				if(
 					(pos.x >= (newFaceBox.startX)) && (pos.x < faceBoxXMax)
@@ -297,10 +310,18 @@ var ImageFaceHandling = (function () {
       	console.log('RENDERER: ImageFaceHandling.addFaceBox new face list :%s',JSON.stringify( faceData ,null,'\t'));
 	} //addFaceBox
 
-	var saveFaceInfo = function(faceBox)
+	var drawFaceBox = function(color,width,box)
 	{
+		console.log('RENDERER: ImageFaceHandling.drawFaceBox color :%s:' ,color);
+      	console.log('RENDERER: ImageFaceHandling.drawFaceBox box :%s',JSON.stringify( box ,null,'\t'));
+		let ctx  = document.getElementById(IFH_CanvasElementID).getContext('2d');
+		ctx.lineWidth = width;
+		ctx.strokeStyle = color;
 
-	} //saveFaceInfo
+		ctx.beginPath();
+		ctx.strokeRect(box.startX, box.startY, box.width, box.height);
+		ctx.closePath();
+	} //drawFaceBox
 
 	// construct a DOM element using the passed in parameters
 	function makeElement(kind,params,content) {
@@ -313,14 +334,20 @@ var ImageFaceHandling = (function () {
 	} // makeElement
 
   return {
-	 init           : init
-	 ,setup         : setup
-	 ,showConfig    : showConfig
-	 ,getConfig     : getConfig
-	 ,drawFaces     : drawFaces
-	 ,showPicture   : showPicture
-	 ,faceEdit      : faceEdit
+	init           : init
+	,setup         : setup
+	,showConfig    : showConfig
+	,getConfig     : getConfig
+	,drawFaces     : drawFaces
+	,adjustFaceBox : adjustFaceBox
+	,showPicture   : showPicture
+	,faceEdit      : faceEdit
     ,addFaceBox    : addFaceBox
-	 ,deleteFaceBox : deleteFaceBox
+	,deleteFaceBox : deleteFaceBox
+	,drawFaceBox   : drawFaceBox
+	,FaceBoxBaseColor      : FaceBoxBaseColor 
+	,FaceBoxHighLightColor : FaceBoxHighLightColor
+	,FaceBoxBaseWidth      : FaceBoxBaseWidth
+	,FaceBoxHighLightWidth : FaceBoxHighLightWidth
   };
 })();

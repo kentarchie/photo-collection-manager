@@ -6,7 +6,7 @@ class ImageDisplayManagement
 		this.DISPLAY_BOX_WIDTH = 450;
     	this.DISPLAY_BOX_HEIGHT = 450;
 		this.LINE_WIDTH = 2;
-		this.STROKE_STYLE = '#FF0000';
+		this.STROKE_STYLE = ImageFaceHandling.FaceBoxBaseColor
     	this.AlbumPath = '';
     	this.FileList = []
       this.CurrentPicture = '';

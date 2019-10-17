@@ -29,7 +29,12 @@ header {
 }
 
 .copyright  {
-    float:right; position:relative; font-size :  small;
+	float:right; 
+	position:relative; 
+	font-size : small;
+}
+.copyright span  {
+	padding-left: 10px;
 }
 
 header span.center {
@@ -119,7 +124,11 @@ header span.left {
 	padding-bottom: 30px;
 }
 
-.center     { width:95%; margin-left: auto; margin-right:auto;}
+.center { 
+	width:95%; 
+	margin-left: auto; 
+	margin-right:auto;
+}
 
 .whoList {
 	list-style-type: none;
@@ -127,4 +136,18 @@ header span.left {
 
 #whoList li span {
 	padding-right : 5px;
+}
+
+span[contenteditable=false] {
+   background: white;
+   font-size : smaller;
+}
+
+span[contenteditable=true] {
+   background: lightgreen; /* transparent bg */
+   font-size : larger;
+}
+
+.highlightWhoList {
+	background-color: yellow;
 }

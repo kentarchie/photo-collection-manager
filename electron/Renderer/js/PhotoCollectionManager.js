@@ -70,6 +70,7 @@ function setupEventHandlers()
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
          document.getElementById('IFH_CancelCreateFace').style.display='none';
     });
+
     FaceInfo.init();
 } // setupEventHandlers
 
@@ -100,7 +101,7 @@ $(document).ready(function()
        wrapperID    : 'pictureDisplay'
        ,albumName   : 'NO_REAL_ALBUM'
 	    ,lineWidth   : 1
-	    ,strokeStyle : '#FF0000'
+	    ,strokeStyle : '#00FF00'
 		 ,albumFile   : AlbumFile
     };
 	ImageFaceHandling.init(ImageHandlingSettings);
