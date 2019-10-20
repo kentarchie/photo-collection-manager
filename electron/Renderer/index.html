@@ -48,17 +48,22 @@
                             Next
                     </button>
                 </div> <!-- pictureButtons -->
-                <div id='pictureDisplay' class='pictureDisplay IFH_WrapperClass' style='width: 450px; height: 450px;'>
+                <div id='pictureDisplay' class='pictureDisplay IFH_WrapperClass'>
                     <div class='IHF_Buttons_Block'>
                         <button type='button' id='IFH_CreateFace' name='IFH_CreateFace' 
                                 class='IFH_ButtonBaseClass IFH_CreateButtonClass'
                                 title='Draw a box around a Face'>
                                 Add A Face
                         </button>
-                        <button type='button' id='IFH_CancelCreateFace' name='IFH_CancelCreateFace' 
-                                class='IFH_ButtonBaseClass IFH_CancelButtonClass'
+                        <button type='button' id='IFH_DeleteFace' name='IFH_DeleteFace' 
+                                class='IFH_ButtonBaseClass IFH_DeleteButtonClass'
                                 title='Cancel drawing a box around a Face'>
-                                Cancel Adding A Face
+                                Delete This Face
+                        </button>
+                        <button type='button' id='IFH_SaveChanges' name='IFH_SaveChanges' 
+                                class='IFH_ButtonBaseClass IFH_SaveButtonClass'
+                                title='Cancel drawing a box around a Face'>
+                                Save Changes
                         </button>
                     </div>
                     <div class='IFH_ImageGroupClass'>
@@ -117,8 +122,5 @@
    <!-- Insert this line after script imports -->
    <script>if (window.module) module = window.module;</script>
 
-   <footer>
-        <div class='center copyright'>Copyright Kent Archie<span>year</span></div>
-   </footer>
 </body>
 </html>

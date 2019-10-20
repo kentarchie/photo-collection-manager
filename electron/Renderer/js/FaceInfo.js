@@ -28,7 +28,7 @@ var FaceInfo = (function () {
 		document.getElementById('FaceInfoBlackout').addEventListener('click', closeNoChange);
 		document.getElementById('FaceInfoClose').addEventListener('click', closeNoChange);
 		document.getElementById('DeleteFaceBox').addEventListener('click',deleteFaceBox);
-		document.getElementById('FaceInfoSave').addEventListener('click',faceInfoSave);
+		document.getElementById('IFH_SaveChanges').addEventListener('click',faceInfoSave);
    } // init
 
 	var faceInfoSave = function(evt)
@@ -80,10 +80,13 @@ var FaceInfo = (function () {
 	var displayFaceData = function(faceNumber, firstName, secondName)
 	{
    		console.log('RENDERER: FaceInfo.displayFaceData: START face number = :%s:',faceNumber);
+		let fName = document.getElementById('pictureFileName').innerHTML;
+
 		let el = document.createElement('li');  // wrapper
 		var fnum = faceNumber;
 		el.dataset.faceNumber = faceNumber;
-   		console.log('RENDERER: FaceInfo.displayFaceData: LI el facenumber = :%s:',el.dataset.faceNumber);
+		el.dataset.fName = fName;
+		console.log('RENDERER: FaceInfo.displayFaceData: fName = :%s: faceNumber=:%d:',fName,faceNumber);
 		el.className = 'FaceInfoBlock';
 
 		let first = document.createElement('span');
@@ -94,14 +97,19 @@ var FaceInfo = (function () {
 		[first,second].map(el => 
 		{
 			el.dataset.faceNumber = fnum;
+			el.dataset.fName = fName;
+
       		el.addEventListener('click', function(evt) {
-         		evt.stopPropagation();
+				evt.preventDefault();
+				let faceNumber = evt.target.dataset.faceNumber;
+				let fName = evt.target.dataset.fName;
    				console.log('RENDERER: FaceInfo.displayFaceData: el click target content = :%s:',evt.target.innerHTML);
    				console.log('RENDERER: FaceInfo.displayFaceData: el click face number = :%s:',evt.target.dataset.faceNumber);
-        		evt.target.setAttribute('contenteditable',true);
+				evt.target.setAttribute('contenteditable',true);
+				ImageFaceHandling.highLightFace(fName,faceNumber);
       		});
       		el.addEventListener('blur', function(evt) {
-         		evt.stopPropagation();
+         		evt.preventDefault();
 				console.log('RENDERER: FaceInfo.displayFaceData: el blur');
         		evt.target.setAttribute('contenteditable',false);
 			});
@@ -120,13 +128,14 @@ var FaceInfo = (function () {
 		var faceList = whoList.querySelectorAll('li');
    		console.log('RENDERER: FaceInfo.faceSelected: faceList.length = :%d:',faceList.length);
 		//var chosenFace = whoList.querySelector('[data-face-number="'+faceNumber+'"]');
-		for (var f in faceList) {
+
+		faceList.forEach((item) =>  {
    			///console.log('RENDERER: FaceInfo.faceSelected: f= :%s:',JSON.stringify(f,null,'\t'));
-   			console.log('RENDERER: FaceInfo.faceSelected: faceList[f].classList = :%s:',faceList[f].classList);
-			faceList[f].classList.remove('highlightWhoList');
-			if(faceList[f].dataset.faceNumber == faceNumber)
-				faceList[f].classList.add('highlightWhoList');
-		}
+   			console.log('RENDERER: FaceInfo.faceSelected: item.classList = :%s:',item.classList);
+			item.classList.remove('highlightWhoList');
+			if(item.dataset.faceNumber == faceNumber)
+				item.classList.add('highlightWhoList');
+		});
 	} // faceSelected
 
 
@@ -146,7 +155,7 @@ var FaceInfo = (function () {
    console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: faceInfoList.length :%d',faceInfoList.length);
    for (const faceData of faceInfoList) {
       faceData.addEventListener('dblclick', function(evt) {
-         evt.stopPropagation();
+         evt.preventDefault();
         evt.target.setAttribute('contentEditable',true);
       })
    }

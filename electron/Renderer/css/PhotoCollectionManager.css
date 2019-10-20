@@ -28,14 +28,6 @@ header {
     background:#5ee;
 }
 
-.copyright  {
-	float:right; 
-	position:relative; 
-	font-size : small;
-}
-.copyright span  {
-	padding-left: 10px;
-}
 
 header span.center {
     width:80%;

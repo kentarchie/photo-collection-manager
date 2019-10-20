@@ -55,7 +55,6 @@ function processArgs(app)
     .describe('album', 'Load an album')
     .help('h')
     .alias('h', 'help')
-    .epilog('copyright ' + copyRightYear)
     .argv;
 
   CliData['debug'] = argv.debug;
@@ -151,14 +150,9 @@ function createMainMenu()
     } // Menu top menu item
     ,{
         label: 'About'
-        ,submenu: [
-          {
-            label:'About'
             ,click() { 
               openAboutWindow();
             }
-          }
-        ]
     } // About top menu item
   ]);
   return menu;
@@ -175,14 +169,18 @@ function openAboutWindow()
      width : 500
     ,height: 400
     ,resizable : false
-    ,title : ''
+    ,title : 'ABOUT'
     ,minimizable : false
     ,fullscreenable : false
     ,backgroundColor: "#d7ef77" 
+    ,webPreferences : {
+      nodeIntegration: true
+    }
   });
-  AboutWindow.setMenu(null);
+  AboutWindow.setMenuBarVisibility(false);
+  if(CliData.debug) AboutWindow.webContents.openDevTools({'mode' : 'undocked'}); 
 
-  let urlToLoad = 'file://' + __dirname + '/app/about.html';
+  let urlToLoad = 'file://' + __dirname + '/../Renderer/about.html';
   console.log('MAIN: openAboutWindow: loading url ->%s', urlToLoad);
   AboutWindow.loadURL(urlToLoad);
 

@@ -53,7 +53,7 @@ var DrawBox = (function () {
 
 		function mouseDown(e) {
          	console.log('RENDERER: DrawBox.mouseDown: START');
-         	e.stopPropagation();
+         	e.preventDefault();
     		start_mousex = parseInt(e.clientX - canvasx);
 			start_mousey = parseInt(e.clientY - canvasy);
     		mousedown = true;
@@ -65,7 +65,7 @@ var DrawBox = (function () {
 		function mouseUp(e)
 		{
         	console.log('RENDERER: DrawBox.mouseUp START:');
-        	e.stopPropagation();
+        	e.preventDefault();
       		//console.log ('RENDERER: DrawBox.mouseUp: The current mouse position is (x) %f  (y) %f',current_mousex,current_mousey);
 			DrewBox = true;
     		mousedown = false;
@@ -83,7 +83,7 @@ var DrawBox = (function () {
 
 		function mouseMove(e)
 		{
-        	e.stopPropagation();
+        	e.preventDefault();
     		current_mousex = parseInt(e.clientX - canvasx);
 			current_mousey = parseInt(e.clientY - canvasy);
          	//console.log('RENDERER: DrawBox.mouseMove: x,y (%d,%d)',current_mousex,current_mousey);

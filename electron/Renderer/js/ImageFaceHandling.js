@@ -172,6 +172,24 @@ var ImageFaceHandling = (function () {
 		}
 	} // deleteFaceBox
 
+
+	var highLightFace = function(fname,faceNumber)
+	{
+		drawFaces(fname);
+		let faceData = AlbumData.getFaceList(fname);
+		let fd = faceData[faceNumber];
+		let newFaceBox = adjustFaceBox(fd);
+		console.log('RENDERER: ImageFaceHandling.highLightFace: face = :%d: first name = :%s: last name = :%s:'
+			,faceNumber,fd.firstName,fd.lastName);
+		console.log('RENDERER: ImageFaceHandling.highLightFace (181): Calling FaceInfo.openFaceInfo face = %d',faceNumber);
+		drawFaceBox( FaceBoxHighLightColor
+			,FaceBoxBaseWidth
+			,newFaceBox);
+		FaceInfo.faceSelected (fd,faceNumber);
+   		document.getElementById('IFH_DeleteFace').style.visibility='visible';
+   		document.getElementById('IFH_SaveChanges').style.visibility='visible';
+	} // highLightFace
+
 	// if a face box is single clicked, display the name information for editing
 	var onImageClick = function(ev)
 	{
@@ -188,17 +206,7 @@ var ImageFaceHandling = (function () {
 
 		let face = isFaceClicked(ev);
 		if(face != -1) {  // we have clicked on a face box
-			let faceData = AlbumData.getFaceList(fname);
-			let fd = faceData[face];
-			let newFaceBox = adjustFaceBox(fd);
-			console.log('RENDERER: ImageFaceHandling.onImageClick: face = :%d: first name = :%s: last name = :%s:'
-				,face,fd.firstName,fd.lastName);
-			console.log('RENDERER: ImageFaceHandling.onImageClick (181): Calling FaceInfo.openFaceInfo face = %d',face);
-			drawFaceBox( FaceBoxHighLightColor
-				,FaceBoxBaseWidth
-				,newFaceBox);
-			//FaceInfo.openFaceInfo (fd,face);
-			FaceInfo.faceSelected (fd,face);
+			highLightFace(fname,face);
 		}
 		else 
 			console.log('RENDERER: ImageFaceHandling.onImageClick: clicked NOT ON face %d', face);
@@ -240,22 +248,22 @@ var ImageFaceHandling = (function () {
 				if(
 					(pos.x >= (newFaceBox.startX)) && (pos.x < faceBoxXMax)
 					 && (pos.y >= (newFaceBox.startY)) && (pos.y < faceBoxYMax)
-				  )
-				  {
-						 console.log('RENDERER: ImageFaceHandling.isFaceClicked: clicked in face %s',fd.firstName);
-						 return i;
-					 }
-					 else {
-						 console.log('RENDERER: ImageFaceHandling.isFaceClicked: NOT clicked in face');
-					 }
-					 ++i;
-				}
+					)
+					{
+						console.log('RENDERER: ImageFaceHandling.isFaceClicked: clicked in face %s',fd.firstName);
+						return i;
+					}
+					else {
+						console.log('RENDERER: ImageFaceHandling.isFaceClicked: NOT clicked in face');
+					}
+				++i;
+			}
 			return -1;
 		} // isFaceClicked
 
 	var faceEdit = function(ev)
 	{
-		ev.stopPropagation();
+		ev.preventDefault();
 		console.log('RENDERER: ImageFaceHandling.faceEdit : START');
 		let target = ev.currentTarget;
 		let fname = getFileName();
@@ -345,6 +353,7 @@ var ImageFaceHandling = (function () {
     ,addFaceBox    : addFaceBox
 	,deleteFaceBox : deleteFaceBox
 	,drawFaceBox   : drawFaceBox
+	,highLightFace : highLightFace
 	,FaceBoxBaseColor      : FaceBoxBaseColor 
 	,FaceBoxHighLightColor : FaceBoxHighLightColor
 	,FaceBoxBaseWidth      : FaceBoxBaseWidth

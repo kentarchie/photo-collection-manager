@@ -20,11 +20,13 @@ let CliData = remote.getCurrentWindow().CliData; // parameters from the command 
 
 function setupEventHandlers()
 {
+   /*
 	 document.getElementById('IFH_CanvasTag').addEventListener('contextmenu', (e) => {
         console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: contextmenu : detected');
         ImageFaceHandling.faceEdit(e);
 	 });
-	 console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: contextmenu: after faceEdit setup');
+    console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: contextmenu: after faceEdit setup');
+    */
 
     var prevImage = document.getElementById('prevImage');
 	 console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: prevImage :%s:',prevImage);
@@ -45,7 +47,7 @@ function setupEventHandlers()
       if (addSaveButton.search('Add') != -1) {
          console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: createFace(): Starting to draw face box:');
          evt.target.innerHTML = 'Save New Face Box';
-         document.getElementById('IFH_CancelCreateFace').style.display='block';
+         //document.getElementById('IFH_CancelCreateFace').style.display='block';
          DrawBox.init(Album_Data,config,AlbumFile,ImageFaceHandling);
          DrawBox.startDrawing();
       }
@@ -60,6 +62,7 @@ function setupEventHandlers()
       }
     });
 
+    /*
     document.getElementById('IFH_CancelCreateFace').addEventListener('click',function (evt) 
 	 {
          console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: cancel create face: START:');
@@ -70,6 +73,7 @@ function setupEventHandlers()
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick);
          document.getElementById('IFH_CancelCreateFace').style.display='none';
     });
+    */
 
     FaceInfo.init();
 } // setupEventHandlers
@@ -96,8 +100,10 @@ $(document).ready(function()
     else {
         console.log('RENDERER: PhotoCollectionManager.ready: Clidata.album NOT set AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
     }
+   document.getElementById('IFH_DeleteFace').style.visibility='hidden';
+   document.getElementById('IFH_SaveChanges').style.visibility='hidden';
 
-    ImageHandlingSettings = {
+   ImageHandlingSettings = {
        wrapperID    : 'pictureDisplay'
        ,albumName   : 'NO_REAL_ALBUM'
 	    ,lineWidth   : 1
@@ -112,7 +118,4 @@ $(document).ready(function()
    console.log('RENDERER: PhotoCollectionManager.ready: before open-album: AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
    ipcRenderer.on('open-album', AlbumData.findAlbum);
 
-   var copyRightYear = new Date().getFullYear();
-   console.log('RENDERER: PhotoCollectionManager.ready:  copyRightYear=:%d:',copyRightYear);
-   $('.copyright span').html(copyRightYear);
 }); // ready function
