@@ -260,6 +260,12 @@ var addNewFaceData = function(imageName,faceBox)
    return AlbumContents['images'][imageName]['faces'].length - 1;
 } // addNewFaceData
 
+var getNumFaces = function(imageName)
+{
+   console.log('RENDERER: AlbumData.getNumFaces imageName (%s)',imageName);
+   return AlbumContents['images'][imageName]['faces'].length;
+} // getNumFaces
+
 var updateFaceData = function(imageName,faceNumber,firstName,secondName)
 {
    let fNum = parseInt(faceNumber);
@@ -307,6 +313,7 @@ function makeThumbNails()
 	 ,getImageList     : getImageList
 	 ,getImageData     : getImageData
 	 ,getFaceList      : getFaceList
+	 ,getNumFaces      : getNumFaces
 	 ,deleteFaceData   : deleteFaceData
 	 ,addNewFaceData   : addNewFaceData
 	 ,updateFaceData   : updateFaceData

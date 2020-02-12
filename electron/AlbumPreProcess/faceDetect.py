@@ -5,14 +5,16 @@ from pathlib import Path
 import cv2
 from PIL import Image
 
+# the data file used in face detection is in the same place as the this program
 PATH_TO_DATA_FILES = os.path.dirname(sys.argv[0])
 CASC_PATH = os.path.join(PATH_TO_DATA_FILES, "haarcascade_frontalface_default.xml")
+
 INCLUDED_EXTENSIONS = ["jpg", "bmp", "png", "gif"]
 THUMB_NAILS = "thumbnails"
 BIG_PIC_SCALE = 0.10
 SMALL_PIC_SCALE = 0.25
 
-FULL_ALBUM_PATH = ""
+FULL_ALBUM_PATH = ""   # where the photo album is locatewd
 ALBUM_NAME = ""
 ALBUM_DATA = {}
 FACE_CASCADE = ""
@@ -24,7 +26,11 @@ def initializeAlbumData():
  		if not, create a new empty one and save the file
 	"""
 	global FULL_ALBUM_PATH, ALBUM_NAME, ALBUM_DATA
-	FULL_ALBUM_PATH = os.getcwd()
+	print("argv length",len(sys.argv))
+	if(len(sys.argv) < 2):
+		print("%s: path_to_album" % sys.argv[0])
+		sys.exit()
+	FULL_ALBUM_PATH = sys.argv[1]
 	ALBUM_NAME = os.path.basename(FULL_ALBUM_PATH)
 	print("ALBUM_NAME {0}".format(ALBUM_NAME))
 	fullAlbumName = os.path.join(FULL_ALBUM_PATH, ALBUM_NAME+".json")
@@ -39,7 +45,7 @@ def initializeAlbumData():
 		ALBUM_DATA['album'] = ALBUM_NAME
 		ALBUM_DATA['albumPath'] = FULL_ALBUM_PATH
 		ALBUM_DATA['images'] = {}
-		print(json.dumps(ALBUM_DATA))
+		print(json.dumps(ALBUM_DATA,indent=4))
 
 	if(not os.path.isdir(THUMB_NAILS)):
 		os.mkdir("./" + THUMB_NAILS)
@@ -74,12 +80,12 @@ def processImage(imageFileName):
 	print("working on {0}".format(fullFileName))
 	faces = getFaces(fullFileName, image)
 	showFaces(faces, image)
-	#print(json.dumps(albumData))
+	#print(json.dumps(albumData,indent=4))
 
 def saveAlbumData(albumData):
 	fullAlbumName = os.path.join(FULL_ALBUM_PATH, ALBUM_NAME+".json")
 	albumFile = open(fullAlbumName, "w")
-	albumFile.write(json.dumps(albumData))
+	albumFile.write(json.dumps(albumData,indent=4))
 	albumFile.close() 
 
 def main():
@@ -92,7 +98,7 @@ def main():
 	# Create the haar cascade
 	FACE_CASCADE = cv2.CascadeClassifier(CASC_PATH)
 	initializeAlbumData()
-	#print("START: {0}".format(json.dumps(ALBUM_DATA)))
+	#print("START: {0}".format(json.dumps(ALBUM_DATA,indent=4)))
 
 	# get the list of image files in the current directory
 	imageList = [fn for fn in os.listdir(FULL_ALBUM_PATH)
@@ -156,7 +162,7 @@ def main():
 			face["lastName"] = ""
 			imageData['faces']['faceList'].append(face)
 		imageData['faces']['numberFaces'] = len(imageData['faces']['faceList'])
-	print(json.dumps(ALBUM_DATA))
+	print(json.dumps(ALBUM_DATA,indent=4))
 	saveAlbumData(ALBUM_DATA)
 
 main()

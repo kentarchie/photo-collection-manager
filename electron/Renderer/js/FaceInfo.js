@@ -19,6 +19,7 @@ var FaceInfo = (function () {
 
 	var deleteFaceBox = function(evt)
 	{
+		console.log('RENDERER: FaceInfo.deleteFaceBox: START');
        ImageFaceHandling.deleteFaceBox(evt);
 	} // deleteFaceBox
 
@@ -27,7 +28,7 @@ var FaceInfo = (function () {
 		console.log('RENDERER: FaceInfo.init: START');
 		document.getElementById('FaceInfoBlackout').addEventListener('click', closeNoChange);
 		document.getElementById('FaceInfoClose').addEventListener('click', closeNoChange);
-		document.getElementById('DeleteFaceBox').addEventListener('click',deleteFaceBox);
+		document.getElementById('IFH_DeleteFace').addEventListener('click',deleteFaceBox);
 		document.getElementById('IFH_SaveChanges').addEventListener('click',faceInfoSave);
    } // init
 
@@ -53,9 +54,15 @@ var FaceInfo = (function () {
 
 	var getFaceInfo = function()
 	{
-       faceData['firstName'] = document.getElementById('FaceInfoFirstName').value;
-       faceData['lastName']  = document.getElementById('FaceInfoSecondName').value;
-       return faceData;
+		var highlightedFaces = document.getElementsByClassName('highlightWhoList');
+		console.log('FaceInfo.getFaceInfo: hightlightedFaces.length = :%d:',hightlightedFaces.length);
+		var nameParts = highlightedFaces[0].querySelectorAll('span');
+       //faceData['firstName'] = document.getElementById('FaceInfoFirstName').value;
+       //faceData['lastName']  = document.getElementById('FaceInfoSecondName').value;
+		console.log('FaceInfo.getFaceInfo: first = :%s: second=:%s:',numParts[0].innerHTML,numParts[1].innerHTML);
+    	faceData['firstName'] = nameParts[0].innerHTML;
+    	faceData['lastName'] =  nameParts[1].innerHTML;
+    	return faceData;
 	}  // getFaceInfo
 
 	var openFaceInfo = function(fd,faceNumber)
@@ -82,12 +89,13 @@ var FaceInfo = (function () {
    		console.log('RENDERER: FaceInfo.displayFaceData: START face number = :%s:',faceNumber);
 		let fName = document.getElementById('pictureFileName').innerHTML;
 
-		let el = document.createElement('li');  // wrapper
+		let liEl = document.createElement('li');  // wrapper
+		document.getElementById('whoList').append(liEl);
 		var fnum = faceNumber;
-		el.dataset.faceNumber = faceNumber;
-		el.dataset.fName = fName;
+		liEl.dataset.faceNumber = faceNumber;
+		liEl.dataset.fName = fName;
 		console.log('RENDERER: FaceInfo.displayFaceData: fName = :%s: faceNumber=:%d:',fName,faceNumber);
-		el.className = 'FaceInfoBlock';
+		liEl.className = 'FaceInfoBlock';
 
 		let first = document.createElement('span');
 		first.innerText = firstName;
@@ -98,6 +106,7 @@ var FaceInfo = (function () {
 		{
 			el.dataset.faceNumber = fnum;
 			el.dataset.fName = fName;
+			liEl.appendChild(el);
 
       		el.addEventListener('click', function(evt) {
 				evt.preventDefault();
@@ -106,6 +115,7 @@ var FaceInfo = (function () {
    				console.log('RENDERER: FaceInfo.displayFaceData: el click target content = :%s:',evt.target.innerHTML);
    				console.log('RENDERER: FaceInfo.displayFaceData: el click face number = :%s:',evt.target.dataset.faceNumber);
 				evt.target.setAttribute('contenteditable',true);
+   				console.log('RENDERER: FaceInfo.displayFaceData: el click contenteditable = :%s:',evt.target.getAttribute('contenteditable'));
 				ImageFaceHandling.highLightFace(fName,faceNumber);
       		});
       		el.addEventListener('blur', function(evt) {
@@ -115,9 +125,6 @@ var FaceInfo = (function () {
 			});
 		})
 
-		el.appendChild(first);
-		el.appendChild(second);
-		document.getElementById('whoList').append(el);
 	} // displayFaceData
 
 	var faceSelected = function(fd,faceNumber)

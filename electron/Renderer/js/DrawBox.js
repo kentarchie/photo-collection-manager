@@ -74,6 +74,8 @@ var DrawBox = (function () {
 			let faceData = AlbumData.getImageData(CurrentImageName);
          	console.log('RENDERER: DrawBox.mouseUp : faceData: %s',JSON.stringify(faceData,null,'\t'));
 			let delta = makeDelta('IFH_ImageTag',faceData);
+			result['firstName'] = 'First';
+			result['lastName'] = 'Second';
 			result['end_x']   = Math.floor(current_mousex / delta.width);
 			result['end_y']   = Math.floor(current_mousey / delta.height);
 			result['start_x'] = Math.floor(start_mousex / delta.width);

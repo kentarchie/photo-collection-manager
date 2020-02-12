@@ -314,8 +314,9 @@ var ImageFaceHandling = (function () {
 
       	FaceInfo.init(faceData);
 		console.log('RENDERER: ImageFaceHandling.addFaceBox (292): Calling FaceInfo.openFaceInfo face = -1');
-      	FaceInfo.openFaceInfo(newFace,newFaceNum);
-      	console.log('RENDERER: ImageFaceHandling.addFaceBox new face list :%s',JSON.stringify( faceData ,null,'\t'));
+      	//FaceInfo.openFaceInfo(newFace,newFaceNum);
+		console.log('RENDERER: ImageFaceHandling.addFaceBox new face list :%s',JSON.stringify( faceData ,null,'\t'));
+		return newFaceNum;
 	} //addFaceBox
 
 	var drawFaceBox = function(color,width,box)

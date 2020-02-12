@@ -57,7 +57,11 @@ function setupEventHandlers()
          evt.target.innerHTML = 'Add A Face';
 		   config.canvas.addEventListener('click',ImageFaceHandling.onImageClick); // go back to waiting for click
          let newFace = DrawBox.getNewBoxInfo();
-         ImageFaceHandling.addFaceBox(newFace);
+         let newFaceNumber = ImageFaceHandling.addFaceBox(newFace);
+         //let fName = document.getElementById('pictureFileName').innerHTML;
+         //let newFaceNumber = AlbumData.getNumFaces(fName) - 1;
+	      FaceInfo.displayFaceData(newFaceNumber, 'First', 'Second');
+		   FaceInfo.faceSelected (newFace,newFaceNumber);
          console.log('RENDERER: PhotoCollectionManager.setupEventHandlers: newface :%s',JSON.stringify(newFace,null,'\t'));
       }
     });

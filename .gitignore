@@ -71,6 +71,7 @@ csharp/dbCode/
 csharp/PhotoAlbum/attic/
 csharp/PhotoAlbum/packages/
 electron/attic/
+electron/AlbumPreProcess/thumbnails
 csharp/PhotoPageProcessor/attic/
 csharp/PhotoPageProcessor/packages/
 
