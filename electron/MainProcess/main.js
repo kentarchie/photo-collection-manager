@@ -57,15 +57,18 @@ function processArgs(app)
     .alias('h', 'help')
     .argv;
 
+  console.log('MAIN: processArgs : argv %s', JSON.stringify(argv,null,'\t'));
   CliData['debug'] = argv.debug;
   CliData['AppPath'] = app.getAppPath();
   CliData['album'] = argv.album;
-  console.log('MAIN: processArgs: CliData %s', JSON.stringify(CliData,null,'\t'));
+  console.log('MAIN: processArgs Done: CliData %s', JSON.stringify(CliData,null,'\t'));
 } //processArgs
 
 function createWindow (app)
 {
+  console.log('MAIN: createWindow: START');
   processArgs(app);
+  console.log('MAIN: createWindow: after processArgs');
 
   let winHeight = DEFAULT_HEIGHT;
   let winWidth = DEFAULT_WIDTH;
@@ -86,6 +89,7 @@ function createWindow (app)
     ,show: false // Don't show the window until it's ready, this prevents any white flickering
     ,webPreferences : {
       nodeIntegration: true
+      ,enableRemoteModule: true
     }
   });
 
@@ -94,8 +98,9 @@ function createWindow (app)
   console.log('MAIN: createWindow: loading url ->%s', urlToLoad);
   MainWindow.loadURL(urlToLoad);
 
-  MainWindow.CliData = CliData;  // make CLI data available to  the renderer
+  global.CliData = CliData;  // make CLI data available to  the renderer
   if(CliData.debug) MainWindow.webContents.openDevTools({'mode' : 'undocked'}); // Open the DevTools as separate window
+  console.log('MAIN: createWindow : global.CliData %s', JSON.stringify(global.CliData,null,'\t'));
 
   // Remove window once app is closed
   MainWindow.on('closed', () => { MainWindow = null; });

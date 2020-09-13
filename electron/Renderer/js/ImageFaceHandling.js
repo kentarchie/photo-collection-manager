@@ -104,7 +104,7 @@ var ImageFaceHandling = (function () {
 		console.log('RENDERER: ImageFaceHandling.drawFaces fname %s',fname);
 		let faceData = AlbumData.getFaceList(fname);
 
-			console.log('RENDERER: ImageFaceHandling.drawFaces faceData %s:',JSON.stringify(faceData,null,'\t'));
+			console.log('RENDERER: ImageFaceHandling.drawFaces faceData :%s:',JSON.stringify(faceData,null,'\t'));
 			//console.log ('RENDERER: ImageFaceHandling.drawFaces: The image id is :%s:',Config.inage.getAttribute('id'));
 			//console.log('RENDERER: ImageFaceHandling.drawFaces: scrollX,scrollY %s,%s',window.scrollX, window.scrollY);
 			//console.log('RENDERER: ImageFaceHandling.drawFaces: canvas width,height %s,%s',Config.canvas.width, Config.canvas.height);

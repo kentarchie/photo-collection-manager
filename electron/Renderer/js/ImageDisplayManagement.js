@@ -75,7 +75,7 @@ class ImageDisplayManagement
 
       imageTag.setAttribute('data-path', filePath);
       imageTag.setAttribute('data-filename', fileName);
-      imageTag.setAttribute('src',filePath);
+      imageTag.setAttribute('src','../' + filePath);
 
       let imageData = AlbumData.getImageData(fileName);
       document.getElementById('whenTaken').value = imageData['whenTaken'];

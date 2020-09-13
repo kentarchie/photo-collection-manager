@@ -1,4 +1,6 @@
-const {remote} = require('electron');
+//const {remote} = require('electron');
+const remote = require('electron').remote;
+console.log("definition: remote exists? :%s:",remote);
 const { ipcRenderer } = require('electron')
 const fsLib = require('fs');
 const pathLib = require('path');
@@ -15,8 +17,6 @@ let ImageHandlingSettings = {};
 let ImageDisplay = null;
 let DrawBoxControls = null;
 let AlbumFile = null;
-
-let CliData = remote.getCurrentWindow().CliData; // parameters from the command line
 
 function setupEventHandlers()
 {
@@ -86,6 +86,11 @@ $(document).ready(function()
 {
     console.log('RENDERER: PhotoCollectionManager.ready: START ');
     console.log('RENDERER: PhotoCollectionManager.ready: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
+	 console.log("ready: remote exists? :%s:",remote);
+	 //console.log("ready: remote.getCurrentWindow() exists? :%s:",remote.getCurrentWindow);
+	 //let CliData = remote.getCurrentWindow().CliData; // parameters from the command line
+	 let CliData = remote.getGlobal('CliData');
+	 console.log('RENDERER: CliData from global :%s:',JSON.stringify(CliData,null,'\t'));
 
     ImageDisplay = new ImageDisplayManagement('');
     console.log('RENDERER: PhotoCollectionManager.ready: CliData.album :%s:',CliData.album);
