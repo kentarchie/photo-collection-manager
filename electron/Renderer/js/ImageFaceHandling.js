@@ -120,6 +120,10 @@ var ImageFaceHandling = (function () {
 		Config.ctx.clearRect(0, 0, Config.canvas.width, Config.canvas.height);
 
 		FaceInfo.clearWhoList();
+		if(faceData.length == 0) {
+			FaceDetectionCode.updateResults(Config.canvas,imageTag,0.5);
+		}
+
 		faceData.forEach((fd, i) => {
 			console.log('RENDERER: ImageFaceHandling.drawFaces: fd %s',JSON.stringify(fd,null,'\t'));
 			let newFaceBox = adjustFaceBox(fd);

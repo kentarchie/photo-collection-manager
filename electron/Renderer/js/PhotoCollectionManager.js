@@ -18,6 +18,10 @@ let ImageDisplay = null;
 let DrawBoxControls = null;
 let AlbumFile = null;
 
+const SSD_MOBILENETV1 = 'weights';
+let InputImgEl = '';
+let Canvas     = '';
+
 function setupEventHandlers()
 {
    /*
@@ -84,11 +88,7 @@ function setupEventHandlers()
 
 $(document).ready(function()
 {
-    console.log('RENDERER: PhotoCollectionManager.ready: START ');
-    console.log('RENDERER: PhotoCollectionManager.ready: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
-	 console.log("ready: remote exists? :%s:",remote);
-	 //console.log("ready: remote.getCurrentWindow() exists? :%s:",remote.getCurrentWindow);
-	 //let CliData = remote.getCurrentWindow().CliData; // parameters from the command line
+    console.log('RENDERER: PhotoCollectionManager.ready: START: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
 	 let CliData = remote.getGlobal('CliData');
 	 console.log('RENDERER: CliData from global :%s:',JSON.stringify(CliData,null,'\t'));
 
@@ -123,6 +123,7 @@ $(document).ready(function()
 	ImageFaceHandling.showConfig();
    ImageFaceHandling.setup();
 	setupEventHandlers();
+   FaceDetectionCode.init();
 
    console.log('RENDERER: PhotoCollectionManager.ready: before open-album: AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
    ipcRenderer.on('open-album', AlbumData.findAlbum);
