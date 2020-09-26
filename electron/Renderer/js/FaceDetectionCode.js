@@ -78,8 +78,8 @@ var FaceDetectionCode = (function ()
        await setFaceDetector();
    
        // start processing image
-       updateResults(Canvas,InputImgEl,min);
-       console.log('FaceDetectionCode.index: run: after updateResults');
+       //updateResults(Canvas,InputImgEl,min);
+       console.log('FaceDetectionCode.run: after updateResults');
     } //run
    
     //document.addEventListener("DOMContentLoaded", function()

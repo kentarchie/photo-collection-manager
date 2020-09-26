@@ -121,7 +121,9 @@ var ImageFaceHandling = (function () {
 
 		FaceInfo.clearWhoList();
 		if(faceData.length == 0) {
+      		console.log('RENDERER: ImageFaceHandling.drawFaces: no facedata BEFORE update results');
 			FaceDetectionCode.updateResults(Config.canvas,imageTag,0.5);
+      		console.log('RENDERER: ImageFaceHandling.drawFaces: no facedata AFTER update results');
 		}
 
 		faceData.forEach((fd, i) => {
