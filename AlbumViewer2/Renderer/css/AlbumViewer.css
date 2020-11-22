@@ -1,0 +1,83 @@
+:root {
+/*
+	--image-width  : 450px;
+	--image-height : 450px;
+*/
+}
+
+.IFH_WrapperClass {
+	background: #fff;
+	border-radius: 4px;
+	position:relative;
+/*
+	width : var(--image-width);
+	height: var(--image-height);
+*/
+  
+	display: grid;
+}
+
+.IFH_ImageGroupClass {
+	margin-top: 20px;
+}
+.IFH_CoveringCanvas {
+/*
+	width : var(--image-width);
+	height: var(--image-height);
+*/
+	position: absolute;
+	z-index: 10;
+	/*
+	opacity: 0.33;
+   background-color: coral;
+	border: 3px solid coral;
+	*/
+}
+
+.pictureBlock {
+	display: flex;
+	flex-direction: row;
+}
+
+.pictureView {
+	float:left;
+	width:90%;
+	border:1px solid black;
+}
+
+#pictureFileName  {
+		height: 1em;
+		text-align:center;
+		background-color:yellow;
+		border:1px solid green;
+		flex:1 1 auto; /* Lets middle column shrink/grow to available width */
+}
+
+.grid-container {
+	 display: grid;
+    grid-template-columns: 1fr 1fr;
+	 grid-template-rows: 100px
+    grid-gap: 20px;
+	width:100%;
+}
+
+.grid-child {
+    border: 2px solid yellow;
+	width:100%;
+	height:100%;
+}  
+
+.fileTree {
+	 width:20%;
+    border: 2px solid yellow;
+}
+
+.normalSize {
+	 width:500px;
+	 height:500px;
+}
+.bigSize {
+	 width:1200px;
+	 height:1200px;
+}
+

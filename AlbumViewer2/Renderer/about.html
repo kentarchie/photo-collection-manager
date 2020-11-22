@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>About AlbumViewer</title>
+        <style>
+            h1 {
+                margin-left: auto;
+                margin-right: auto;
+                width: 50%
+            }
+            ul {
+                list-style-type: none;
+            }
+            .copyright span  {
+	            padding-left: 10px;
+            }
+        </style>
+    </head>
+<body>
+    <h1> About AlbumViewer</h1>
+    <h2>Source Code:</h2>
+        <a href = 'https://github.com/kentarchie/photo-collection-manager'>https://github.com/kentarchie/photo-collection-manager/AlbumViewer </a>
+    <h2>Versions:</h2>
+    <ul>
+        <li>Node:      <script>document.write(process.versions.node);</script></li>
+        <li>Chrome:    <script>document.write(process.versions.chrome);</script></li>
+        <li>Electron:  <script>document.write(process.versions.electron);</script></li>
+        <li>Operating System:  
+            <script>
+                document.write(process.platform);
+                if(process.getSystemVersion)
+                    document.write('&nbsp;' + process.getSystemVersion());
+            </script>
+        </li>
+    </ul>
+   <footer>
+        <div class='copyright'>Copyright Kent Archie<span>year</span></div>
+   </footer>
+   <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var copyRightYear = new Date().getFullYear();
+            document.querySelector('.copyright span').innerHTML = copyRightYear;
+        });
+   </script>
+</body>
+</html>
