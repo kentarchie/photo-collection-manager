@@ -71,6 +71,9 @@
 	 width:20%;
     border: 2px solid yellow;
 }
+.fileTreeLink {
+	cursor : pointer;
+}
 
 .normalSize {
 	 width:500px;
@@ -80,4 +83,3 @@
 	 width:1200px;
 	 height:1200px;
 }
-
