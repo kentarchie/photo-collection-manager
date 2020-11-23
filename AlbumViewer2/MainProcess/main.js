@@ -144,6 +144,13 @@ function createMainMenu()
         }
         ,{type:'separator'} 
         ,{
+          label:'Next Picture N | n | Right | Down'
+         }
+        ,{
+          label:'Previous Picture P | p | Left | Up'
+         }
+        ,{type:'separator'} 
+        ,{
           label:'Exit'
           ,role : 'quit'
           ,accelerator: 'CmdOrCtrl+Q'

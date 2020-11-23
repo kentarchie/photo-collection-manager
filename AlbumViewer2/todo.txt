@@ -1,7 +1,7 @@
-highlight current file in file tree
+--highlight current file in file tree
+--zoom in and out using keys
+--make pP be prev and Nn be next
+--add keys meaning to about/help
+--file click should update CurrentImage
 get album selection to work
-zoom in and out using keys
-make pP be prev and Nn be next
-add keys meaning to about/help
 save current album and image between runs (low priority)
-file click should update CurrentImage

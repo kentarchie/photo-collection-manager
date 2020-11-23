@@ -13,6 +13,7 @@ let CliData = {};
 let ImageData = new Map();
 let ImageClicked=false;
 let CurrentImage=0;
+let PreviousImage = 0;
 let ImagesKeys = [];
 
 function logImageData(title)
@@ -29,27 +30,27 @@ function logImageData(title)
 function isImage(fname)
 {
     let ext = pathLib.extname(fname).toLowerCase().replace('.','');
-    //console.log('RENDERER: AlbumData.isImage: extension is :%s:',ext);
+    //console.log('RENDERER: AlbumViewer2.isImage: extension is :%s:',ext);
     return(ImageExtensions.indexOf(ext) > 0);
 } // isImage
 
-function nextPicture()
+function switchHighLight()
 {
-	console.log('nextPicture: START');
-	nextPrevPicture('next');
-} // nextPicture
-
-function prevPicture()
-{
-	console.log('prevPicture: START');
-	nextPrevPicture('prev');
-} // prevPicture
+	[PreviousImage, CurrentImage].map((num) => {
+		let imageName = ImagesKeys[num];
+   	console.log('RENDERER: AlbumViewer2.switchHighLight: working on image :%s:\n',imageName);
+		let imageElement = document.querySelector( "[data-filename='"+imageName+"']" );
+		imageElement.classList.toggle('selectedImage');
+	});
+} //switchHighLight
 
 function nextPrevPicture(dir)
 {
    console.log('RENDERER: AlbumViewer2.nextPrevPicture: START dir  = :%s:' , dir);
    if(CurrentImage == 0) fileName = ImagesKeys[0];
+   PreviousImage = CurrentImage;
    console.log('RENDERER: AlbumViewer2.nextPrevPicture: initial CurrentImage= %d' , CurrentImage);
+   console.log('RENDERER: AlbumViewer2.nextPrevPicture: initial PreviousImage= %d' , PreviousImage);
    CurrentImage = (dir == 'prev') ? CurrentImage - 1 : CurrentImage + 1;
    if(CurrentImage < 0) CurrentImage = ImagesKeys.length-1;
    if(CurrentImage >= ImagesKeys.length) CurrentImage = 0;
@@ -57,6 +58,7 @@ function nextPrevPicture(dir)
 
    console.log('RENDERER: AlbumViewer2.nextPrevPicture: ImagesKeys[CurrentImage= %s' , ImagesKeys[CurrentImage]);
 	switchPicture(ImagesKeys[CurrentImage],ImagesKeys[CurrentImage]);
+	switchHighLight();
 } // nextPrevPicture
 
 function switchPicture(fileName,filePath)
@@ -65,15 +67,14 @@ function switchPicture(fileName,filePath)
 	let imageTag = document.getElementById('IFH_ImageTag'); // where to display the front image
 	let backImageTag = document.getElementById('IFH_BackImageTag'); // where to display the back image
 
-   console.log('RENDERER: ImageDisplayManagment.switchPicture: fileName :%s:',fileName)
-   console.log('RENDERER: ImageDisplayManagment.switchPicture: filePath :%s:',filePath)
-   console.log('RENDERER: ImageDisplayManagment.switchPicture: album :%s:',CliData.album)
+   console.log('RENDERER: AlbumViewer2.switchPicture: fileName :%s: filePath :%s:',fileName,filePath);
+   console.log('RENDERER: AlbumViewer3.switchPicture: album :%s:',CliData.album)
 
    document.getElementById('frontFileName').innerHTML = fileName;  // display the filename
 
    [imageTag,backImageTag].map((tag) => {
 		tag.addEventListener('load', () => {
-			console.log('RENDERER: ImageDisplayManagement.switchPicture: image object loaded this.src = :%s:', tag.src);
+			console.log('RENDERER: AlbumViewer2.switchPicture: image object loaded this.src = :%s:', tag.src);
 		}); // load event
 	});
 
@@ -83,7 +84,7 @@ function switchPicture(fileName,filePath)
 
    backImageTag.setAttribute('src','images/NothingOnBack.png');
 	if(ImageData.has(fileName)) backFileName = ImageData.get(fileName).get("backName");
-   console.log('RENDERER: ImageDisplayManagment.switchPicture: backFileName :%s:',backFileName)
+   console.log('RENDERER: AlbumViewer2.switchPicture: backFileName :%s:',backFileName)
 	document.getElementById('backFileName').innerHTML = backFileName;
 
 	if(backFileName != "") {
@@ -95,40 +96,44 @@ function pictureSelected(evt)
 {
 	console.log('RENDERER: pictureSelected: evt.target.innerHTML = :%s:',evt.target.innerHTML);
 	console.log('RENDERER: pictureSelected: evt.target.tagName = :%s:',evt.target.tagName);
+	console.log('RENDERER: pictureSelected: INITIAL PreviousImage :%d: CurrentImage :%d:',PreviousImage,CurrentImage);
+	PreviousImage = CurrentImage;
    if (evt.target.tagName.toLowerCase() != 'li') return; // ignore these clicks
    let fileName = evt.target.dataset.filename;
    let filePath = evt.target.dataset.path;
 	switchPicture(fileName,filePath);
+	CurrentImage = ImagesKeys.indexOf(fileName);
+	switchHighLight();
+	console.log('RENDERER: pictureSelected: FINAL PreviousImage :%d: CurrentImage :%d:',PreviousImage,CurrentImage);
 } // pictureSelected
 
 function gatherImages(album)
 {
 	let fileList = null;
 	let albumPath = pathLib.join(__dirname, album);
-   console.log('RENDERER: AlbumViewer.gatherImages: __dirname (%s)',__dirname);
-   console.log('RENDERER: AlbumViewer.gatherImages: albumPath (%s)',albumPath);
+   console.log('RENDERER: AlbumViewer2.gatherImages: __dirname (%s)',__dirname);
+   console.log('RENDERER: AlbumViewer2.gatherImages: albumPath (%s)',albumPath);
    try {
          fileList = fsLib.readdirSync(albumPath);
-         console.log('RENDERER: AlbumViewer.gatherImages: fileContents length (%d)',fileList.length);
+         console.log('RENDERER: AlbumViewer2.gatherImages: fileContents length (%d)',fileList.length);
     		fileList.forEach(function (file) {
-         	console.log('RENDERER: AlbumViewer.gatherImages: file (%s)',file);
+         	console.log('RENDERER: AlbumViewer2.gatherImages: file (%s)',file);
           	if(!isImage(file)) return; // only show image files
 
           	let pathParts = pathLib.parse(file);
           	let imageName= pathParts.base;
-         	console.log('RENDERER: AlbumViewer.gatherImages: imageName (%s)',imageName);
+         	console.log('RENDERER: AlbumViewer2.gatherImages: imageName (%s)',imageName);
 
 				if(imageName.startsWith(BackTag)) {
-         		console.log('RENDERER: AlbumViewer.gatherImages: processing back of image');
+         		console.log('RENDERER: AlbumViewer2.gatherImages: processing back of image');
 					frontName = imageName.replace(BackTag,'');
-         		console.log('RENDERER: AlbumViewer.gatherImages: frontName (%s)',frontName);
+         		console.log('RENDERER: AlbumViewer2.gatherImages: frontName (%s)',frontName);
 					if(!ImageData.has(frontName)) {
-         			console.log('RENDERER: AlbumViewer.gatherImages: frontName NOT IN ImageData');
+         			console.log('RENDERER: AlbumViewer2.gatherImages: frontName NOT IN ImageData');
 						ImageData.set(frontName,new Map().set('backName',imageName));
-						//ImageData[frontName] = {'backName' : imageName};
 					}
 					else {
-         			console.log('RENDERER: AlbumViewer.gatherImages: frontName IN ImageData');
+         			console.log('RENDERER: AlbumViewer2.gatherImages: frontName IN ImageData');
 						ImageData.get(frontName).set('backName',imageName);
 					}
 				}
@@ -141,14 +146,14 @@ function gatherImages(album)
     	});
 
    } catch(error) {
-         console.error('RENDERER: AlbumViewer.gatherImages data file (%s) read failed error is (%s)',albumPath, error);
+         console.error('RENDERER: AlbumViewer2.gatherImages data file (%s) read failed error is (%s)',albumPath, error);
    }
 } // gatherImages
 
 function bigPicture(evt)
 {
 	let image=evt.target
-	console.log('RENDERER: bigPicture: image.tagName = :%s:',image.tagName);
+	console.log('RENDERER: AlbumViewer2.bigPicture: image.tagName = :%s:',image.tagName);
 	image.classList.toggle('normalSize');
 	image.classList.toggle('bigSize');
 } // bigPicture
@@ -167,7 +172,7 @@ function setupEventHandlers()
 	[document.getElementById('IFH_ImageTag'), document.getElementById('IFH_BackImageTag')]
    	.map((tag) => {
 			tag.addEventListener('load', () => {
-				console.log('RENDERER: ImageDisplayManagement.setupEventHandlers: image object loaded this.src = :%s:', tag.src);
+				console.log('RENDERER: AlbumViewer2.setupEventHandlers: image object loaded this.src = :%s:', tag.src);
 			}); // load event
 			tag.addEventListener('click', bigPicture); // click event
 		});
@@ -184,21 +189,27 @@ function processKey(evt)
   switch (event.key) {
     case "ArrowDown":
     case "ArrowRight":
+    case "N":
+    case "n":
       // go to next image in the list
-	  nextPicture();
+		nextPrevPicture('next');
       break;
     case "ArrowUp":
     case "ArrowLeft":
+    case "P":
+    case "p":
       // go to previous image in the list
-	  prevPicture();
+		nextPrevPicture('prev');
       break;
     case "F":
     case "f":
       // make the front side big
+		document.getElementById('IFH_ImageTag').click();
       break;
     case "B":
     case "b":
       // make the back side big
+		document.getElementById('IFH_BackImageTag').click();
       break;
     case "Escape":
       // restore big image to normal size
@@ -220,7 +231,9 @@ function createImageList(listElement)
 		imgList.push(`<li data-filename='${img}' data-path='${img}' class='fileTreeLink'> ${img} </li>`);
 		ImagesKeys.push(img);
 	}
+	PreviousImage = ImagesKeys.length;
 	document.getElementById(listElement).innerHTML = imgList.join('');
+	document.querySelector( ".fileList > :first-child" ).classList.toggle('selectedImage');
 } // createImageList
 
 // run when the page is fully loaded
@@ -228,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function()
 {
     //console.log('RENDERER: AlbumViewer2.ready: START: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
 	 CliData = remote.getGlobal('CliData');
-	 console.log('RENDERER:AlbumViewer2 CliData from global :%s:',JSON.stringify(CliData,null,'\t'));
+	 console.log('RENDERER:AlbumViewer2.ready: CliData from global :%s:',JSON.stringify(CliData,null,'\t'));
 
     if(CliData.album) {
 		console.log('RENDERER: AlbumViewer2.ready: CliData.album set is :%s:',CliData.album);
@@ -236,7 +249,7 @@ document.addEventListener("DOMContentLoaded", function()
 		gatherImages(CliData.album);
 		console.log('RENDERER: AlbumViewer2.ready: AFTER gatherImages');
 		createImageList('fileList');
-		console.log('RENDERER:AlbumViewer2 ready ImagesKeys :%s:',JSON.stringify(ImagesKeys,null,'\t'));
+		console.log('RENDERER:AlbumViewer2.ready ImagesKeys :%s:',JSON.stringify(ImagesKeys,null,'\t'));
 		logImageData( 'RENDERER:AlbumViewer2 ready ImageData');
 		switchPicture(ImagesKeys[0],ImagesKeys[0]);
     }
