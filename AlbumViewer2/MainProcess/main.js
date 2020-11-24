@@ -127,6 +127,7 @@ function createMainMenu()
           label:'Open Album'
           ,click() { 
             // run the open album code on the renderer
+  				console.log('MAIN: Open Album: clicked');
             MainWindow.webContents.send('open-album', 'click!'); 
           }
         }

@@ -2,6 +2,7 @@ const remote = require('electron').remote;
 const { ipcRenderer } = require('electron')
 const fsLib = require('fs');
 const pathLib = require('path');
+const WIN = remote.getCurrentWindow();
 
 // extensions of allowed image files
 const ImageExtensions = [ 'tif' ,'tiff' ,'gif' ,'jpeg' ,'jpg' ,'jif'
@@ -177,6 +178,8 @@ function setupEventHandlers()
 			tag.addEventListener('click', bigPicture); // click event
 		});
 
+    console.log('RENDERER: AlbumViewer2.ready: before open-album: CliData.album=:%s:',CliData.album);
+    ipcRenderer.on('open-album', findAlbum);
 } // setupEventHandlers
 
 // from MDN notes
@@ -239,7 +242,6 @@ function createImageList(listElement)
 // run when the page is fully loaded
 document.addEventListener("DOMContentLoaded", function()
 {
-    //console.log('RENDERER: AlbumViewer2.ready: START: AlbumData: album path is :%s:',AlbumData.getAlbumPath());
 	 CliData = remote.getGlobal('CliData');
 	 console.log('RENDERER:AlbumViewer2.ready: CliData from global :%s:',JSON.stringify(CliData,null,'\t'));
 
@@ -259,8 +261,44 @@ document.addEventListener("DOMContentLoaded", function()
 
 	setupEventHandlers();
 
-   // console.log('RENDERER: AlbumViewer2.ready: before open-album: AlbumData.AlbumPath=:%s:',AlbumData.getAlbumPath())
-   // ipcRenderer.on('open-album', AlbumData.findAlbum);
-
     console.log('RENDERER: AlbumViewer2.ready: DONE');
 }); // ready function
+
+  //TODO: this is written assuming we are on Linux, how should we deal with
+  // file path designation on multiple OS's
+function findAlbum(event, arg)
+{
+    var that=this;
+    console.log('RENDERER: AlbumViewer2.findAlbum: findAlbum message received');
+    console.log('RENDERER: AlbumViewer2.findAlbum: CliData.album:%s:',CliData.album);
+    let albumPath = remote.dialog.showOpenDialog({
+        'title':'Select an album folder'
+        ,'defaultPath': '/home'
+        ,'properties': ['openDirectory']
+    	}
+	); // showOpenDialog
+    			console.log('RENDERER: AlbumViewer2.findAlbum: found path:%s:',albumPath);
+/*
+		,(folderPaths) => {
+        console.log('RENDERER: AlbumViewer2.findAlbum.showOpenDialog: called callback function');
+        // folderPaths is an array that contains all the selected paths
+        if(folderPaths === undefined) {
+            console.log("RENDERER: AlbumViewer2.findAlbum.showOpenDialog: No destination folder selected");
+            albumPath = 'NONE_SELECTED';
+    			console.log('RENDERER: AlbumViewer2.findAlbum: found path:%s:',albumPath);
+            return;
+        }
+        else {
+            //we only use the first selected path
+            // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
+            // example Album  :TestData
+
+            console.log('RENDERER: AlbumViewer2.findAlbum: before processAlbum');
+            albumPath = folderPaths[0];
+    			console.log('RENDERER: AlbumViewer2.findAlbum: found path:%s:',albumPath);
+        }
+    	} // end of callback function
+*/
+//	); // showOpenDialog
+    console.log('RENDERER: AlbumViewer2.findAlbum: DONE');
+} // findAlbum
