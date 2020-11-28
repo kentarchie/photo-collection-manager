@@ -3,5 +3,5 @@
 --make pP be prev and Nn be next
 --add keys meaning to about/help
 --file click should update CurrentImage
-get album selection to work
+--get album selection to work
 save current album and image between runs (low priority)

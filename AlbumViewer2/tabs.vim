@@ -1,7 +1,9 @@
 tabe ./Renderer/index.html
 tabe ./MainProcess/main.js
+tabe ./MainProcess/preload.js
 tabe ./Renderer/js/AlbumViewer.js
 tabe ./Renderer/css/AlbumViewer.css
+tabe ./Renderer/css/popout.css
 tabe ./MainProcess/window.js
 tabe ./Renderer/about.html
 tabe ./todo.txt

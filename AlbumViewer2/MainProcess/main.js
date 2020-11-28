@@ -88,8 +88,14 @@ function createWindow (app)
     ,backgroundColor: "#D6D8DC" // background color of the page, this prevents any white flickering
     ,show: false // Don't show the window until it's ready, this prevents any white flickering
     ,webPreferences : {
-      nodeIntegration: true
+		preload: pathLib.join(__dirname, 'preload.js')
+      ,nodeIntegration: true
       ,enableRemoteModule: true
+      ,'title':"Select a folder"
+      ,'defaultPath': 'C:'
+      ,'properties': ["openDirectory"]
+      //,contextIsolation: true
+      //,sandbox: true
     }
   });
 
@@ -104,6 +110,14 @@ function createWindow (app)
 
   // Remove window once app is closed
   MainWindow.on('closed', () => { MainWindow = null; });
+
+	ipcMain.on('select-dirs', async (event, arg) => {
+  		console.log('MAIN: select-dirs received');
+  		const result = await dialog.showOpenDialog(mainWindow, {
+    		properties: ['openDirectory']
+  		});
+  		console.log('MAIN: directories selected :%s:', result.filePaths)
+	});
 
   // Show window when page is ready
   MainWindow.once('ready-to-show', () => { 

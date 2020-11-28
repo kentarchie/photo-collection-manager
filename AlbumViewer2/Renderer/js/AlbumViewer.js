@@ -12,20 +12,17 @@ const BackTag = 'BackOf';
 
 let CliData = {};
 let ImageData = new Map();
-let ImageClicked=false;
 let CurrentImage=0;
 let PreviousImage = 0;
 let ImagesKeys = [];
-
-function logImageData(title)
-{
-	console.log(title);
-	ImageData.forEach(function(value, key) {
-		value.forEach(function(value2, key2) {
-			console.log(`main key is :${key}: key2 is :${key2}: value2 is :${value2}:`);
-		});
-	});
-} // logImageData
+let FolderDialogOptions = {
+	'title':'Select an album folder'
+	,'defaultPath': '/home'
+	,'properties': ['openDirectory']
+	,'buttonLabel': 'Select Photo Album Folder'
+};
+let FrontClicked = false;
+let BackClicked = false;
 
 // check the filename extension against the list of image file extensions
 function isImage(fname)
@@ -50,59 +47,43 @@ function nextPrevPicture(dir)
    console.log('RENDERER: AlbumViewer2.nextPrevPicture: START dir  = :%s:' , dir);
    if(CurrentImage == 0) fileName = ImagesKeys[0];
    PreviousImage = CurrentImage;
-   console.log('RENDERER: AlbumViewer2.nextPrevPicture: initial CurrentImage= %d' , CurrentImage);
-   console.log('RENDERER: AlbumViewer2.nextPrevPicture: initial PreviousImage= %d' , PreviousImage);
+   console.log('RENDERER: AlbumViewer2.nextPrevPicture: initial CurrentImage,PreviousImage (%d , %d)', CurrentImage,PreviousImage);
+
    CurrentImage = (dir == 'prev') ? CurrentImage - 1 : CurrentImage + 1;
    if(CurrentImage < 0) CurrentImage = ImagesKeys.length-1;
    if(CurrentImage >= ImagesKeys.length) CurrentImage = 0;
-	console.log('RENDERER: AlbumViewer2.nextPrevPicture: final CurrentImage= %d' , CurrentImage);
+   console.log('RENDERER: AlbumViewer2.nextPrevPicture: ImagesKeys[%d]= %s' , CurrentImage,ImagesKeys[CurrentImage]);
 
-   console.log('RENDERER: AlbumViewer2.nextPrevPicture: ImagesKeys[CurrentImage= %s' , ImagesKeys[CurrentImage]);
-	switchPicture(ImagesKeys[CurrentImage],ImagesKeys[CurrentImage]);
+	switchPicture(ImagesKeys[CurrentImage]);
 	switchHighLight();
 } // nextPrevPicture
 
-function switchPicture(fileName,filePath)
+function switchPicture(frontFileName)
 {
+   console.log('RENDERER: AlbumViewer2.switchPicture: fileName :%s: album :%s:',frontFileName,CliData.album);
 	let backFileName = "Nothing On Back";
-	let imageTag = document.getElementById('IFH_ImageTag'); // where to display the front image
-	let backImageTag = document.getElementById('IFH_BackImageTag'); // where to display the back image
-
-   console.log('RENDERER: AlbumViewer2.switchPicture: fileName :%s: filePath :%s:',fileName,filePath);
-   console.log('RENDERER: AlbumViewer3.switchPicture: album :%s:',CliData.album)
-
-   document.getElementById('frontFileName').innerHTML = fileName;  // display the filename
-
-   [imageTag,backImageTag].map((tag) => {
-		tag.addEventListener('load', () => {
-			console.log('RENDERER: AlbumViewer2.switchPicture: image object loaded this.src = :%s:', tag.src);
-		}); // load event
-	});
-
-   imageTag.setAttribute('data-path', filePath);
-   imageTag.setAttribute('data-filename', fileName);
-   imageTag.setAttribute('src',CliData.album + filePath);
-
-   backImageTag.setAttribute('src','images/NothingOnBack.png');
-	if(ImageData.has(fileName)) backFileName = ImageData.get(fileName).get("backName");
+	if(ImageData.has(frontFileName)) backFileName = ImageData.get(frontFileName).get("backName");
    console.log('RENDERER: AlbumViewer2.switchPicture: backFileName :%s:',backFileName)
-	document.getElementById('backFileName').innerHTML = backFileName;
+	let backFileSrc = 'images/NothingOnBack.png';
+	if(backFileName != "") backFileSrc = CliData.album +'/' + backFileName;
+	let backImageEl = document.getElementById('IFH_BackImageTag'); // where to display the back image
+   backImageEl.setAttribute('src',backFileSrc);
+	document.getElementById('backFileName').innerHTML = (backFileName == "") ? "Nothing On Back" : backFileName;
 
-	if(backFileName != "") {
-   	backImageTag.setAttribute('src',CliData.album + backFileName);
-	}
+	let frontFileSrc = CliData.album +'/' + frontFileName;
+	let frontImageEl = document.getElementById('IFH_ImageTag'); // where to display the front image
+   frontImageEl.setAttribute('data-filename', frontFileName);
+   frontImageEl.setAttribute('src',frontFileSrc);
+   document.getElementById('frontFileName').innerHTML = frontFileName;  // display the filename
 } // switchPicture
 
 function pictureSelected(evt)
 {
-	console.log('RENDERER: pictureSelected: evt.target.innerHTML = :%s:',evt.target.innerHTML);
-	console.log('RENDERER: pictureSelected: evt.target.tagName = :%s:',evt.target.tagName);
-	console.log('RENDERER: pictureSelected: INITIAL PreviousImage :%d: CurrentImage :%d:',PreviousImage,CurrentImage);
-	PreviousImage = CurrentImage;
-   if (evt.target.tagName.toLowerCase() != 'li') return; // ignore these clicks
    let fileName = evt.target.dataset.filename;
-   let filePath = evt.target.dataset.path;
-	switchPicture(fileName,filePath);
+   if (evt.target.tagName.toLowerCase() != 'li') return; // ignore these clicks
+	console.log('RENDERER: pictureSelected: fileName = :%s: INITIAL PreviousImage :%d: CurrentImage :%d:',fileName,PreviousImage,CurrentImage);
+	PreviousImage = CurrentImage;
+	switchPicture(fileName);
 	CurrentImage = ImagesKeys.indexOf(fileName);
 	switchHighLight();
 	console.log('RENDERER: pictureSelected: FINAL PreviousImage :%d: CurrentImage :%d:',PreviousImage,CurrentImage);
@@ -111,43 +92,40 @@ function pictureSelected(evt)
 function gatherImages(album)
 {
 	let fileList = null;
-	let albumPath = pathLib.join(__dirname, album);
-   console.log('RENDERER: AlbumViewer2.gatherImages: __dirname (%s)',__dirname);
-   console.log('RENDERER: AlbumViewer2.gatherImages: albumPath (%s)',albumPath);
+   console.log('RENDERER: AlbumViewer2.gatherImages: __dirname (%s) album (%s)',__dirname,album);
    try {
-         fileList = fsLib.readdirSync(albumPath);
+         fileList = fsLib.readdirSync(album);
          console.log('RENDERER: AlbumViewer2.gatherImages: fileContents length (%d)',fileList.length);
     		fileList.forEach(function (file) {
-         	console.log('RENDERER: AlbumViewer2.gatherImages: file (%s)',file);
+         	//console.log('RENDERER: AlbumViewer2.gatherImages: file (%s)',file);
           	if(!isImage(file)) return; // only show image files
 
           	let pathParts = pathLib.parse(file);
           	let imageName= pathParts.base;
-         	console.log('RENDERER: AlbumViewer2.gatherImages: imageName (%s)',imageName);
+         	//console.log('RENDERER: AlbumViewer2.gatherImages: imageName (%s)',imageName);
 
 				if(imageName.startsWith(BackTag)) {
-         		console.log('RENDERER: AlbumViewer2.gatherImages: processing back of image');
+         		//console.log('RENDERER: AlbumViewer2.gatherImages: processing back of image');
 					frontName = imageName.replace(BackTag,'');
-         		console.log('RENDERER: AlbumViewer2.gatherImages: frontName (%s)',frontName);
+         		//console.log('RENDERER: AlbumViewer2.gatherImages: frontName (%s)',frontName);
 					if(!ImageData.has(frontName)) {
-         			console.log('RENDERER: AlbumViewer2.gatherImages: frontName NOT IN ImageData');
+         			//console.log('RENDERER: AlbumViewer2.gatherImages: frontName NOT IN ImageData');
 						ImageData.set(frontName,new Map().set('backName',imageName));
 					}
 					else {
-         			console.log('RENDERER: AlbumViewer2.gatherImages: frontName IN ImageData');
+         			//console.log('RENDERER: AlbumViewer2.gatherImages: frontName IN ImageData');
 						ImageData.get(frontName).set('backName',imageName);
 					}
 				}
 				else {  // see regular image file
 					if(!ImageData.has(imageName)) {  // if there is  no backOf file
 						ImageData.set(imageName,new Map().set('backName',''));
-						//ImageData[imageName] = {'backName' : ''};
 					}
 				}
     	});
 
    } catch(error) {
-         console.error('RENDERER: AlbumViewer2.gatherImages data file (%s) read failed error is (%s)',albumPath, error);
+         console.error('RENDERER: AlbumViewer2.gatherImages data file (%s) read failed error is (%s)',album, error);
    }
 } // gatherImages
 
@@ -161,29 +139,56 @@ function bigPicture(evt)
 
 function setupEventHandlers()
 {
-	document.getElementById('albumName').addEventListener('data-loaded', () => {
-		console.log('RENDERER: AlbumViewer2.setupEventHandlers: data-loaded: event caught');
+	ipcRenderer.on('open-album', () => {findAlbum('albumName');});
+	document.getElementById('albumName').addEventListener('open-album', () => {
+		console.log('RENDERER: AlbumViewer2.setupEventHandlers: open-album: event caught');
+	});
+	document.getElementById('albumName').addEventListener('click', (evt) => {
+		console.log('RENDERER: AlbumViewer2.setupEventHandlers: albumName clicked');
+		findAlbum('albumName');
 	});
 
 	// what to do when an image is selected from the file tree
 	document.getElementById('fileList').addEventListener('click',pictureSelected);
 
-	window.addEventListener("keydown", processKey, true);
+	window.addEventListener("keydown", processKeyStroke, true);
 
 	[document.getElementById('IFH_ImageTag'), document.getElementById('IFH_BackImageTag')]
    	.map((tag) => {
 			tag.addEventListener('load', () => {
 				console.log('RENDERER: AlbumViewer2.setupEventHandlers: image object loaded this.src = :%s:', tag.src);
 			}); // load event
-			tag.addEventListener('click', bigPicture); // click event
+			//tag.addEventListener('click', bigPicture); // click event
 		});
 
-    console.log('RENDERER: AlbumViewer2.ready: before open-album: CliData.album=:%s:',CliData.album);
-    ipcRenderer.on('open-album', findAlbum);
+	 ['IFH_ImageTag','IFH_BackImageTag'].map((tag) => {
+		let el = document.getElementById(tag);
+		el.addEventListener('load', () => {
+			console.log('RENDERER: AlbumViewer2.setupEventHandler: image object loaded src = :%s:', el.src);
+		}); // load event
+	});
+
+// Get the modal
+var modal = document.getElementById('myModal');
+
+// Get the image and insert it inside the modal - use its "alt" text as a caption
+	 ['IFH_ImageTag','IFH_BackImageTag'].map((tag) => {
+		var img = document.getElementById(tag);
+		var modalImg = document.getElementById("img01");
+
+		// When the user clicks on the bigger image, close the modal
+		modal.onclick = function() { 
+    		modal.style.display = "none";
+		}
+		img.onclick = function(){
+    		modal.style.display = "block";
+    		modalImg.src = this.src;
+		}
+});
 } // setupEventHandlers
 
 // from MDN notes
-function processKey(evt)
+function processKeyStroke(evt)
 {
   if (event.defaultPrevented) {
     return; // Do nothing if the event was already processed
@@ -207,12 +212,16 @@ function processKey(evt)
     case "F":
     case "f":
       // make the front side big
-		document.getElementById('IFH_ImageTag').click();
+		let fel = (FrontClicked) ? 'myModal' : 'IFH_ImageTag';
+		document.getElementById(fel).click();
+		FrontClicked = !FrontClicked;
       break;
     case "B":
     case "b":
       // make the back side big
-		document.getElementById('IFH_BackImageTag').click();
+		let bel = (BackClicked) ? 'myModal' : 'IFH_BackImageTag';
+		document.getElementById(bel).click();
+		BackClicked = !BackClicked;
       break;
     case "Escape":
       // restore big image to normal size
@@ -223,19 +232,21 @@ function processKey(evt)
 
   // Cancel the default action to avoid it being handled twice
   event.preventDefault();
-} // processKey
+} // processKeyStroke
 
 function createImageList(listElement)
 {
 	console.log('RENDERER: AlbumViewer2.createImageList START:  ImageData.size (%d)',ImageData.size)
 	let imgList = [];
+	let ulElement = document.getElementById(listElement);
 	for (let [img, value] of ImageData) {
-		console.log('RENDERER: AlbumViewer2.createImageList adding (%s)',img)
-		imgList.push(`<li data-filename='${img}' data-path='${img}' class='fileTreeLink'> ${img} </li>`);
+		//console.log('RENDERER: AlbumViewer2.createImageList adding (%s)',img)
+		imgList.push(`<li data-filename='${img}' class='fileTreeLink'> ${img} </li>`);
 		ImagesKeys.push(img);
 	}
 	PreviousImage = ImagesKeys.length;
-	document.getElementById(listElement).innerHTML = imgList.join('');
+	ulElement.innerHTML = imgList.join('');
+	console.log("image list:",ulElement);
 	document.querySelector( ".fileList > :first-child" ).classList.toggle('selectedImage');
 } // createImageList
 
@@ -243,17 +254,16 @@ function createImageList(listElement)
 document.addEventListener("DOMContentLoaded", function()
 {
 	 CliData = remote.getGlobal('CliData');
-	 console.log('RENDERER:AlbumViewer2.ready: CliData from global :%s:',JSON.stringify(CliData,null,'\t'));
+	 console.log("CliData Contents"); console.dir(CliData);
 
     if(CliData.album) {
 		console.log('RENDERER: AlbumViewer2.ready: CliData.album set is :%s:',CliData.album);
     	document.getElementById('albumName').value = CliData.album;
 		gatherImages(CliData.album);
-		console.log('RENDERER: AlbumViewer2.ready: AFTER gatherImages');
 		createImageList('fileList');
-		console.log('RENDERER:AlbumViewer2.ready ImagesKeys :%s:',JSON.stringify(ImagesKeys,null,'\t'));
-		logImageData( 'RENDERER:AlbumViewer2 ready ImageData');
-		switchPicture(ImagesKeys[0],ImagesKeys[0]);
+		console.log("ImagesKeys Contents"); console.dir(ImagesKeys);
+		console.log("ImageData Contents"); console.dir(ImageData);
+		switchPicture(ImagesKeys[0]);
     }
     else {
         console.log('RENDERER: AlbumViewer2.ready: Clidata.album NOT set',);
@@ -261,44 +271,33 @@ document.addEventListener("DOMContentLoaded", function()
 
 	setupEventHandlers();
 
-    console.log('RENDERER: AlbumViewer2.ready: DONE');
+   console.log('RENDERER: AlbumViewer2.ready: DONE');
 }); // ready function
 
   //TODO: this is written assuming we are on Linux, how should we deal with
   // file path designation on multiple OS's
-function findAlbum(event, arg)
+function findAlbum(elName)
 {
-    var that=this;
-    console.log('RENDERER: AlbumViewer2.findAlbum: findAlbum message received');
-    console.log('RENDERER: AlbumViewer2.findAlbum: CliData.album:%s:',CliData.album);
-    let albumPath = remote.dialog.showOpenDialog({
-        'title':'Select an album folder'
-        ,'defaultPath': '/home'
-        ,'properties': ['openDirectory']
-    	}
-	); // showOpenDialog
-    			console.log('RENDERER: AlbumViewer2.findAlbum: found path:%s:',albumPath);
-/*
-		,(folderPaths) => {
-        console.log('RENDERER: AlbumViewer2.findAlbum.showOpenDialog: called callback function');
-        // folderPaths is an array that contains all the selected paths
-        if(folderPaths === undefined) {
-            console.log("RENDERER: AlbumViewer2.findAlbum.showOpenDialog: No destination folder selected");
-            albumPath = 'NONE_SELECTED';
-    			console.log('RENDERER: AlbumViewer2.findAlbum: found path:%s:',albumPath);
-            return;
-        }
-        else {
-            //we only use the first selected path
-            // example AlbumPath  /home/kent/projects/photo-collection-manager/electron/TestData
-            // example Album  :TestData
+    console.log('RENDERER: AlbumViewer2.findAlbum: START: CliData.album:%s:',CliData.album);
+	 let target = document.getElementById(elName);  // the element that will hold the album path
+	 let currentFolder = target.value;
 
-            console.log('RENDERER: AlbumViewer2.findAlbum: before processAlbum');
-            albumPath = folderPaths[0];
-    			console.log('RENDERER: AlbumViewer2.findAlbum: found path:%s:',albumPath);
-        }
+	 // p is the Promise returned by showOpenDialog
+    // folderPaths is an array that contains all the selected paths
+    remote.dialog.showOpenDialog(WIN,FolderDialogOptions).then((p) => {
+			if(p.canceled) {
+				target.value = currentFolder;
+			} 
+			else {
+				target.value = p.filePaths[0];
+				CliData.album = p.filePaths[0];
+				gatherImages(CliData.album);
+				createImageList('fileList');
+				switchPicture(ImagesKeys[0]);
+			}
+    		console.log('RENDERER: AlbumViewer2.findAlbum: target.value :%s:',target.value);
     	} // end of callback function
-*/
-//	); // showOpenDialog
+	); // showOpenDialog
     console.log('RENDERER: AlbumViewer2.findAlbum: DONE');
 } // findAlbum
+
