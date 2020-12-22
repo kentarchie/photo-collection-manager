@@ -50,6 +50,8 @@ function processArgs(app)
   var argv = require('yargs')
     .usage('Usage: $0 <command> [options]')
     .command('debug', 'open browser debug window')
+    .command('FrontPrefix', 'first part of file name of front images')
+    .command('BackPrefix', 'first part of file name of back images')
     .example('$0 --debug --album full/path/to/album', 'Load in the specified album')
     .alias('album', 'album')
     .describe('album', 'Load an album')
@@ -61,6 +63,8 @@ function processArgs(app)
   CliData['debug'] = argv.debug;
   CliData['AppPath'] = app.getAppPath();
   CliData['album'] = argv.album;
+  CliData['FrontPrefix'] = argv.FrontPrefix;
+  CliData['BackPrefix'] = argv.BackPrefix;
   console.log('MAIN: processArgs Done: CliData %s', JSON.stringify(CliData,null,'\t'));
 } //processArgs
 
