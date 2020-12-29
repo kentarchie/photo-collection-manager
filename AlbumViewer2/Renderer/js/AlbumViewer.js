@@ -241,7 +241,7 @@ function processKeyStroke(evt)
   }
 
   // Cancel the default action to avoid it being handled twice
-  event.preventDefault();
+  evt.preventDefault();
 } // processKeyStroke
 
 function createImageList(listElement)
